@@ -1,0 +1,136 @@
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+
+namespace STranslate.Controls;
+
+public class OutputControl : ItemsControl
+{
+    static OutputControl()
+    {
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(OutputControl),
+            new FrameworkPropertyMetadata(typeof(OutputControl)));
+    }
+
+    public ICommand? CopyCommand
+    {
+        get => (ICommand?)GetValue(CopyCommandProperty);
+        set => SetValue(CopyCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty CopyCommandProperty =
+        DependencyProperty.Register(
+            nameof(CopyCommand),
+            typeof(ICommand),
+            typeof(OutputControl));
+
+    public ICommand? InsertCommand
+    {
+        get => (ICommand?)GetValue(InsertCommandProperty);
+        set => SetValue(InsertCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty InsertCommandProperty =
+        DependencyProperty.Register(
+            nameof(InsertCommand),
+            typeof(ICommand),
+            typeof(OutputControl));
+
+    public ICommand? CleanTransBackCommand
+    {
+        get => (ICommand?)GetValue(CleanTransBackCommandProperty);
+        set => SetValue(CleanTransBackCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty CleanTransBackCommandProperty =
+        DependencyProperty.Register(
+            nameof(CleanTransBackCommand),
+            typeof(ICommand),
+            typeof(OutputControl));
+
+    public ICommand? RetryCommand
+    {
+        get => (ICommand?)GetValue(RetryCommandProperty);
+        set => SetValue(RetryCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty RetryCommandProperty =
+        DependencyProperty.Register(
+            nameof(RetryCommand),
+            typeof(ICommand),
+            typeof(OutputControl));
+
+    public ICommand? TransBackCommand
+    {
+        get => (ICommand?)GetValue(TransBackCommandProperty);
+        set => SetValue(TransBackCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty TransBackCommandProperty =
+        DependencyProperty.Register(
+            nameof(TransBackCommand),
+            typeof(ICommand),
+            typeof(OutputControl));
+
+    public ICommand? NavigateCommand
+    {
+        get => (ICommand?)GetValue(NavigateCommandProperty);
+        set => SetValue(NavigateCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty NavigateCommandProperty =
+        DependencyProperty.Register(
+            nameof(NavigateCommand),
+            typeof(ICommand),
+            typeof(OutputControl));
+
+    public ICommand? PlayAudioCommand
+    {
+        get => (ICommand?)GetValue(PlayAudioCommandProperty);
+        set => SetValue(PlayAudioCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty PlayAudioCommandProperty =
+        DependencyProperty.Register(
+            nameof(PlayAudioCommand),
+            typeof(ICommand),
+            typeof(OutputControl));
+
+    public ICommand? PlayAudioUrlCommand
+    {
+        get => (ICommand?)GetValue(PlayAudioUrlCommandProperty);
+        set => SetValue(PlayAudioUrlCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty PlayAudioUrlCommandProperty =
+        DependencyProperty.Register(
+            nameof(PlayAudioUrlCommand),
+            typeof(ICommand),
+            typeof(OutputControl));
+
+    public bool ShowPrompt
+    {
+        get => (bool)GetValue(ShowPromptProperty);
+        set => SetValue(ShowPromptProperty, value);
+    }
+
+    public static readonly DependencyProperty ShowPromptProperty =
+        DependencyProperty.Register(
+            nameof(ShowPrompt),
+            typeof(bool),
+            typeof(OutputControl),
+            new PropertyMetadata(true));
+
+    public ICommand? ExplainCommand
+    {
+        get => (ICommand?)GetValue(ExplainCommandProperty);
+        set => SetValue(ExplainCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty ExplainCommandProperty =
+        DependencyProperty.Register(
+            nameof(ExplainCommand),
+            typeof(ICommand),
+            typeof(OutputControl));
+
+}

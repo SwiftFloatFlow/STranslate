@@ -1,0 +1,46 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using STranslate.Core;
+using STranslate.Plugin;
+using System.Collections.ObjectModel;
+
+namespace STranslate.Instances;
+
+public partial class PluginInstance : ObservableObject
+{
+    private readonly PluginManager _pluginManager;
+
+    [ObservableProperty] public partial ObservableCollection<PluginMetaData> PluginMetaDatas { get; set; } = [];
+
+    public PluginInstance(PluginManager pluginManager)
+    {
+        _pluginManager = pluginManager;
+        foreach (var plugin in pluginManager.AllPluginMetaDatas)
+        {
+            PluginMetaDatas.Add(plugin);
+        }
+    }
+
+    internal string? InstallPlugin(string spkgPluginFilePath)
+    {
+        var (errMsg, pluginMetaData) = _pluginManager.InstallPlugin(spkgPluginFilePath);
+        if (pluginMetaData != null)
+        {
+            PluginMetaDatas.Add(pluginMetaData);
+            return null;
+        }
+        return errMsg;
+    }
+
+    internal bool UninstallPlugin(PluginMetaData pluginMetaData)
+    {
+        // ServiceManager卸载（考虑到各个实例的清除，本来ServiceManager里就有加载配置清理无效服务，先不管这部分了
+
+        // PluginManager卸载
+        var result = _pluginManager.UninstallPlugin(pluginMetaData);
+        if (result)
+        {
+            App.Current.Dispatcher.Invoke(() => PluginMetaDatas.Remove(pluginMetaData));
+        }
+        return result;
+    }
+}

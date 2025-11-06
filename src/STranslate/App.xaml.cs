@@ -1,191 +1,377 @@
-﻿using System.Diagnostics;
-using System.Windows;
-using System.Windows.Threading;
-using STranslate.Helper;
-using STranslate.Log;
-using STranslate.Model;
-using STranslate.Style.Controls;
-using STranslate.Util;
+using CommunityToolkit.Mvvm.DependencyInjection;
+using iNKORE.UI.WPF.Modern.Common;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using STranslate.Core;
+using STranslate.Helpers;
+using STranslate.Instances;
+using STranslate.Plugin;
+using STranslate.ViewModels;
 using STranslate.Views;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Windows;
 
 namespace STranslate;
 
-public partial class App
+public partial class App : ISingleInstanceApp, INavigation, IDisposable
 {
+    #region Fields & Properties
+
+    private static Settings? _settings;
+    private readonly HotkeySettings? _hotkeySettings;
+    private readonly ServiceSettings? _svcSettings;
+
+    private ILogger<App>? _logger;
+    private MainWindow? _mainWindow;
+    private MainWindowViewModel? _mainWindowViewModel;
+    private Notification? _notification;
+    private static bool _disposed;
+
+    public bool IsNavigated { get; set; }
+
+    #endregion
+
+    #region Constructor
+
+    public App()
+    {
+        // 只允许严重错误才输出，大多数警告都会被抑制。
+        // 为了处理ui:Expander中的PasswordBox绑定错误
+        PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Critical;
+
+        // Do not use bitmap cache since it can cause WPF second window freezing issue
+        ShadowAssist.UseBitmapCache = false;
+
+        try
+        {
+            var appStorage = new AppStorage<Settings>();
+            _settings = appStorage.Load();
+            _settings.SetStorage(appStorage);
+
+            var hotkeyStorage = new AppStorage<HotkeySettings>();
+            _hotkeySettings = hotkeyStorage.Load();
+            _hotkeySettings.SetStorage(hotkeyStorage);
+
+            var svcStorage = new AppStorage<ServiceSettings>();
+            _svcSettings = svcStorage.Load();
+            _svcSettings.SetStorage(svcStorage);
+        }
+        catch (Exception e)
+        {
+            ShowErrorMsgBoxAndFailFast("Cannot load setting storage, please check local data directory", e);
+            return;
+        }
+
+        try
+        {
+            var host = Host.CreateDefaultBuilder()
+                .ConfigureAppConfiguration(c => c.SetBasePath(AppContext.BaseDirectory))
+                .ConfigureServices((context, services) =>
+                {
+                    // 注册日志服务
+                    services.AddLogging(builder =>
+                    {
+                        builder.AddSerilog();
+                        builder.SetMinimumLevel(LogLevel.Trace);
+                    });
+
+                    // 注册配置
+                    services.AddSingleton(_settings.NonNull());
+                    services.AddSingleton(_hotkeySettings.NonNull());
+                    services.AddSingleton(_svcSettings.NonNull());
+
+                    // 注册核心服务
+                    services.AddSingleton<PluginManager>();
+                    services.AddSingleton<ServiceManager>();
+                    services.AddSingleton<PluginInstance>();
+                    services.AddSingleton<TranslateInstance>();
+                    services.AddSingleton<OcrInstance>();
+                    services.AddSingleton<TtsInstance>();
+                    services.AddSingleton<VocabularyInstance>();
+                    services.AddSingleton<IInternationalization, Internationalization>();
+
+                    // 注册HTTP客户端
+                    services.AddHttpClient(Constant.HttpClientName, client =>
+                    {
+                        client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+                        client.Timeout = TimeSpan.FromSeconds(30);
+                    })
+                    .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
+                    {
+                        var settings = serviceProvider.GetRequiredService<Settings>();
+                        return ProxyHelper.CreateHttpHandler(settings.Proxy);
+                    });
+                    services.AddSingleton<IHttpService, HttpService>();
+
+                    // 注册应用程序服务
+                    services.AddSingleton<INotification, Notification>();
+                    services.AddSingleton<IAudioPlayer, AudioPlayer>();
+                    services.AddSingleton<IScreenshot, Screenshot>();
+                    services.AddSingleton<ISnackbar, Snackbar>();
+
+                    // 注册数据提供程序
+                    services.AddSingleton<DataProvider>();
+
+                    // 注册ViewModels
+                    services.AddSingleton<MainWindowViewModel>();
+                    services.AddTransient<SettingsWindowViewModel>();
+                    services.AddTransient<OcrWindowViewModel>();
+                    services.AddTransient<ImageTranslateWindowViewModel>();
+
+                    // 自动注册页面
+                    services.AddScopedFromNamespace("STranslate.ViewModels.Pages", Assembly.GetExecutingAssembly());
+                    services.AddScopedFromNamespace("STranslate.Views.Pages", Assembly.GetExecutingAssembly());
+                })
+                .Build();
+            Ioc.Default.ConfigureServices(host.Services);
+        }
+        catch (Exception e)
+        {
+            ShowErrorMsgBoxAndFailFast("Cannot configure dependency injection container, please open new issue in STranslate", e);
+            return;
+        }
+
+        try
+        {
+            if (_settings is null || _hotkeySettings is null)
+                throw new Exception("settings or hotkeySettings is null when initialize executing");
+
+            _settings.Initialize();
+            _hotkeySettings.Initialize();
+        }
+        catch (Exception ex)
+        {
+            ShowErrorMsgBoxAndFailFast("Cannot initialize settings, please open new issue in STranslate", ex);
+            return;
+        }
+    }
+
+    #endregion
+
+    #region App Events
+
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
 
-        // 开启日志服务
-        LogService.Register();
+        // 注册编码提供程序以支持 GBK 等编码
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-        // 检查是否已经具有管理员权限
-        if (NeedAdministrator())
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Override("System.Net.Http", Serilog.Events.LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.Extensions.Http", Serilog.Events.LogEventLevel.Warning)
+            .WriteTo.File(
+                path: Path.Combine(Constant.Logs, ".log"),
+                encoding: Encoding.UTF8,
+                rollingInterval: RollingInterval.Day,
+                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] [{SourceContext}]: {Message:lj}{NewLine}{Exception}"
+            )
+            .CreateLogger();
+
+        _logger = Ioc.Default.GetRequiredService<ILogger<App>>();
+        _logger.LogInformation("Begin STranslate startup ----------------------------------------------------");
+
+        _notification = Ioc.Default.GetRequiredService<INotification>() as Notification;
+        _notification?.Install();
+
+        AutoLoggerAttribute.InitializeLogger(_logger);
+
+        Ioc.Default.GetRequiredService<PluginManager>().LoadPlugins();
+        Ioc.Default.GetRequiredService<ServiceManager>().LoadServices();
+
+        RegisterAppDomainExceptions();
+        RegisterDispatcherUnhandledException();
+        RegisterTaskSchedulerUnhandledException();
+
+        _mainWindowViewModel = Ioc.Default.GetRequiredService<MainWindowViewModel>();
+        _mainWindow = new MainWindow();
+        Current.MainWindow = _mainWindow;
+        Current.MainWindow.Title = Constant.AppName;
+        _mainWindow.Loaded += (s, e) =>
         {
-            RunAsAdministrator();
-            Environment.Exit(0);
-            return;
-        }
+            _settings?.LazyInitialize();
+            _hotkeySettings?.LazyInitialize();
+            UpdateToolTip();
+        };
 
-        // 多开检测
-        if (IsAnotherInstanceRunning())
-        {
-            MessageBox_S.Show($"{Constant.AppName} {AppLanguageManager.GetString("MessageBox.AlreadyRunning")}", AppLanguageManager.GetString("MessageBox.MultiOpeningDetection"));
-            Environment.Exit(0);
-            return;
-        }
+        RegisterExitEvents();
 
-        // 开启监听系统代理
-        ProxyUtil.LoadDynamicProxy();
-
-        // 软件配置涉及初始化操作
-        Singleton<ConfigHelper>.Instance.InitialOperate();
-
-        // 启动应用程序
-        StartProgram();
-
-        // 全局异常处理
-        ExceptionHandler();
+        _logger.LogInformation("End STranslate startup ----------------------------------------------------");
     }
 
-    protected override void OnExit(ExitEventArgs e)
+    private void UpdateToolTip()
     {
-        //释放监听系统代理资源
-        ProxyUtil.UnLoadDynamicProxy();
-
-        //释放主题帮助类
-        Singleton<ThemeHelper>.Instance.Dispose();
-
-        //打印退出日志并释放日志资源
-        if (LogService.Logger != null)
-        {
-            var adminMsg = CommonUtil.IsUserAdministrator() ? "[Administrator]" : "";
-            LogService.Logger.Info($"{Constant.AppName}_{Constant.AppVersion}{adminMsg} Closed...\n");
-            LogService.UnRegister();
-        }
-
-        base.OnExit(e);
+        if (!UACHelper.IsUserAdministrator()) return;
+        _mainWindowViewModel?.TrayToolTip = $"{Constant.AppName} # " +
+            $"{Ioc.Default.GetRequiredService<IInternationalization>().GetTranslation("Administrator")}";
     }
 
-    private bool NeedAdministrator()
-    {
-        // 加载配置
-        var mode = Singleton<ConfigHelper>.Instance.CurrentConfig?.StartMode ?? StartModeKind.Normal;
+    #endregion
 
-        if (mode == StartModeKind.Normal)
+    #region Main
+
+    [STAThread]
+    public static void Main()
+    {
+        // Start the application as a single instance
+        if (!SingleInstance<App>.InitializeAsFirstInstance())
+            return;
+
+        using var application = new App();
+
+        if (NeedAdmin())
+        {
+#if DEBUG
+            // 7 秒延迟是 Visual Studio 调试器的正常行为 生产环境不会有这个延迟(Ctrl+F5能避免该延迟)
+            Process.GetCurrentProcess().Kill();
+#endif
+            return;
+        }
+        application.InitializeComponent();
+        application.Run();
+    }
+
+    private static bool NeedAdmin()
+    {
+        var mode = _settings?.StartMode;
+
+        if (mode == null || mode == StartMode.Normal)
             return false;
 
-        return !CommonUtil.IsUserAdministrator();
-    }
+        // 如果已经是管理员模式，则不需要再次提升
+        if (UACHelper.IsUserAdministrator())
+            return false;
 
-    private void RunAsAdministrator()
-    {
-        var mode = Singleton<ConfigHelper>.Instance.CurrentConfig?.StartMode ?? StartModeKind.Normal;
-        var modeStr = mode switch
-        {
-            StartModeKind.Admin => "elevated",
-            StartModeKind.SkipUACAdmin => "task",
-            _ => throw new InvalidOperationException("Unsupported start mode for admin")
-        };
-        var target = mode switch
-        {
-            StartModeKind.Admin => $"{Constant.ExecutePath}{Constant.AppName}.exe",
-            StartModeKind.SkipUACAdmin => Constant.TaskName,
-            _ => throw new InvalidOperationException("Unsupported start mode for admin")
-        };
         // 如果是跳过UAC管理员模式，则检查，如果缺失则先创建计划任务
-        if (mode == StartModeKind.SkipUACAdmin)
+        if (mode == StartMode.SkipUACAdmin)
         {
-            var fileName = $"{Constant.ExecutePath}{Constant.AppName}.exe";
-            var info = TaskSchedulerUtil.GetTaskInfo(Constant.TaskName);
-            if (!info.Success || !info.Output.Contains(fileName))
-            {
-                LogService.Logger.Debug($"<App> 启动方式已选择为'{mode.GetDescription()}', 未检测已经存在计划任务'{Constant.TaskName}', 尝试创建");
-                string[] args = ["task", "-a", "create", "-n", Constant.TaskName, "-p", fileName, "-f"];
-                var isNeedAdmin = !CommonUtil.IsUserAdministrator();
-                CommonUtil.ExecuteProgram(Constant.HostExePath, args, isNeedAdmin, true);
-                LogService.Logger.Debug($"<App> 启动方式已选择为'{mode.GetDescription()}', 已创建计划任务'{Constant.TaskName}'");
-            }
+            UACHelper.Create();
         }
-        CommonUtil.ExecuteProgram(Constant.HostExePath, ["start", "-m", modeStr, "-t", target]);
+
+        UACHelper.Run(mode.Value);
+
+        return true;
     }
 
-    [Obsolete]
-    private bool TryRunAsAdministrator()
-    {
-        ProcessStartInfo startInfo =
-            new()
-            {
-                FileName = $"{Constant.ExecutePath}{Constant.AppName}.exe",
-                UseShellExecute = true,
-                Verb = "runas" // 提升权限
-            };
+    #endregion
 
-        try
+    #region Fail Fast
+
+    private static void ShowErrorMsgBoxAndFailFast(string message, Exception e)
+    {
+        // Firstly show users the message
+        MessageBox.Show(e.ToString(), message, MessageBoxButton.OK, MessageBoxImage.Error);
+
+        // Flow cannot construct its App instance, so ensure Flow crashes w/ the exception info.
+        Environment.FailFast(message, e);
+    }
+
+    #endregion
+
+    #region Register Events
+
+    private void RegisterExitEvents()
+    {
+        AppDomain.CurrentDomain.ProcessExit += (s, e) =>
         {
-            Process.Start(startInfo);
-            return true;
-        }
-        catch (Exception)
+            _logger?.LogInformation("Process Exit");
+            Dispose();
+        };
+
+        Current.Exit += (s, e) =>
         {
-            return false;
+            _logger?.LogInformation("Application Exit");
+            Dispose();
+        };
+
+        Current.SessionEnding += (s, e) =>
+        {
+            _logger?.LogInformation("Session Ending");
+            Dispose();
+        };
+    }
+
+    [Conditional("RELEASE")]
+    private void RegisterDispatcherUnhandledException()
+    {
+        DispatcherUnhandledException += (s, e) =>
+        {
+            var ex = e.Exception;
+            _logger?.LogError(ex, "UI线程异常");
+            e.Handled = true; //表示异常已处理，可以继续运行
+        };
+    }
+
+    [Conditional("RELEASE")]
+    private void RegisterAppDomainExceptions()
+    {
+        AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+        {
+            if (e.ExceptionObject is not Exception ex) return;
+            _logger?.LogError(ex, "非UI线程异常");
+        };
+    }
+
+    private void RegisterTaskSchedulerUnhandledException()
+    {
+        TaskScheduler.UnobservedTaskException += (s, e) =>
+        {
+            _logger?.LogError(e.Exception, "Task异常");
+        };
+    }
+
+    #endregion
+
+    #region ISingleInstanceApp
+
+    public void OnSecondAppStarted() => _mainWindowViewModel?.Show();
+
+    #endregion
+
+    #region IDisposable
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposing)
+        {
+            return;
         }
+
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+
+        _logger?.LogInformation("Begin STranslate dispose ----------------------------------------------------");
+
+        if (disposing)
+        {
+            // Dispose needs to be called on the main Windows thread,
+            // since some resources owned by the thread need to be disposed.
+            _notification?.Uninstall();
+            _mainWindowViewModel?.Dispose();
+            _mainWindow?.Dispatcher.Invoke(_mainWindow.Dispose);
+            Ioc.Default.GetRequiredService<PluginManager>().CleanupTempFiles();
+        }
+
+        _logger?.LogInformation("End STranslate dispose ----------------------------------------------------");
     }
 
-    private bool IsAnotherInstanceRunning()
+    public void Dispose()
     {
-        const string currentProcessName = "STranslate";
-        var runningProcesses = Process.GetProcessesByName(currentProcessName);
-        return runningProcesses.Length > 1;
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
-    private void StartProgram()
-    {
-        var adminMsg = CommonUtil.IsUserAdministrator() ? "[Administrator]" : "";
-        LogService.Logger.Info($"{Constant.AppName}_{Constant.AppVersion}{adminMsg} Opened...");
-        // 当前配置目录
-        LogService.Logger.Info($"Config Path: {Constant.CnfPath}");
-        new MainView().Show();
-    }
-
-    /// <summary>
-    ///     异常处理监听
-    /// </summary>
-    private void ExceptionHandler()
-    {
-        //UI线程未捕获异常处理事件（UI主线程）
-        DispatcherUnhandledException += App_DispatcherUnhandledException;
-        //非UI线程未捕获异常处理事件(例如自己创建的一个子线程)
-        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-        //Task线程内未捕获异常处理事件
-        TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
-    }
-
-    //UI线程未捕获异常处理事件（UI主线程）
-    private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-    {
-        var ex = e.Exception;
-        //异常信息 和 调用堆栈信息
-        //string msg = String.Format("{0}\n\n{1}", ex.Message, ex.StackTrace);
-        LogService.Logger.Error("UI线程异常", ex);
-        e.Handled = true; //表示异常已处理，可以继续运行
-    }
-
-    //非UI线程未捕获异常处理事件(例如自己创建的一个子线程)
-    //如果UI线程异常DispatcherUnhandledException未注册，则如果发生了UI线程未处理异常也会触发此异常事件
-    //此机制的异常捕获后应用程序会直接终止。没有像DispatcherUnhandledException事件中的Handler=true的处理方式，可以通过比如Dispatcher.Invoke将子线程异常丢在UI主线程异常处理机制中处理
-    private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-    {
-        if (e.ExceptionObject is Exception ex)
-            //string msg = String.Format("{0}\n\n{1}", ex.Message, ex.StackTrace);
-            LogService.Logger.Error("非UI线程异常", ex);
-    }
-
-    //Task线程内未捕获异常处理事件
-    private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
-    {
-        var ex = e.Exception;
-        //string msg = String.Format("{0}\n\n{1}", ex.Message, ex.StackTrace);
-        LogService.Logger.Error("Task异常", ex);
-    }
+    #endregion
 }

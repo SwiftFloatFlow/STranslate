@@ -1,0 +1,10 @@
+{
+  "PluginID": "0f6892a390a543709926092aba510273",
+  "Name": "iCIBA Dictionary",
+  "Description": "iCIBA dictionary plugin for stranslate",
+  "Author": "zggsong",
+  "Version": "1.0.0",
+  "Website": "https://github.com/ZGGSONG/STranslate",
+  "ExecuteFileName": "STranslate.Plugin.Translate.KingSoftDict.dll",
+  "IconPath": "icon.png"
+}

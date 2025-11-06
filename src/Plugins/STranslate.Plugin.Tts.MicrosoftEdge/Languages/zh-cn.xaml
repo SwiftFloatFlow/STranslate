@@ -1,0 +1,15 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="STranslate_Plugin_Tts_MicrosoftEdge_Url">接口地址</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Tts_MicrosoftEdge_Url_Placeholder">https://tts.wangwangit.com/v1/audio/speech</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Tts_MicrosoftEdge_Voice">声音</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Tts_MicrosoftEdge_Voice_Placeholder">zh-CN-XiaoxiaoNeural</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Tts_MicrosoftEdge_Speed">语速</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Tts_MicrosoftEdge_Pitch">音调</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Tts_MicrosoftEdge_Style">风格</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Tts_MicrosoftEdge_Style_Placeholder">通用</sys:String>
+
+</ResourceDictionary>

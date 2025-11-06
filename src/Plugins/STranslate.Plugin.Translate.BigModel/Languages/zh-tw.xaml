@@ -1,0 +1,25 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_Url">網址</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_Url_Description">配置智譜清言 API 服務地址&#x0a;接口API地址不填寫Path內容則自動填充 /api/paas/v4/chat/completions&#x0a;如BigModel接口地址為 https://open.bigmodel.cn/api/paas/v4/chat/completions 其中 Path 為 /api/paas/v4/chat/completions</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_ApiKey">API 金鑰</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_ApiKey_Placeholder">請輸入金鑰</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_ApiKey_Description">輸入您的智譜清言 API 金鑰</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_Model">请選擇模型</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_Prompt_Header">提示詞配置</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_Prompt_Description">選擇或編輯翻譯使用的提示詞範本</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_Prompt_Placeholder">選擇提示詞範本</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_EditPrompt_ToolTip">編輯提示詞</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_EditPrompt_Content">編輯</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_AutoTransBack_Header">回譯</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_AutoTransBack_Description">翻譯之後自動進行回譯</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_On">開啟</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_Off">關閉</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_Validate">驗證</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_ValidateBtnContent">驗證</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_BigModel_Validate_Description">測試 API 連接和配置是否正確</sys:String>
+
+</ResourceDictionary>

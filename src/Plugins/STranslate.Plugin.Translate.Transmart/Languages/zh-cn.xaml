@@ -1,0 +1,11 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="STranslate_Plugin_Translate_Transmart_Url">接口:</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_Transmart_AutoTransBack">自动回译:</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_Transmart_Validate">校验:</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_Transmart_ValidateBtnContent">校验</sys:String>
+
+</ResourceDictionary>

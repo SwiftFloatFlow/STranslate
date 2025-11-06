@@ -1,0 +1,12 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="STranslate_Plugin_Translate_Google_Url">Url:</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_Google_AutoTransBack">Auto TransBack:</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_Google_ApiKey">ApiKey:</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_Google_Validate">Validate:</sys:String>
+    <sys:String x:Key="STranslate_Plugin_Translate_Google_ValidateBtnContent">Validate</sys:String>
+
+</ResourceDictionary>

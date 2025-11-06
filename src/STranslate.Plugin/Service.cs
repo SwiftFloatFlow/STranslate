@@ -1,0 +1,95 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace STranslate.Plugin;
+
+/// <summary>
+/// 服务实例 - 插件的运行时实例，包含具体的配置和状态
+/// </summary>
+public partial class Service : ObservableObject, IDisposable
+{
+    /// <summary>
+    /// 服务实例唯一标识符
+    /// </summary>
+    public string ServiceID { get; internal set; } = string.Empty;
+
+    /// <summary>
+    /// 插件元数据引用
+    /// </summary>
+    public PluginMetaData MetaData { get; internal set; } = null!;
+
+    /// <summary>
+    /// 插件实例
+    /// </summary>
+    public IPlugin Plugin { get; set; } = null!;
+
+    /// <summary>
+    /// 插件上下文
+    /// </summary>
+    public IPluginContext Context { get; internal set; } = null!;
+
+    /// <summary>
+    /// 显示名称（可自定义）
+    /// </summary>
+    public string DisplayName
+    {
+        get => string.IsNullOrEmpty(field) ? MetaData.Name : field;
+        set => SetProperty(ref field, value);
+    }
+
+    /// <summary>
+    /// 是否已初始化
+    /// </summary>
+    public bool IsInitialized { get; private set; }
+
+    /// <summary>
+    /// 是否启用
+    /// </summary>
+    [ObservableProperty] public partial bool IsEnabled { get; set; } = true;
+
+    /// <summary>
+    /// 初始化服务实例
+    /// </summary>
+    public void Initialize()
+    {
+        if (IsInitialized) return;
+
+        Plugin.Init(Context);
+        IsInitialized = true;
+    }
+
+    /// <summary>
+    /// 字符串转换
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString() => DisplayName;
+
+    /// <summary>
+    /// 为了兼容现有代码，保持与 PluginPair 相同的 Equals 和 GetHashCode 逻辑
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj) =>
+        obj is Service instance &&
+        instance.MetaData.PluginID == MetaData.PluginID &&
+        instance.ServiceID == ServiceID;
+
+    /// <summary>
+    /// 获取哈希值
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode() => HashCode.Combine(MetaData.PluginID, ServiceID);
+
+    /// <summary>
+    /// 释放
+    /// </summary>
+    public void Dispose()
+    {
+        // 删除服务配置文件
+        Context.Dispose();
+
+        // 释放插件资源
+        Plugin.Dispose();
+
+        GC.SuppressFinalize(this);
+    }
+}
