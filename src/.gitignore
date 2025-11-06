@@ -305,3 +305,6 @@ Output-Performance.txt
 # vscode
 .vscode
 .history
+
+# output
+.artifacts/
