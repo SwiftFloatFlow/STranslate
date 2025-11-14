@@ -39,25 +39,35 @@
                     <ui:IconAndText Content="{DynamicResource AddPlugin}" Icon="{x:Static ui:FluentSystemIcons.BotAdd_24_Regular}" />
                 </Button>
 
-                <TextBlock
-                    Margin="6,0,0,0"
-                    VerticalAlignment="Center"
-                    Foreground="{DynamicResource {x:Static ui:ThemeKeys.TextFillColorSecondaryBrushKey}}">
-                    <Run Text="{DynamicResource FilterPlugin}" />
-                    <Run Text=":" />
-                </TextBlock>
                 <ComboBox
                     MaxWidth="200"
                     DisplayMemberPath="Display"
                     ItemsSource="{Binding DataProvider.PluginTypes}"
                     SelectedValue="{Binding PluginType}"
                     SelectedValuePath="Value" />
+                <Button Margin="-6,0,0,0" Padding="5,6">
+                    <ui:FontIcon FontSize="{DynamicResource STControlFontSize16}" Icon="{x:Static ui:FluentSystemIcons.Filter_20_Regular}" />
+                    <ui:FlyoutService.Flyout>
+                        <ui:MenuFlyout Placement="BottomEdgeAlignedLeft">
+                            <MenuItem Header="名称">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.TextSortAscending_20_Regular}" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="版本">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.DataBarVertical_20_Regular}" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ui:MenuFlyout>
+                    </ui:FlyoutService.Flyout>
+                </Button>
                 <Button
                     Margin="-6,0,0,0"
-                    VerticalAlignment="Top"
+                    Padding="5,6"
                     Command="{Binding PluginSummaryCommand}"
                     CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}}">
-                    <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.QuestionCircle_20_Regular}" />
+                    <ui:FontIcon FontSize="{DynamicResource STControlFontSize16}" Icon="{x:Static ui:FluentSystemIcons.QuestionCircle_20_Regular}" />
                 </Button>
                 <TextBox
                     x:Name="PluginFilterTextbox"

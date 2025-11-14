@@ -155,11 +155,11 @@ public partial class PluginViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task PluginSummaryAsync(Button button)
+    private async Task PluginSummaryAsync(Control control)
     {
         var helpDialog = new ContentDialog()
         {
-            Owner = Window.GetWindow(button),
+            Owner = Window.GetWindow(control),
             Content = new StackPanel
             {
                 Children =
