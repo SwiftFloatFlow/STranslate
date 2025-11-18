@@ -8,6 +8,7 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
     xmlns:local="clr-namespace:STranslate.Views"
+    xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:s="https://github.com/zggsong/2022/xaml"
     xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
@@ -369,41 +370,66 @@
                                 BorderThickness="0"
                                 Text="{Binding Result, UpdateSourceTrigger=PropertyChanged}"
                                 TextWrapping="Wrap"
-                                VerticalScrollBarVisibility="Auto" />
-                            <ikw:SimpleStackPanel
+                                VerticalScrollBarVisibility="Auto"
+                                Visibility="{Binding Settings.IsOcrShowingMarkdown, Converter={cnvt:BoolToVisibilityInverseConverter}}" />
+                            <markdig:MarkdownViewer
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                BorderThickness="0"
+                                Focusable="True"
+                                Markdown="{Binding Result}"
+                                Visibility="{Binding Settings.IsOcrShowingMarkdown, Converter={cnvt:BoolToVisibilityConverter}}" />
+                            <Grid
                                 Grid.Row="1"
                                 Margin="5"
-                                VerticalAlignment="Bottom"
-                                Orientation="Horizontal"
-                                Spacing="5"
                                 Visibility="{Binding Result, Converter={cnvt:EqualToVisibilityInverseConverter}}">
-                                <control:IconButton
-                                    Padding="5,3"
-                                    Command="{Binding PlayAudioCommand}"
-                                    CommandParameter="{Binding Result}"
-                                    Icon="{x:Static ui:FluentSystemIcons.Speaker2_24_Regular}"
-                                    IconSize="14" />
-                                <control:IconButton
-                                    Padding="5,3"
-                                    Command="{Binding CopyCommand}"
-                                    CommandParameter="{Binding Result}"
-                                    Icon="{x:Static ui:FluentSystemIcons.Copy_24_Regular}"
-                                    IconSize="14" />
-                                <control:IconButton
-                                    Padding="5,3"
-                                    Command="{Binding RemoveLineBreaksCommand}"
-                                    CommandParameter="{Binding ElementName=PART_TextBox}"
-                                    Icon="{x:Static ui:FluentSystemIcons.TextWrap_24_Regular}"
-                                    IconSize="14"
-                                    ToolTip="{DynamicResource RemoveLineBreak}" />
-                                <control:IconButton
-                                    Padding="5,3"
-                                    Command="{Binding RemoveSpacesCommand}"
-                                    CommandParameter="{Binding ElementName=PART_TextBox}"
-                                    Icon="{x:Static ui:FluentSystemIcons.Spacebar_24_Regular}"
-                                    IconSize="14"
-                                    ToolTip="{DynamicResource RemoveSpace}" />
-                            </ikw:SimpleStackPanel>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <ikw:SimpleStackPanel
+                                    VerticalAlignment="Bottom"
+                                    Orientation="Horizontal"
+                                    Spacing="5">
+                                    <control:IconButton
+                                        Padding="5,3"
+                                        Command="{Binding PlayAudioCommand}"
+                                        CommandParameter="{Binding Result}"
+                                        Icon="{x:Static ui:FluentSystemIcons.Speaker2_24_Regular}"
+                                        IconSize="14" />
+                                    <control:IconButton
+                                        Padding="5,3"
+                                        Command="{Binding CopyCommand}"
+                                        CommandParameter="{Binding Result}"
+                                        Icon="{x:Static ui:FluentSystemIcons.Copy_24_Regular}"
+                                        IconSize="14" />
+                                    <control:IconButton
+                                        Padding="5,3"
+                                        Command="{Binding RemoveLineBreaksCommand}"
+                                        CommandParameter="{Binding ElementName=PART_TextBox}"
+                                        Icon="{x:Static ui:FluentSystemIcons.TextWrap_24_Regular}"
+                                        IconSize="14"
+                                        ToolTip="{DynamicResource RemoveLineBreak}" />
+                                    <control:IconButton
+                                        Padding="5,3"
+                                        Command="{Binding RemoveSpacesCommand}"
+                                        CommandParameter="{Binding ElementName=PART_TextBox}"
+                                        Icon="{x:Static ui:FluentSystemIcons.Spacebar_24_Regular}"
+                                        IconSize="14"
+                                        ToolTip="{DynamicResource RemoveSpace}" />
+                                </ikw:SimpleStackPanel>
+                                <ikw:SimpleStackPanel
+                                    Grid.Column="1"
+                                    VerticalAlignment="Bottom"
+                                    FlowDirection="RightToLeft"
+                                    Orientation="Horizontal"
+                                    Spacing="5">
+                                    <control:IconButton
+                                        Icon="{x:Static ui:FluentSystemIcons.Markdown_20_Regular}"
+                                        IsOn="{Binding Settings.IsOcrShowingMarkdown}"
+                                        Type="Toggle" />
+                                </ikw:SimpleStackPanel>
+                            </Grid>
                         </Grid>
 
                         <Separator

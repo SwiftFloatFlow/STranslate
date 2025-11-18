@@ -201,6 +201,7 @@ public partial class Settings : ObservableObject
     [ObservableProperty] public partial bool IsOcrShowingTextControl { get; set; } = false;
     [ObservableProperty] public partial double OcrWindowWidth { get; set; } = 600;
     [ObservableProperty] public partial double OcrWindowHeight { get; set; } = 600;
+    [ObservableProperty] public partial bool IsOcrShowingMarkdown { get; set; } = false;
 
     #endregion
 
