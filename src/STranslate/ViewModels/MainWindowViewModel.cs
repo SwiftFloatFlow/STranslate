@@ -169,6 +169,15 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             history.Data = [.. history.Data.OrderBy(data => enabledServices.FindIndex(svc => svc.ServiceID.Equals(data.ServiceID)))];
             await _sqlService.InsertDataAsync(history, (long)Settings.HistoryLimit).ConfigureAwait(false);
         }
+        else
+        {
+            // 检查避免重复添加，暂定最大缓存数量为100
+            if (_recentTexts.Count >= 100)
+                _recentTexts.RemoveAt(_recentTexts.Count - 1);
+
+            if (!_recentTexts.Contains(InputText))
+                _recentTexts.Insert(0, InputText);
+        }
     }
 
     [RelayCommand(IncludeCancelCommand = true, CanExecute = nameof(CanTranslate))]
@@ -808,7 +817,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task HistoryPreviousAsync()
     {
-        var result = await QueryRecentTextAsync();
+        var result = Settings.HistoryLimit == HistoryLimit.NotSave ?
+            await QueryRecentTextFromCacheAsync() :
+            await QueryRecentTextFromHistoryAsync();
 
         if (!string.IsNullOrWhiteSpace(result))
             ExecuteTranslate(result);
@@ -819,7 +830,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task HistoryNextAsync()
     {
-        var result = await QueryRecentTextAsync(isNext: true);
+        var result = Settings.HistoryLimit == HistoryLimit.NotSave ?
+            await QueryRecentTextFromCacheAsync(isNext: true) :
+            await QueryRecentTextFromHistoryAsync(isNext: true);
 
         if (!string.IsNullOrWhiteSpace(result))
             ExecuteTranslate(result);
@@ -827,7 +840,31 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             _snakebar.ShowWarning(_i18n.GetTranslation("NavigateFailed"));
     }
 
-    private async Task<string?> QueryRecentTextAsync(bool isNext = false)
+    private List<string> _recentTexts = [];
+
+    private async Task<string?> QueryRecentTextFromCacheAsync(bool isNext = false)
+    {
+        if (_recentTexts.Count == 0)
+            return default;
+
+        if (string.IsNullOrWhiteSpace(InputText))
+        {
+            // 如果输入为空，则获取最新的一条历史记录
+            return _recentTexts[0];
+        }
+        else
+        {
+            var currentIndex = _recentTexts.FindIndex(t => t.Equals(InputText, StringComparison.OrdinalIgnoreCase));
+            if (currentIndex == -1)
+                return default;
+            var newIndex = isNext ? currentIndex - 1 : currentIndex + 1;
+            if (newIndex < 0 || newIndex >= _recentTexts.Count)
+                return default;
+            return _recentTexts[newIndex];
+        }
+    }
+
+    private async Task<string?> QueryRecentTextFromHistoryAsync(bool isNext = false)
     {
         if (string.IsNullOrWhiteSpace(InputText))
         {
