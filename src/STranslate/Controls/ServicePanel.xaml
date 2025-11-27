@@ -231,14 +231,14 @@
                             <Style BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="MenuItem">
                                 <Setter Property="Icon">
                                     <Setter.Value>
-                                        <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.FlashOff_20_Regular}" />
+                                        <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Flash_20_Regular}" />
                                     </Setter.Value>
                                 </Setter>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.AutoBackTranslation}" Value="True">
                                         <Setter Property="Icon">
                                             <Setter.Value>
-                                                <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.FlashSparkle_20_Regular}" />
+                                                <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.FlashAuto_20_Regular}" />
                                             </Setter.Value>
                                         </Setter>
                                     </DataTrigger>
