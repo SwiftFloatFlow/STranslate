@@ -189,8 +189,9 @@ public class ServiceManager
             (typeof(ITranslatePlugin).IsAssignableFrom(metaData.PluginType) ||
                 typeof(IDictionaryPlugin).IsAssignableFrom(metaData.PluginType)))
         {
-            service.ExecMode = settings?.ExecMode ?? ExecutionMode.Automatic;
-            service.AutoBackTranslation = settings?.AutoBackTranslation ?? false;
+            service.Options ??= new TranslationOptions();
+            service.Options.ExecMode = settings?.Options?.ExecMode ?? ExecutionMode.Automatic;
+            service.Options.AutoBackTranslation = settings?.Options?.AutoBackTranslation ?? false;
         }
         var plugin = metaDataClone.CreatePluginInstance();
         var context = new PluginContext(metaDataClone, serviceID);

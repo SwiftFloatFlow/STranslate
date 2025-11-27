@@ -181,10 +181,10 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void TemporaryTranslate(Service service)
     {
-        if (!SingleTranslateCommand.CanExecute(service) || service.TemporaryDisplay)
+        if (!SingleTranslateCommand.CanExecute(service) || (service.Options?.TemporaryDisplay ?? false))
             return;
 
-        service.TemporaryDisplay = true;
+        service.Options?.TemporaryDisplay = true;
 
         SingleTranslateCommand.Execute(service);
     }
@@ -241,7 +241,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         }
         historyData.TransResult = translateResult;
 
-        if (service.AutoBackTranslation)
+        if (service.Options?.AutoBackTranslation ?? false)
         {
             var backResult = await ExecuteBackAsync(plugin, target, source, cancellationToken).ConfigureAwait(false);
             historyData.TransBackResult = backResult;
@@ -298,7 +298,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     private async Task<HistoryModel?> ExecuteTranslateAsync(bool checkCacheFirst, CancellationToken cancellationToken)
     {
-        var enabledSvcs = TranslateInstance.Services.Where(x => x.IsEnabled && x.ExecMode == ExecutionMode.Automatic).ToList();
+        var enabledSvcs = TranslateInstance.Services.Where(x => x.IsEnabled && x.Options?.ExecMode == ExecutionMode.Automatic).ToList();
         if (enabledSvcs.Count == 0)
             return null;
 
@@ -374,7 +374,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             if (data.TransResult != null && data.TransResult.IsSuccess && !string.IsNullOrWhiteSpace(data.TransResult.Text))
                 tPlugin.TransResult.Update(data.TransResult);
 
-            if (svc.AutoBackTranslation && data.TransBackResult != null && data.TransBackResult.IsSuccess && !string.IsNullOrWhiteSpace(data.TransBackResult.Text))
+            if ((svc.Options?.AutoBackTranslation ?? false) && data.TransBackResult != null && data.TransBackResult.IsSuccess && !string.IsNullOrWhiteSpace(data.TransBackResult.Text))
                 tPlugin.TransBackResult.Update(data.TransBackResult);
         }
         else if (svc.Plugin is IDictionaryPlugin dPlugin)
@@ -438,7 +438,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             await ExecuteNewTranslationAsync(service, plugin, source, target, history, cancellationToken).ConfigureAwait(false);
         }
         // 否则，只执行反向翻译（如果需要）
-        else if (service.AutoBackTranslation && history.GetData(service)?.TransBackResult == null)
+        else if ((service.Options?.AutoBackTranslation ?? false) && history.GetData(service)?.TransBackResult == null)
         {
             await ExecuteBackTranslationOnlyAsync(service, plugin, target, source, history, cancellationToken).ConfigureAwait(false);
         }
@@ -458,7 +458,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         historyData.TransResult = translateResult;
 
         // 执行反向翻译（如果需要且主翻译成功）
-        if (service.AutoBackTranslation)
+        if (service.Options?.AutoBackTranslation ?? false)
         {
             var backResult = await ExecuteBackAsync(plugin, target, source, cancellationToken).ConfigureAwait(false);
             historyData.TransBackResult = backResult;
@@ -1382,7 +1382,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         var services = TranslateInstance.Services.Where(x => x.IsEnabled).ToList();
         foreach (var service in services)
         {
-            service.TemporaryDisplay = false;
+            service.Options?.TemporaryDisplay = false;
             if (service.Plugin is ITranslatePlugin tPlugin) tPlugin.Reset();
             else if (service.Plugin is IDictionaryPlugin dPlugin) dPlugin.Reset();
         }

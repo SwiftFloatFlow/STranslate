@@ -18,9 +18,9 @@ public abstract partial class ServiceInstanceBase : ObservableObject, IDisposabl
     private readonly PluginInstance _pluginInstance;
     private readonly ServiceSettings _serviceSettings;
     private readonly Internationalization _i18n;
-    private readonly List<ServiceData> _svcSettingDatas;
     private bool _isInternalTrigger;
 
+    protected List<ServiceData> SvcSettingDatas;
     protected Action? OnSvcPropertyChanged;
 
     [ObservableProperty] public partial ObservableCollection<PluginMetaData> Plugins { get; set; } = [];
@@ -40,7 +40,7 @@ public abstract partial class ServiceInstanceBase : ObservableObject, IDisposabl
         _serviceSettings = serviceSettings;
         _i18n = i18n;
 
-        _svcSettingDatas = ServiceType switch
+        SvcSettingDatas = ServiceType switch
         {
             ServiceType.Translation => _serviceSettings.TranSvcDatas,
             ServiceType.OCR => _serviceSettings.OcrSvcDatas,
@@ -136,7 +136,7 @@ public abstract partial class ServiceInstanceBase : ObservableObject, IDisposabl
 
     private int GetServiceOrder(string serviceId)
     {
-        var index = _svcSettingDatas.FindIndex(d => d.SvcID == serviceId);
+        var index = SvcSettingDatas.FindIndex(d => d.SvcID == serviceId);
         return index == -1 ? int.MaxValue : index;
     }
 
@@ -183,11 +183,11 @@ public abstract partial class ServiceInstanceBase : ObservableObject, IDisposabl
             if (oldIndex != newIndex && oldIndex >= 0 && newIndex >= 0 && oldIndex < Services.Count && newIndex < Services.Count)
             {
                 var svc = Services[newIndex];
-                var svcSetting = _svcSettingDatas.FirstOrDefault(s => s.SvcID == svc.ServiceID);
+                var svcSetting = SvcSettingDatas.FirstOrDefault(s => s.SvcID == svc.ServiceID);
                 if (svcSetting != null)
                 {
-                    _svcSettingDatas.Remove(svcSetting);
-                    _svcSettingDatas.Insert(newIndex, svcSetting);
+                    SvcSettingDatas.Remove(svcSetting);
+                    SvcSettingDatas.Insert(newIndex, svcSetting);
                     _serviceSettings.Save();
                 }
             }
@@ -216,7 +216,7 @@ public abstract partial class ServiceInstanceBase : ObservableObject, IDisposabl
 
         OnSvcPropertyChanged?.Invoke();
 
-        var svcSetting = _svcSettingDatas.FirstOrDefault(s => s.SvcID == svc.ServiceID);
+        var svcSetting = SvcSettingDatas.FirstOrDefault(s => s.SvcID == svc.ServiceID);
         if (svcSetting == null)
             return;
 
@@ -237,13 +237,19 @@ public abstract partial class ServiceInstanceBase : ObservableObject, IDisposabl
                 svcSetting.Name = svc.DisplayName;
                 _serviceSettings.Save();
                 break;
-            case nameof(Service.AutoBackTranslation):
-                svcSetting.AutoBackTranslation = svc.AutoBackTranslation;
-                _serviceSettings.Save();
+            case nameof(TranslationOptions.AutoBackTranslation):
+                if (svcSetting.Options != null && svc.Options != null)
+                {
+                    svcSetting.Options.AutoBackTranslation = svc.Options.AutoBackTranslation;
+                    _serviceSettings.Save();
+                }
                 break;
-            case nameof(Service.ExecMode):
-                svcSetting.ExecMode = svc.ExecMode;
-                _serviceSettings.Save();
+            case nameof(TranslationOptions.ExecMode):
+                if (svcSetting.Options != null && svc.Options != null)
+                {
+                    svcSetting.Options.ExecMode = svc.Options.ExecMode;
+                    _serviceSettings.Save();
+                }
                 break;
         }
     }
@@ -275,7 +281,7 @@ public abstract partial class ServiceInstanceBase : ObservableObject, IDisposabl
             }
 
             // 批量更新设置数据
-            foreach (var svcData in _svcSettingDatas.Where(x => x.IsEnabled && x.SvcID != enabledService.ServiceID))
+            foreach (var svcData in SvcSettingDatas.Where(x => x.IsEnabled && x.SvcID != enabledService.ServiceID))
             {
                 svcData.IsEnabled = false;
             }

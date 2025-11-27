@@ -1,4 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace STranslate.Plugin;
 
@@ -46,10 +48,32 @@ public partial class Service : ObservableObject, IDisposable
     /// </summary>
     [ObservableProperty] public partial bool IsEnabled { get; set; } = true;
 
-    [ObservableProperty] public partial ExecutionMode ExecMode { get; set; } = ExecutionMode.Automatic;
-    [ObservableProperty] public partial bool TemporaryDisplay { get; set; } = false;
+    /// <summary>
+    /// 特殊配置
+    /// * 后续可根据需要通过泛型扩展成不同类型的配置
+    /// </summary>
+    [ObservableProperty] public partial TranslationOptions? Options { get; set; }
 
-    [ObservableProperty] public partial bool AutoBackTranslation { get; set; } = false;
+    partial void OnOptionsChanged(TranslationOptions? oldValue, TranslationOptions? newValue)
+    {
+        if (oldValue != null)
+        {
+            oldValue.PropertyChanged -= OnOptionsPropertyChanged;
+        }
+
+        if (newValue != null)
+        {
+            newValue.PropertyChanged += OnOptionsPropertyChanged;
+        }
+    }
+
+    /// <summary>
+    /// 将来自Options的属性变更通知冒泡到Service的订阅者
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void OnOptionsPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        => OnPropertyChanged(e);
 
     /// <summary>
     /// 初始化服务实例
@@ -89,6 +113,8 @@ public partial class Service : ObservableObject, IDisposable
     /// </summary>
     public void Dispose()
     {
+        Options?.PropertyChanged -= OnOptionsPropertyChanged;
+
         // 删除服务配置文件
         Context.Dispose();
 
@@ -97,6 +123,15 @@ public partial class Service : ObservableObject, IDisposable
 
         GC.SuppressFinalize(this);
     }
+}
+
+public partial class TranslationOptions : ObservableObject
+{
+    [ObservableProperty] public partial ExecutionMode ExecMode { get; set; } = ExecutionMode.Automatic;
+    [ObservableProperty]
+    [JsonIgnore]
+    public partial bool TemporaryDisplay { get; set; } = false;
+    [ObservableProperty] public partial bool AutoBackTranslation { get; set; } = false;
 }
 
 /// <summary>

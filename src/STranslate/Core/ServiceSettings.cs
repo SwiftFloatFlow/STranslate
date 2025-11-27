@@ -25,16 +25,14 @@ public class ServiceData
     public string SvcID { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public bool IsEnabled { get; set; } = true;
-    public ExecutionMode ExecMode { get; set; } = ExecutionMode.Automatic;
-    public bool AutoBackTranslation { get; set; } = false;
+    public TranslationOptions? Options { get; set; }
     public ServiceData() { }
-    public ServiceData(string svcId, string name, bool isEnabled, ExecutionMode execMode = ExecutionMode.Automatic, bool autoBackTranslation = false)
+    public ServiceData(string svcId, string name, bool isEnabled, TranslationOptions? options = null)
     {
         SvcID = svcId;
         Name = name;
         IsEnabled = isEnabled;
-        ExecMode = execMode;
-        AutoBackTranslation = autoBackTranslation;
+        Options = options;
     }
 }
 

@@ -202,7 +202,7 @@
                                     <Button.Visibility>
                                         <MultiBinding Converter="{cnvt:ServicePinnedVisibilityConverter}">
                                             <Binding Path="IsEnabled" />
-                                            <Binding Path="ExecMode" />
+                                            <Binding Path="Options.ExecMode" />
                                         </MultiBinding>
                                     </Button.Visibility>
                                     <Button.Resources>
@@ -213,15 +213,15 @@
                                             <MenuItem
                                                 Header="{DynamicResource TransExecAutomatic}"
                                                 IsCheckable="True"
-                                                IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Automatic}" />
+                                                IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Automatic}" />
                                             <MenuItem
                                                 Header="{DynamicResource TransExecManual}"
                                                 IsCheckable="True"
-                                                IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Manual}" />
+                                                IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Manual}" />
                                             <MenuItem
                                                 Header="{DynamicResource TransExecPinned}"
                                                 IsCheckable="True"
-                                                IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Pinned}" />
+                                                IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Pinned}" />
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                     <Image

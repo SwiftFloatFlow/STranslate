@@ -48,8 +48,8 @@
             <Expander.Visibility>
                 <MultiBinding Converter="{cnvt:ServiceVisibilityConverter}">
                     <Binding Path="IsEnabled" />
-                    <Binding Path="ExecMode" />
-                    <Binding Path="TemporaryDisplay" />
+                    <Binding Path="Options.ExecMode" />
+                    <Binding Path="Options.TemporaryDisplay" />
                 </MultiBinding>
             </Expander.Visibility>
             <i:Interaction.Triggers>
@@ -92,15 +92,15 @@
                                 <MenuItem
                                     Header="{DynamicResource TransExecAutomatic}"
                                     IsCheckable="True"
-                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Automatic}" />
+                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Automatic}" />
                                 <MenuItem
                                     Header="{DynamicResource TransExecManual}"
                                     IsCheckable="True"
-                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Manual}" />
+                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Manual}" />
                                 <MenuItem
                                     Header="{DynamicResource TransExecPinned}"
                                     IsCheckable="True"
-                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Pinned}" />
+                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Pinned}" />
                             </MenuItem>
                             <MenuItem
                                 Command="{Binding Source={StaticResource MainVmProxy}, Path=Data.NavigateCommand}"
@@ -376,8 +376,8 @@
             <Expander.Visibility>
                 <MultiBinding Converter="{cnvt:ServiceVisibilityConverter}">
                     <Binding Path="IsEnabled" />
-                    <Binding Path="ExecMode" />
-                    <Binding Path="TemporaryDisplay" />
+                    <Binding Path="Options.ExecMode" />
+                    <Binding Path="Options.TemporaryDisplay" />
                 </MultiBinding>
             </Expander.Visibility>
             <i:Interaction.Triggers>
@@ -419,15 +419,15 @@
                                 <MenuItem
                                     Header="{DynamicResource TransExecAutomatic}"
                                     IsCheckable="True"
-                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Automatic}" />
+                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Automatic}" />
                                 <MenuItem
                                     Header="{DynamicResource TransExecManual}"
                                     IsCheckable="True"
-                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Manual}" />
+                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Manual}" />
                                 <MenuItem
                                     Header="{DynamicResource TransExecPinned}"
                                     IsCheckable="True"
-                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Pinned}" />
+                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.ExecMode, Converter={cnvt:ExecutionModeBoolConverter}, ConverterParameter=Pinned}" />
                             </MenuItem>
                             <MenuItem Header="{DynamicResource AutoBackTranslation}">
                                 <MenuItem.Style>
@@ -438,7 +438,7 @@
                                             </Setter.Value>
                                         </Setter>
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Source={StaticResource SvcProxy}, Path=Data.AutoBackTranslation}" Value="True">
+                                            <DataTrigger Binding="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.AutoBackTranslation}" Value="True">
                                                 <Setter Property="Icon">
                                                     <Setter.Value>
                                                         <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.FlashSparkle_20_Regular}" />
@@ -451,11 +451,11 @@
                                 <MenuItem
                                     Header="{DynamicResource On}"
                                     IsCheckable="True"
-                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.AutoBackTranslation}" />
+                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.AutoBackTranslation}" />
                                 <MenuItem
                                     Header="{DynamicResource Off}"
                                     IsCheckable="True"
-                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.AutoBackTranslation, Converter={cnvt:BoolInverseConverter}}" />
+                                    IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.AutoBackTranslation, Converter={cnvt:BoolInverseConverter}}" />
                             </MenuItem>
                             <MenuItem
                                 Command="{Binding Source={StaticResource MainVmProxy}, Path=Data.NavigateCommand}"

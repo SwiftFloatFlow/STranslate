@@ -24,6 +24,12 @@ public partial class TranslateInstance : ServiceInstanceBase
     {
         _serviceSettings = serviceSettings;
 
+        // Ensure all service data have translation options
+        foreach (var item in SvcSettingDatas)
+        {
+            item.Options ??= new TranslationOptions();
+        }
+
         LoadPlugins<ITranslatePlugin>();
         LoadPlugins<IDictionaryPlugin>();
         LoadServices<ITranslatePlugin, IDictionaryPlugin>();
