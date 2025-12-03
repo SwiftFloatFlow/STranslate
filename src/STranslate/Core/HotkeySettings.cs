@@ -92,7 +92,7 @@ public partial class HotkeySettings : ObservableObject
         [
             // MainWindow
             new RegisteredHotkeyData(Key.Escape.ToString(), "Hotkey_CancelOrHide", HotkeyType.Global | HotkeyType.MainWindow | HotkeyType.SettingsWindow | HotkeyType.OcrWindow | HotkeyType.ImageTransWindow),
-            //new RegisteredHotkeyData("Ctrl + Shift + T", "Hotkey_ToggleTopmost", HotkeyType.MainWindow),
+            new RegisteredHotkeyData("Ctrl + Shift + Q", "Hotkey_Exit", HotkeyType.MainWindow),
 
             //TODO: Other Window
         ];
