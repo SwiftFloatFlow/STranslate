@@ -53,7 +53,7 @@
     <sys:String x:Key="General_TranslateOnPaste">粘贴立即翻译</sys:String>
     <sys:String x:Key="General_TranslateOnPasteDescription">输入框内粘贴文本立即执行翻译。</sys:String>
     <sys:String x:Key="General_LineBreakHandleType">取词换行处理</sys:String>
-    <sys:String x:Key="General_LineBreakHandleTypeDescription" xml:space="preserve">包括划词、截图翻译、剪贴板、静默OCR取词场最的换行处理&#10;「移除多于换行」主要针对PDF取词场景，移除多于换行和断句，但是对非PDF取词可能有影响</sys:String>
+    <sys:String x:Key="General_LineBreakHandleTypeDescription" xml:space="preserve">包括划词、截图翻译、剪贴板、静默OCR取词场最的换行处理&#10;「移除多余换行」主要针对PDF取词场景，移除多余换行和断句，但是对非PDF取词可能有影响</sys:String>
     <sys:String x:Key="General_ImageQuality">图片质量</sys:String>
     <sys:String x:Key="General_ImageQualityDescription">处理图片时质量调整，在线OCR服务可能会限制图片大小</sys:String>
     <sys:String x:Key="General_Language">语言</sys:String>
@@ -412,7 +412,7 @@
     <sys:String x:Key="LanguageDetectorTypeMicrosoft">微软识别</sys:String>
 
     <sys:String x:Key="LineBreakHandleTypeNone">不处理换行</sys:String>
-    <sys:String x:Key="LineBreakHandleTypeRemoveExtraLineBreak">移除多于换行</sys:String>
+    <sys:String x:Key="LineBreakHandleTypeRemoveExtraLineBreak">移除多余换行</sys:String>
     <sys:String x:Key="LineBreakHandleTypeRemoveAllLineBreak">移除所有换行</sys:String>
     <sys:String x:Key="LineBreakHandleTypeRemoveAllLineBreakWithoutSpace">移除所有换行（非空格填充）</sys:String>
 
