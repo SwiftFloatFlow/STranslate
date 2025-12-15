@@ -159,7 +159,10 @@ public partial class OcrWindowViewModel : ObservableObject, IDisposable
             _lastOcrResult = await ocrSvc.RecognizeAsync(new OcrRequest(data, Settings.OcrLanguage), cancellationToken);
 
             if (!_lastOcrResult.IsSuccess || string.IsNullOrEmpty(_lastOcrResult.Text))
-                return;
+            {
+                _snackbar.ShowWarning(_i18n.GetTranslation("OcrFailed"));
+                _logger.LogError("OCR failed: {ErrorMessage}", _lastOcrResult.ErrorMessage);
+            }
 
             if (Settings.CopyAfterOcr)
                 Utilities.SetText(_lastOcrResult.Text);

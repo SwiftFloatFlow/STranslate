@@ -68,6 +68,9 @@ public class Main : ObservableObject, IOcrPlugin, ILlm
         if (uriBuilder.Path == "/")
             uriBuilder.Path = "/v1/chat/completions";
 
+        if (Context.ImageQuality == ImageQuality.High)
+            return new OcrResult().Fail($"Not supported, please use low or medium");
+
         // 处理图片数据
         var base64Str = Convert.ToBase64String(request.ImageData);
         // https://www.volcengine.com/docs/82379/1362931#%E5%9B%BE%E7%89%87%E6%A0%BC%E5%BC%8F%E8%AF%B4%E6%98%8E
@@ -75,7 +78,6 @@ public class Main : ObservableObject, IOcrPlugin, ILlm
         {
             ImageQuality.Low => "image/jpeg",
             ImageQuality.Medium => "image/png",
-            ImageQuality.High => "image/bmp",
             _ => "image/png"
         };
 
