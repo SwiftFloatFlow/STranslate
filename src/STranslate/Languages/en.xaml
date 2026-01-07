@@ -173,6 +173,7 @@
     <sys:String x:Key="Network_ExternalCallPort">External Call Port</sys:String>
     <sys:String x:Key="Network_ExternalCallPortDescription">External call port, address is localhost</sys:String>
     <sys:String x:Key="Network_ExternalCallPortPlaceholder">e.g., 50020</sys:String>
+    <sys:String x:Key="Network_ExternalCallPortError">External call error message</sys:String>
     <sys:String x:Key="Network_EnableProxy">Enable Proxy</sys:String>
     <sys:String x:Key="Network_EnableProxyDescription">Enable or disable proxy functionality</sys:String>
     <sys:String x:Key="Network_ProxyType">Proxy Type</sys:String>

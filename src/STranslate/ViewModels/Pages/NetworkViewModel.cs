@@ -17,6 +17,8 @@ public partial class NetworkViewModel : SearchViewModelBase
     [ObservableProperty]
     public partial bool IsTesting { get; set; } = false;
 
+    [ObservableProperty] public partial string ExternalServiceStatus { get; set; } = string.Empty;
+
     public Settings Settings { get; }
     public DataProvider DataProvider { get; }
 
@@ -25,12 +27,15 @@ public partial class NetworkViewModel : SearchViewModelBase
         DataProvider dataProvider,
         IHttpService httpService,
         Internationalization i18n,
+        ExternalCallService externalCallService,
         ILogger<NetworkViewModel> logger) : base(i18n, "Network_")
     {
         Settings = settings;
         DataProvider = dataProvider;
         _httpService = httpService;
         _logger = logger;
+
+        externalCallService.OnActionOccurred += msg => ExternalServiceStatus = msg;
     }
 
     [RelayCommand]

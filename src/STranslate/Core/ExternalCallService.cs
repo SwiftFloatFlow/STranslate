@@ -31,12 +31,14 @@ public class ExternalCallService(
             _listener.BeginGetContext(Callback, _listener);
             IsStarted = true;
 
+            OnActionOccurred?.Invoke(string.Empty);
             return true;
         }
         catch (Exception ex)
         {
             var msg = $"启动服务失败请重新配置端口: {prefix}";
             logger.LogError(ex, msg);
+            OnActionOccurred?.Invoke(msg);
             notification.Show(i18n.GetTranslation("Prompt"), msg);
 
             return false;
@@ -48,6 +50,7 @@ public class ExternalCallService(
         if (!IsStarted)
             return;
 
+        OnActionOccurred?.Invoke(string.Empty);
         _listener?.Close();
         _listener = null;
         IsStarted = false;
@@ -257,6 +260,8 @@ public class ExternalCallService(
         writer.Close();
         response.Close();
     }
+
+    public Action<string>? OnActionOccurred;
 }
 
 /// <summary>

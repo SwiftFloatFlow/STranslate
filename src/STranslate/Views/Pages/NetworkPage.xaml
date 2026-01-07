@@ -91,6 +91,33 @@
                             ValidationMode="InvalidInputOverwritten"
                             Value="{Binding Settings.ExternalCallPort}" />
                     </ui:SettingsCard>
+
+                    <ui:SettingsCard Foreground="{DynamicResource {x:Static ui:ThemeKeys.SystemControlErrorTextForegroundBrushKey}}" Header="{DynamicResource Network_ExternalCallPortError}">
+                        <ui:SettingsCard.HeaderIcon>
+                            <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Info_24_Regular}" />
+                        </ui:SettingsCard.HeaderIcon>
+                        <ui:SettingsCard.Style>
+                            <Style BasedOn="{StaticResource {x:Type ui:SettingsCard}}" TargetType="ui:SettingsCard">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ExternalServiceStatus}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ExternalServiceStatus}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:SettingsCard.Style>
+                        <ScrollViewer MaxHeight="100" VerticalScrollBarVisibility="Auto">
+                            <TextBlock
+                                FontFamily="Consolas, 'Courier New'"
+                                FontSize="{DynamicResource STControlFontSize12}"
+                                Foreground="{DynamicResource {x:Static ui:ThemeKeys.SystemControlErrorTextForegroundBrushKey}}"
+                                Text="{Binding ExternalServiceStatus}"
+                                TextWrapping="Wrap" />
+                        </ScrollViewer>
+                    </ui:SettingsCard>
                 </control:CardGroup>
 
                 <!--  代理启用设置  -->
