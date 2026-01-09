@@ -1000,14 +1000,14 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         {
             Show();
             IsTopmost = true;
-            await Utilities.StartMouseTextSelectionAsync();
-            Utilities.MouseTextSelected += OnMouseTextSelected;
+            await MouseKeyHelper.StartMouseTextSelectionAsync();
+            MouseKeyHelper.MouseTextSelected += OnMouseTextSelected;
         }
         else
         {
             IsTopmost = false;
-            Utilities.StopMouseTextSelection();
-            Utilities.MouseTextSelected -= OnMouseTextSelected;
+            MouseKeyHelper.StopMouseTextSelection();
+            MouseKeyHelper.MouseTextSelected -= OnMouseTextSelected;
         }
     }
 
@@ -1631,7 +1631,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         _debounceExecutor.Dispose();
 
-        Utilities.MouseTextSelected -= OnMouseTextSelected;
+        MouseKeyHelper.MouseTextSelected -= OnMouseTextSelected;
 
         // 如果窗口一直没打开过，恢复位置后再退出
         if (Settings.MainWindowLeft <= -18000 && Settings.MainWindowTop <= -18000)

@@ -1,0 +1,91 @@
+using Gma.System.MouseKeyHook;
+using STranslate.Core;
+
+namespace STranslate.Helpers;
+
+public class MouseKeyHelper
+{
+    private static IKeyboardMouseEvents? _mouseHook;
+    private static bool _isMouseListening;
+    private static string _oldText = string.Empty;
+
+    /// <summary>
+    /// 鼠标划词文本选择事件
+    /// </summary>
+    public static event Action<string>? MouseTextSelected;
+
+    /// <summary>
+    /// 启动鼠标划词监听
+    /// </summary>
+    public static async Task StartMouseTextSelectionAsync()
+    {
+        if (_isMouseListening) return;
+
+        _mouseHook = Hook.GlobalEvents();
+        _mouseHook.MouseDragStarted += OnDragStarted;
+        _mouseHook.MouseDragFinished += OnDragFinished;
+
+        _isMouseListening = true;
+
+        // 等待钩子启动
+        await Task.Delay(100);
+    }
+
+    /// <summary>
+    /// 停止鼠标划词监听
+    /// </summary>
+    public static void StopMouseTextSelection()
+    {
+        if (!_isMouseListening) return;
+
+        _isMouseListening = false;
+
+        if (_mouseHook != null)
+        {
+            _mouseHook.MouseDragStarted -= OnDragStarted;
+            _mouseHook.MouseDragFinished -= OnDragFinished;
+            _mouseHook.Dispose();
+            _mouseHook = null;
+        }
+    }
+
+    /// <summary>
+    /// 切换鼠标划词监听状态
+    /// </summary>
+    public static async Task ToggleMouseTextSelection()
+    {
+        if (_isMouseListening)
+        {
+            StopMouseTextSelection();
+        }
+        else
+        {
+            await StartMouseTextSelectionAsync();
+        }
+    }
+
+    /// <summary>
+    /// 获取鼠标划词监听状态
+    /// </summary>
+    public static bool IsMouseTextSelectionListening => _isMouseListening;
+
+    private static void OnDragStarted(object? sender, System.Windows.Forms.MouseEventArgs e)
+        => _oldText = Utilities.GetText() ?? string.Empty;
+
+    private static void OnDragFinished(object? sender, System.Windows.Forms.MouseEventArgs e)
+    {
+        if (e.Button == System.Windows.Forms.MouseButtons.Left)
+        {
+            // 异步处理文本获取和事件触发
+            _ = Task.Run(async () =>
+            {
+                // 异步获取选中文本
+                var selectedText = await Utilities.GetSelectedTextAsync();
+                if (!string.IsNullOrEmpty(selectedText) && selectedText != _oldText)
+                {
+                    MouseTextSelected?.Invoke(selectedText);
+                }
+            });
+        }
+    }
+}
