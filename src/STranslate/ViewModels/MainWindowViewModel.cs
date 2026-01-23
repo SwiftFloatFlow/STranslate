@@ -76,6 +76,28 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
         _debounceExecutor = new();
         _i18n.OnLanguageChanged += OnLanguageChanged;
+
+        GlobalKeyboardHelper.KeyDown += OnGlobalKeyboardKeyDown;
+        GlobalKeyboardHelper.KeyUp += OnGlobalKeyboardKeyUp;
+        GlobalKeyboardHelper.Start();
+    }
+
+    private void OnGlobalKeyboardKeyDown(Key key)
+    {
+        if (key == Key.LeftCtrl)
+        {
+            IsMouseHook = true;
+            System.Diagnostics.Debug.WriteLine("[MainViewModel] 开始监听...");
+        }
+    }
+
+    private void OnGlobalKeyboardKeyUp(Key key)
+    {
+        if (key == Key.LeftCtrl)
+        {
+            IsMouseHook = false;
+            System.Diagnostics.Debug.WriteLine("[MainViewModel] 结束监听...");
+        }
     }
 
     private void OnLanguageChanged()
@@ -185,7 +207,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                     var textToCopy = data.TransResult?.Text ?? data.DictResult?.Text;
                     if (!string.IsNullOrWhiteSpace(textToCopy))
                     {
-                        Utilities.SetText(textToCopy);
+                        ClipboardHelper.SetText(textToCopy);
                         _snackbar.ShowSuccess(string.Format(_i18n.GetTranslation("CopiedToClipboard"), service.DisplayName));
                     }
                 }
@@ -246,7 +268,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
             if (Settings.CopyAfterTranslationNotAutomatic)
             {
-                Utilities.SetText(result.Text);
+                ClipboardHelper.SetText(result.Text);
                 _snackbar.ShowSuccess(string.Format(_i18n.GetTranslation("CopiedToClipboard"), service.DisplayName));
             }
 
@@ -276,7 +298,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
         if (Settings.CopyAfterTranslationNotAutomatic)
         {
-            Utilities.SetText(translateResult.Text);
+            ClipboardHelper.SetText(translateResult.Text);
             _snackbar.ShowSuccess(string.Format(_i18n.GetTranslation("CopiedToClipboard"), service.DisplayName));
         }
 
@@ -716,7 +738,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                 return;
 
             if (Settings.CopyAfterOcr)
-                Utilities.SetText(result.Text);
+                ClipboardHelper.SetText(result.Text);
 
             ExecuteTranslate(Utilities.LinebreakHandler(result.Text, Settings.LineBreakHandleType));
         }
@@ -794,7 +816,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             var result = await ocrPlugin.RecognizeAsync(new OcrRequest(data, LangEnum.Auto), cancellationToken);
             if (result.IsSuccess && !string.IsNullOrEmpty(result.Text))
             {
-                Utilities.SetText(result.Text);
+                ClipboardHelper.SetText(result.Text);
             }
         }
         catch (TaskCanceledException)
@@ -1302,7 +1324,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private void Copy(string text)
     {
         if (string.IsNullOrEmpty(text)) return;
-        Utilities.SetText(text);
+        ClipboardHelper.SetText(text);
         _snackbar.ShowSuccess(_i18n.GetTranslation("CopySuccess"));
     }
 
@@ -1311,7 +1333,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         if (string.IsNullOrEmpty(text)) return;
         var pascalCaseText = Utilities.ToPascalCase(text);
-        Utilities.SetText(pascalCaseText);
+        ClipboardHelper.SetText(pascalCaseText);
         _snackbar.ShowSuccess(_i18n.GetTranslation("CopySuccess"));
     }
 
@@ -1320,7 +1342,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         if (string.IsNullOrEmpty(text)) return;
         var pascalCaseText = Utilities.ToCamelCase(text);
-        Utilities.SetText(pascalCaseText);
+        ClipboardHelper.SetText(pascalCaseText);
         _snackbar.ShowSuccess(_i18n.GetTranslation("CopySuccess"));
     }
 
@@ -1329,7 +1351,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         if (string.IsNullOrEmpty(text)) return;
         var pascalCaseText = Utilities.ToSnakeCase(text);
-        Utilities.SetText(pascalCaseText);
+        ClipboardHelper.SetText(pascalCaseText);
         _snackbar.ShowSuccess(_i18n.GetTranslation("CopySuccess"));
     }
 
@@ -1623,7 +1645,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         try
         {
-            var text = await Utilities.GetSelectedTextAsync();
+            var text = await ClipboardHelper.GetSelectedTextAsync();
             if (string.IsNullOrEmpty(text))
             {
                 _logger.LogWarning("取词失败，可能：未选中文本、文本禁止复制、取词间隔过短、文本所属软件权限高于本软件");
@@ -1660,6 +1682,10 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         _debounceExecutor.Dispose();
 
         MouseKeyHelper.MouseTextSelected -= OnMouseTextSelected;
+
+        GlobalKeyboardHelper.KeyDown -= OnGlobalKeyboardKeyDown;
+        GlobalKeyboardHelper.KeyUp -= OnGlobalKeyboardKeyUp;
+        GlobalKeyboardHelper.Stop();
 
         // 如果窗口一直没打开过，恢复位置后再退出
         if (Settings.MainWindowLeft <= -18000 && Settings.MainWindowTop <= -18000)

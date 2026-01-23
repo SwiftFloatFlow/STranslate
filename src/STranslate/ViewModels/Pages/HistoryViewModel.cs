@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ObservableCollections;
 using STranslate.Core;
+using STranslate.Helpers;
 using STranslate.Plugin;
 
 namespace STranslate.ViewModels.Pages;
@@ -108,7 +109,7 @@ public partial class HistoryViewModel : ObservableObject, IDisposable
     private void Copy(string text)
     {
         if (string.IsNullOrEmpty(text)) return;
-        Utilities.SetText(text);
+        ClipboardHelper.SetText(text);
         _snackbar.ShowSuccess(_i18n.GetTranslation("CopySuccess"));
     }
 

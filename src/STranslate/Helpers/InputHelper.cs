@@ -50,8 +50,8 @@ public class InputHelper
         // 检查内容是否为空或仅包含空白字符
         if (string.IsNullOrEmpty(content)) return;
         // TODO: 看是不是要尝试重试
-        Utilities.SetText(content);
-        Utilities.SendCtrlCV(false);
+        ClipboardHelper.SetText(content);
+        ClipboardHelper.SendCtrlCV(false);
     }
 
     public static void Backspace(int count = 1)

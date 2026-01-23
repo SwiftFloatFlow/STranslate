@@ -70,7 +70,7 @@ public class MouseKeyHelper
     public static bool IsMouseTextSelectionListening => _isMouseListening;
 
     private static void OnDragStarted(object? sender, System.Windows.Forms.MouseEventArgs e)
-        => _oldText = Utilities.GetText() ?? string.Empty;
+        => _oldText = ClipboardHelper.GetText() ?? string.Empty;
 
     private static void OnDragFinished(object? sender, System.Windows.Forms.MouseEventArgs e)
     {
@@ -80,7 +80,7 @@ public class MouseKeyHelper
             _ = Task.Run(async () =>
             {
                 // 异步获取选中文本
-                var selectedText = await Utilities.GetSelectedTextAsync();
+                var selectedText = await ClipboardHelper.GetSelectedTextAsync();
                 if (!string.IsNullOrEmpty(selectedText) && selectedText != _oldText)
                 {
                     MouseTextSelected?.Invoke(selectedText);

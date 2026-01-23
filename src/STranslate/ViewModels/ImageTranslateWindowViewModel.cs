@@ -178,7 +178,7 @@ public partial class ImageTranslateWindowViewModel : ObservableObject, IDisposab
 
 
             if (Settings.CopyAfterOcr)
-                Utilities.SetText(_lastOcrResult.Text);
+                ClipboardHelper.SetText(_lastOcrResult.Text);
 
             IsNoLocationInfoVisible = !Utilities.HasBoxPoints(_lastOcrResult);
 
