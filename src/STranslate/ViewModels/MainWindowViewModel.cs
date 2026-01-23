@@ -77,46 +77,6 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
         _debounceExecutor = new();
         _i18n.OnLanguageChanged += OnLanguageChanged;
-
-        GlobalKeyboardHelper.KeyDown += OnGlobalKeyboardKeyDown;
-        GlobalKeyboardHelper.KeyUp += OnGlobalKeyboardKeyUp;
-        GlobalKeyboardHelper.Start();
-    }
-
-    private async void OnGlobalKeyboardKeyDown(Key key)
-    {
-        if (key == Key.LeftAlt)
-        {
-            // 取消之前的延迟任务（如果有）
-            _altKeyDelayCts?.Cancel();
-            _altKeyDelayCts?.Dispose();
-            _altKeyDelayCts = new CancellationTokenSource();
-
-            try
-            {
-                // 延迟 1 秒后才开启功能
-                await Task.Delay(1000, _altKeyDelayCts.Token);
-                IsIncreamentalTranslate = true;
-            }
-            catch (OperationCanceledException)
-            {
-                // 延迟被取消（短按），不开启功能
-            }
-        }
-    }
-
-    private void OnGlobalKeyboardKeyUp(Key key)
-    {
-        if (key == Key.LeftAlt)
-        {
-            // 取消延迟任务
-            _altKeyDelayCts?.Cancel();
-            _altKeyDelayCts?.Dispose();
-            _altKeyDelayCts = null;
-
-            // 关闭功能
-            IsIncreamentalTranslate = false;
-        }
     }
 
     private void OnLanguageChanged()
@@ -151,6 +111,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     public partial bool IsIncreamentalTranslate { get; set; } = false;
+
+    [ObservableProperty]
+    public partial bool IsEnableIncreamentalTranslate { get; set; } = false;
 
     [ObservableProperty]
     public partial bool IsIdentifyProcessing { get; set; } = false;
@@ -1063,6 +1026,25 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     #region Increatemental Translate
 
+    partial void OnIsEnableIncreamentalTranslateChanged(bool value)
+    {
+        if (value)
+        {
+            GlobalKeyboardHelper.KeyDown += OnGlobalKeyboardKeyDown;
+            GlobalKeyboardHelper.KeyUp += OnGlobalKeyboardKeyUp;
+            GlobalKeyboardHelper.Start();
+        }
+        else
+        {
+            GlobalKeyboardHelper.KeyDown -= OnGlobalKeyboardKeyDown;
+            GlobalKeyboardHelper.KeyUp -= OnGlobalKeyboardKeyUp;
+            GlobalKeyboardHelper.Stop();
+        }
+    }
+
+    [RelayCommand]
+    private void ToggleIncreamentalTranslate() => IsEnableIncreamentalTranslate = !IsEnableIncreamentalTranslate;
+
     partial void OnIsIncreamentalTranslateChanged(bool enable)
     {
         if (enable)
@@ -1093,6 +1075,42 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         {
             InputText += Utilities.LinebreakHandler(text, Settings.LineBreakHandleType);
         });
+    }
+
+    private async void OnGlobalKeyboardKeyDown(Key key)
+    {
+        if (key == Key.LeftAlt)
+        {
+            // 取消之前的延迟任务（如果有）
+            _altKeyDelayCts?.Cancel();
+            _altKeyDelayCts?.Dispose();
+            _altKeyDelayCts = new CancellationTokenSource();
+
+            try
+            {
+                // 延迟 1 秒后才开启功能
+                await Task.Delay(1000, _altKeyDelayCts.Token);
+                IsIncreamentalTranslate = true;
+            }
+            catch (OperationCanceledException)
+            {
+                // 延迟被取消（短按），不开启功能
+            }
+        }
+    }
+
+    private void OnGlobalKeyboardKeyUp(Key key)
+    {
+        if (key == Key.LeftAlt)
+        {
+            // 取消延迟任务
+            _altKeyDelayCts?.Cancel();
+            _altKeyDelayCts?.Dispose();
+            _altKeyDelayCts = null;
+
+            // 关闭功能
+            IsIncreamentalTranslate = false;
+        }
     }
 
     #endregion
@@ -1741,9 +1759,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
         MouseKeyHelper.MouseTextSelected -= OnMouseTextSelected;
 
+        MouseKeyHelper.MouseTextSelected -= OnMouseTextSelectedIncreatemental;
         GlobalKeyboardHelper.KeyDown -= OnGlobalKeyboardKeyDown;
         GlobalKeyboardHelper.KeyUp -= OnGlobalKeyboardKeyUp;
-        GlobalKeyboardHelper.Stop();
 
         // 如果窗口一直没打开过，恢复位置后再退出
         if (Settings.MainWindowLeft <= -18000 && Settings.MainWindowTop <= -18000)
