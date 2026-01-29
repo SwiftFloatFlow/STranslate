@@ -2,6 +2,7 @@
     x:Class="STranslate.Controls.HotkeyControlDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cnvt="clr-namespace:STranslate.Converters"
     xmlns:control="clr-namespace:STranslate.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
@@ -32,7 +33,18 @@
         </Grid.RowDefinitions>
         <StackPanel Margin="26,12,26,0">
             <TextBlock Style="{DynamicResource {x:Static ui:ThemeKeys.SubtitleTextBlockStyleKey}}" Text="{Binding WindowTitle}" />
-            <TextBlock VerticalAlignment="Center" Text="{DynamicResource HotkeyFunctionPrompt}" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" Text="{DynamicResource HotkeyFunctionPrompt}" />
+                <ui:ElevationBorder
+                    Background="{DynamicResource {x:Static ui:ThemeKeys.SystemFillColorCautionBrushKey}}"
+                    CornerRadius="4"
+                    Visibility="{Binding SingleKeyMode, Converter={cnvt:BoolToVisibilityConverter}}">
+                    <TextBlock
+                        Margin="4,2"
+                        Foreground="{DynamicResource {x:Static ui:ThemeKeys.TextFillColorInverseBrushKey}}"
+                        Text="{DynamicResource HotkeySingleKeyMode}" />
+                </ui:ElevationBorder>
+            </StackPanel>
         </StackPanel>
         <Border
             Grid.Row="1"

@@ -382,6 +382,7 @@
     <!--  // Hotkeys //  -->
     <sys:String x:Key="None">无</sys:String>
     <sys:String x:Key="HotkeyFunctionPrompt">按下您想要用于此功能的键。</sys:String>
+    <sys:String x:Key="HotkeySingleKeyMode">单键模式</sys:String>
     <sys:String x:Key="RegisterHotkeyFailed">未能注册快捷键「{0}」。请重试或查看日志以获取详细信息</sys:String>
     <sys:String x:Key="UnregisterHotkeyFailed">未能取消注册快捷键「{0}」。请重试或查看日志以获取详细信息</sys:String>
     <sys:String x:Key="BindHotkey">绑定热键</sys:String>

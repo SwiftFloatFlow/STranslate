@@ -23,10 +23,10 @@ public partial class HotkeyControlDialog : ContentDialog
     private readonly HotkeySettings _hotkeySettings;
     private readonly HotkeyModel _cacheHotkey;
     private Action? _overwriteOtherHotkey;
-    private readonly bool _singleKeyMode;
 
     private string DefaultHotkey { get; }
     public string WindowTitle { get; }
+    public bool SingleKeyMode { get; }
     public ObservableCollection<string> KeysToDisplay { get; } = [];
     public HkReturnType ReturnType { get; private set; } = HkReturnType.Cancel;
     public string ResultValue { get; private set; } = string.Empty;
@@ -35,7 +35,7 @@ public partial class HotkeyControlDialog : ContentDialog
     public HotkeyControlDialog(HotkeyType type, string hotkey, string defaultHotkey, string windowTitle = "", bool singleKeyMode = false)
     {
         _type = type;
-        _singleKeyMode = singleKeyMode;
+        SingleKeyMode = singleKeyMode;
         _i18n = Ioc.Default.GetRequiredService<Internationalization>();
         _hotkeySettings = Ioc.Default.GetRequiredService<HotkeySettings>();
         WindowTitle = windowTitle switch
@@ -106,7 +106,7 @@ public partial class HotkeyControlDialog : ContentDialog
             return;
 
         // 单键模式处理
-        if (_singleKeyMode)
+        if (SingleKeyMode)
         {
             // 忽略修饰键本身
             if (key == Key.LeftCtrl || key == Key.RightCtrl ||
@@ -185,7 +185,7 @@ public partial class HotkeyControlDialog : ContentDialog
                 OverwriteBtn.Visibility = Visibility.Collapsed;
             }
         }
-        else if (!CheckHotkeyAvailability(hotkey, !_singleKeyMode)) // 单键模式下不验证 KeyGesture
+        else if (!CheckHotkeyAvailability(hotkey, !SingleKeyMode)) // 单键模式下不验证 KeyGesture
         {
             PART_InfoBar.Message = _i18n.GetTranslation("HotkeyUnavailable");
             PART_InfoBar.Visibility = Visibility.Visible;

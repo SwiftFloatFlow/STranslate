@@ -382,6 +382,7 @@
     <!--  // Hotkeys //  -->
     <sys:String x:Key="None">None</sys:String>
     <sys:String x:Key="HotkeyFunctionPrompt">Press the key you want to use for this function.</sys:String>
+    <sys:String x:Key="HotkeySingleKeyMode">Single Key Mode</sys:String>
     <sys:String x:Key="RegisterHotkeyFailed">Failed to register hotkey "{0}". Please try again or check the log for details.</sys:String>
     <sys:String x:Key="UnregisterHotkeyFailed">Failed to unregister hotkey "{0}". Please try again or check the log for details.</sys:String>
     <sys:String x:Key="BindHotkey">Bind Hotkey</sys:String>
