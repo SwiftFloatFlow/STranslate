@@ -177,28 +177,4 @@ public class DataProvider
         DropdownDataGeneric<DoubleClickTrayFunction>.GetValues<DoubleClickTrayFunctionData>("DoubleClickTrayFunction");
 
     #endregion
-
-    #region IncrementalTranslateKeys
-
-    public List<KeyItem> IncrementalTranslateKeys { get; } =
-    [
-        new(Key.None, "None"),
-
-        new(Key.F1, "F1"),
-        new(Key.F2, "F2"),
-        new(Key.F3, "F3"),
-        new(Key.F4, "F4"),
-        new(Key.F5, "F5"),
-        new(Key.F6, "F6"),
-        new(Key.F7, "F7"),
-        new(Key.F8, "F8"),
-        new(Key.F9, "F9"),
-        new(Key.F10, "F10"),
-        new(Key.F11, "F11"),
-        new(Key.F12, "F12"),
-    ];
-
-    public record KeyItem(Key Value, string Display);
-
-    #endregion
 }

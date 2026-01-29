@@ -23,6 +23,7 @@ public partial class HotkeyControlDialog : ContentDialog
     private readonly HotkeySettings _hotkeySettings;
     private readonly HotkeyModel _cacheHotkey;
     private Action? _overwriteOtherHotkey;
+    private readonly bool _singleKeyMode;
 
     private string DefaultHotkey { get; }
     public string WindowTitle { get; }
@@ -31,9 +32,10 @@ public partial class HotkeyControlDialog : ContentDialog
     public string ResultValue { get; private set; } = string.Empty;
     public string EmptyHotkey => _i18n.GetTranslation("None");
 
-    public HotkeyControlDialog(HotkeyType type, string hotkey, string defaultHotkey, string windowTitle = "")
+    public HotkeyControlDialog(HotkeyType type, string hotkey, string defaultHotkey, string windowTitle = "", bool singleKeyMode = false)
     {
         _type = type;
+        _singleKeyMode = singleKeyMode;
         _i18n = Ioc.Default.GetRequiredService<Internationalization>();
         _hotkeySettings = Ioc.Default.GetRequiredService<HotkeySettings>();
         WindowTitle = windowTitle switch
@@ -103,6 +105,25 @@ public partial class HotkeyControlDialog : ContentDialog
         if (ChefKeysManager.StartMenuBlocked && key.ToString() == ChefKeysManager.StartMenuSimulatedKey)
             return;
 
+        // 单键模式处理
+        if (_singleKeyMode)
+        {
+            // 忽略修饰键本身
+            if (key == Key.LeftCtrl || key == Key.RightCtrl ||
+                key == Key.LeftAlt || key == Key.RightAlt ||
+                key == Key.LeftShift || key == Key.RightShift ||
+                key == Key.LWin || key == Key.RWin)
+            {
+                return;
+            }
+
+            // 创建不带修饰键的单键模型
+            var singleHotkeyModel = new HotkeyModel(false, false, false, false, key);
+            SetKeysToDisplay(singleHotkeyModel);
+            return;
+        }
+
+        // 原有的组合键处理逻辑
         SpecialKeyState specialKeyState = HotkeyMapper.CheckModifiers();
 
         var hotkeyModel = new HotkeyModel(
@@ -164,7 +185,7 @@ public partial class HotkeyControlDialog : ContentDialog
                 OverwriteBtn.Visibility = Visibility.Collapsed;
             }
         }
-        else if (!CheckHotkeyAvailability(hotkey, true))
+        else if (!CheckHotkeyAvailability(hotkey, !_singleKeyMode)) // 单键模式下不验证 KeyGesture
         {
             PART_InfoBar.Message = _i18n.GetTranslation("HotkeyUnavailable");
             PART_InfoBar.Visibility = Visibility.Visible;

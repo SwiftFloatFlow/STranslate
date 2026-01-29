@@ -70,6 +70,22 @@
                     Style="{DynamicResource BodyStrongTextBlockStyle}"
                     Text="{DynamicResource GlobalHotkeys}" />
 
+                <ui:SettingsCard Description="{DynamicResource Hotkey_IncrementalTranslateDescription}" Header="{DynamicResource Hotkey_IncrementalTranslate}">
+                    <ui:SettingsCard.HeaderIcon>
+                        <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.TextIndentIncrease_20_Regular}" />
+                    </ui:SettingsCard.HeaderIcon>
+
+                    <Button Command="{Binding IncrementalTranslateKeyCommand}">
+                        <TextBlock Text="{Binding HotkeySettings.IncrementalTranslateKey, Converter={cnvt:StringConverter}}" />
+                    </Button>
+
+                    <!--<ComboBox
+                        DisplayMemberPath="Display"
+                        ItemsSource="{Binding DataProvider.IncrementalTranslateKeys}"
+                        SelectedValue="{Binding HotkeySettings.IncrementalTranslateKey}"
+                        SelectedValuePath="Value" />-->
+                </ui:SettingsCard>
+
                 <control:CardGroup>
                     <ui:SettingsCard Description="{DynamicResource Hotkey_OpenSTranslateDescription}" Header="{DynamicResource Hotkey_OpenSTranslate}">
                         <ui:SettingsCard.HeaderIcon>
@@ -168,18 +184,6 @@
                             Hotkey="{Binding HotkeySettings.OcrHotkey.Key}"
                             IsRegistered="{Binding HotkeySettings.OcrHotkey.IsConflict}"
                             WindowTitle="{DynamicResource Hotkey_Ocr}" />
-                    </ui:SettingsCard>
-
-                    <ui:SettingsCard Description="{DynamicResource Hotkey_IncrementalTranslateDescription}" Header="{DynamicResource Hotkey_IncrementalTranslate}">
-                        <ui:SettingsCard.HeaderIcon>
-                            <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.TextIndentIncrease_20_Regular}" />
-                        </ui:SettingsCard.HeaderIcon>
-
-                        <ComboBox
-                            DisplayMemberPath="Display"
-                            ItemsSource="{Binding DataProvider.IncrementalTranslateKeys}"
-                            SelectedValue="{Binding HotkeySettings.IncrementalTranslateKey}"
-                            SelectedValuePath="Value" />
                     </ui:SettingsCard>
                 </control:CardGroup>
 
