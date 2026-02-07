@@ -6,6 +6,16 @@
 
 **STranslate** 是一个基于 Windows WPF 的翻译和 OCR 工具，采用插件化架构。它通过可扩展的插件支持多种翻译服务、OCR 提供商、TTS（文本转语音）和词汇管理。
 
+### 主要功能
+
+- **翻译服务**: 支持多种翻译引擎（内置 + 插件扩展）
+- **OCR 文字识别**: 截图识别、静默识别
+- **剪贴板监听**: 监听剪贴板变化并自动翻译（可通过全局热键 `Alt + Shift + A` 或主窗口按钮切换）
+- **划词翻译**: 鼠标选中文本后通过热键翻译
+- **截图翻译**: 截取屏幕区域进行 OCR 和翻译
+- **TTS 朗读**: 文本转语音
+- **生词本**: 保存和复习翻译过的单词
+
 ## 构建与开发命令
 
 ### 构建命令
@@ -222,6 +232,8 @@ public partial class HotkeySettings : ObservableObject
     public GlobalHotkey InputTranslateHotkey { get; set; } = new("None");
     public GlobalHotkey CrosswordTranslateHotkey { get; set; } = new("Alt + D");
     public GlobalHotkey ScreenshotTranslateHotkey { get; set; } = new("Alt + S");
+    public GlobalHotkey ClipboardMonitorHotkey { get; set; } = new("Alt + Shift + A");  // 剪贴板监听开关
+    public GlobalHotkey OcrHotkey { get; set; } = new("Alt + Shift + S");
     // ... 其他全局热键
 
     // 软件内热键 - MainWindow
@@ -345,6 +357,68 @@ GlobalHotkey.IsConflict = !HotkeyMapper.SetHotkey(...);
    - 自定义 WPF 控件用于热键设置界面
    - 弹出对话框捕获按键输入
    - 支持验证和冲突检测
+
+### 剪贴板监听功能
+
+剪贴板监听功能允许应用程序在后台监视系统剪贴板的变化，当检测到文本内容时自动触发翻译。
+
+#### 实现架构
+
+**核心组件** (`Helpers/ClipboardMonitor.cs`):
+- 使用 Win32 API `AddClipboardFormatListener` / `RemoveClipboardFormatListener` 注册剪贴板监听
+- 通过 `HwndSource` 在 WPF 窗口上挂接 `WndProc` 接收 `WM_CLIPBOARDUPDATE` 消息
+- 使用 CsWin32 PInvoke 生成类型安全的 Win32 API 绑定
+
+```csharp
+public class ClipboardMonitor : IDisposable
+{
+    private HwndSource? _hwndSource;
+    private HWND _hwnd;
+    private string _lastText = string.Empty;
+
+    public event Action<string>? OnClipboardTextChanged;
+
+    public void Start()
+    {
+        // 使用 WindowInteropHelper 获取窗口句柄
+        var windowHelper = new WindowInteropHelper(_window);
+        _hwnd = new HWND(windowHelper.Handle);
+        _hwndSource = HwndSource.FromHwnd(windowHelper.Handle);
+        _hwndSource?.AddHook(WndProc);
+        PInvoke.AddClipboardFormatListener(_hwnd);
+    }
+
+    private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
+    {
+        if (msg == PInvoke.WM_CLIPBOARDUPDATE)
+        {
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(100);  // 延迟确保剪贴板数据已完全写入
+                var text = ClipboardHelper.GetText();
+                if (!string.IsNullOrWhiteSpace(text) && text != _lastText)
+                {
+                    _lastText = text;
+                    OnClipboardTextChanged?.Invoke(text);
+                    _lastText = string.Empty;  // 触发后重置，允许相同内容再次触发
+                }
+            });
+            handled = true;
+        }
+        return nint.Zero;
+    }
+}
+```
+
+#### 控制方式
+
+1. **全局热键**: `Alt + Shift + A`（默认）- 在任何地方切换监听状态
+2. **主窗口按钮**: HeaderControl 中的切换按钮，带状态指示（IsOn/IsOff）
+3. **设置项**: `Settings.IsClipboardMonitorVisible` 控制按钮是否显示
+
+#### 状态通知
+
+开启/关闭状态通过 Windows 托盘通知（Toast Notification）提示用户，因为此时主窗口可能处于隐藏状态。
 
 ### 数据流：翻译示例
 
@@ -614,6 +688,7 @@ A: 在 `Languages/` 目录添加 `.xaml` 和 `.json` 文件，通过 `IPluginCon
 | `STranslate/Controls/HotkeyControl.cs` | 热键设置自定义控件 |
 | `STranslate/Controls/HotkeyDisplay.cs` | 热键显示自定义控件 |
 | `STranslate/Views/Pages/HotkeyPage.xaml` | 热键设置页面 |
+| `STranslate/Helpers/ClipboardMonitor.cs` | 剪贴板监听实现（Win32 API） |
 | `build.ps1` | Release 构建脚本 |
 | `Directory.Packages.props` | 集中式 NuGet 版本 |
 
@@ -648,3 +723,4 @@ A: 在 `Languages/` 目录添加 `.xaml` 和 `.json` 文件，通过 `IPluginCon
 - 服务被包装在 `Service` 类中，包含 `Plugin`, `MetaData`, `Context` 和 `Options`
 - 翻译插件可以扩展 `TranslatePluginBase` 或 `LlmTranslatePluginBase` 以获得 LLM 功能
 - 应用程序使用 Fody 织入器（Costura.Fody 用于程序集合并，MethodBoundaryAspect.Fody 用于 AOP）
+- **剪贴板监听**: 使用 Win32 API `AddClipboardFormatListener`，监听状态通过 Windows Toast 通知反馈
