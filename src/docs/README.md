@@ -12,8 +12,7 @@ docs/
 ├── features.md        # 功能特性（热键系统、剪贴板监听、历史记录）
 ├── storage.md         # 存储与配置
 ├── plugin.md          # 插件开发指南
-├── development.md     # 常见开发任务
-└── reference.md       # 参考信息（重要文件、关键依赖）
+└── reference.md       # 参考信息（重要文件、关键依赖、修改指南）
 ```
 
 ## 快速导航
@@ -27,7 +26,7 @@ docs/
 | 剪贴板监听 | [功能特性 - 剪贴板监听](features.md) |
 | 历史记录功能 | [功能特性 - 历史记录](features.md) |
 | 如何开发插件 | [插件开发指南](plugin.md) |
-| 修改核心服务 | [常见开发任务](development.md) |
+| 修改核心服务/UI | [参考信息 - 修改指南](reference.md) |
 | 查找关键文件 | [参考信息](reference.md) |
 
 ## 主索引

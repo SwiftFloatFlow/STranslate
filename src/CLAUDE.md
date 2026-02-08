@@ -7,6 +7,19 @@
 - 除非是代码、标识符或不可避免的技术术语，否则不得使用英语。
 - 错误解释和总结必须用中文。
 
+## 快速构建与调试
+
+```powershell
+# 构建并运行（最常用）
+dotnet run --project STranslate/STranslate.csproj
+
+# 或构建后运行
+dotnet build STranslate.sln --configuration Debug
+./.artifacts/Debug/STranslate.exe
+```
+
+更多构建选项参见 [项目概述](docs/overview.md)。
+
 ## 文档导航
 
 本文档已按功能模块拆分为以下子文档：
@@ -32,18 +45,17 @@
 - [**插件开发指南**](docs/plugin.md) - 插件开发、包格式、社区插件开发
 
 ### 开发参考
-- [**常见开发任务**](docs/development.md) - 修改核心服务、UI 更改、调试插件
-- [**参考信息**](docs/reference.md) - 关键文件索引、技术栈与依赖项
+- [**参考信息**](docs/reference.md) - 关键文件索引、修改核心服务/UI、技术栈与依赖项
 
 ## 快速参考
 
 | 任务 | 相关文档 |
 |------|---------|
 | 了解项目结构 | [项目概述](docs/overview.md) |
-| 构建项目 | [项目概述](docs/overview.md) |
+| 构建项目 | CLAUDE.md 快速构建 或 [项目概述](docs/overview.md) |
 | 开发插件 | [插件开发指南](docs/plugin.md) |
 | 修改热键功能 | [功能特性](docs/features.md) |
 | 修改剪贴板监听 | [功能特性](docs/features.md) |
 | 修改历史记录 | [功能特性](docs/features.md) |
-| 修改核心服务 | [常见开发任务](docs/development.md) |
+| 修改核心服务/UI | [参考信息](docs/reference.md) |
 | 查找关键文件 | [参考信息](docs/reference.md) |

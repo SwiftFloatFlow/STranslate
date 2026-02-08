@@ -234,3 +234,29 @@ A:
 **Q: 如何支持多语言？**
 
 A: 在 `Languages/` 目录添加 `.xaml` 和 `.json` 文件，通过 `IPluginContext.GetTranslation()` 获取
+
+## 扩展插件类型
+
+如需添加全新的插件类型（非翻译/OCR/TTS/词汇）：
+
+1. 在 `STranslate.Plugin/` 中定义接口（例如 `IMyPlugin.cs`）
+2. 添加到 `ServiceType` 枚举（如果是新的服务类别）
+3. 更新 `BaseService.LoadPlugins<T>()` 以加载该类型
+4. 更新 `ServiceManager.CreateService()` 以处理该类型
+5. 在 `Services/` 中创建服务类（例如 `MyService.cs`）
+
+## 调试插件
+
+### 查看插件加载日志
+
+检查日志文件 `%APPDATA%\STranslate\Logs\{Version}\.log`：
+- 插件发现
+- 程序集加载
+- 类型解析
+- 初始化错误
+
+### 测试插件安装
+
+1. 构建插件为 `.spkg`（带 plugin.json 的 ZIP）
+2. 使用 UI：设置 → 插件 → 安装
+3. 或放在 `Plugins/` 目录作为预安装插件

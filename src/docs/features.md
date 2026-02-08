@@ -197,6 +197,15 @@ GlobalHotkey.IsConflict = !HotkeyMapper.SetHotkey(...);
 | `STranslate/Controls/HotkeyDisplay.cs` | 热键显示自定义控件 |
 | `STranslate/Views/Pages/HotkeyPage.xaml` | 热键设置页面 |
 
+### 扩展热键
+
+如需添加新的热键：
+
+1. 在 `HotkeySettings.cs` 添加热键属性
+2. 在热键注册逻辑中添加新热键的注册
+3. 如需 UI 设置，更新 `HotkeyPage.xaml`
+4. 如需特殊处理逻辑，在 `HotkeyMapper.cs` 或相关帮助类中实现
+
 ## 剪贴板监听功能
 
 剪贴板监听功能允许应用程序在后台监视系统剪贴板的变化，当检测到文本内容时自动触发翻译。

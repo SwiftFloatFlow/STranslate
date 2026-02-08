@@ -114,3 +114,21 @@
 | 依赖 | 用途 |
 |------|------|
 | **Microsoft.Windows.CsWin32** | 类型安全的 P/Invoke |
+
+## 修改指南
+
+### 修改核心服务
+
+| 服务 | 文件路径 |
+|------|----------|
+| TranslateService | `STranslate/Services/TranslateService.cs` |
+| OcrService | `STranslate/Services/OcrService.cs` |
+| TtsService | `STranslate/Services/TtsService.cs` |
+| VocabularyService | `STranslate/Services/VocabularyService.cs` |
+
+### UI 更改
+
+- **Views**: `STranslate/Views/`
+- **ViewModels**: `STranslate/ViewModels/`
+- **框架**: 使用 CommunityToolkit.Mvvm 进行 MVVM
+- **UI 组件**: 使用 iNKORE.UI.WPF.Modern 用于现代 UI 组件
