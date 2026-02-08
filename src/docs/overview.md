@@ -41,7 +41,33 @@
         └── STranslate.Plugin.Vocabulary.Maimemo/    # 默默记单词生词本插件
 ```
 
-## 社区插件 (ThirdPlugins) 说明
+## 构建命令
+
+```powershell
+# 构建 Debug 配置
+dotnet build STranslate.sln --configuration Debug
+
+# 构建 Release 配置
+dotnet build STranslate.sln --configuration Release
+
+# 构建特定版本（build.ps1 使用）
+dotnet build STranslate.sln --configuration Release /p:Version=2.0.0
+
+# 运行构建脚本（清理、更新版本、构建、清理）
+./build.ps1 -Version "2.0.0"
+```
+
+## 运行应用程序
+
+```powershell
+# 运行 Debug 构建
+dotnet run --project STranslate/STranslate.csproj
+
+# 或构建后直接运行可执行文件
+./.artifacts/Debug/STranslate.exe
+```
+
+## 社区插件 (ThirdPlugins)
 
 `ThirdPlugins` 目录用于存放**社区贡献的第三方插件**，这些插件通常：
 - 由社区开发者独立维护
