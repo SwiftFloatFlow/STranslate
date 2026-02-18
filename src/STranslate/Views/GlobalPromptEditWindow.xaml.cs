@@ -1,21 +1,26 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
+using STranslate.Core;
 using STranslate.ViewModels.Pages;
-using STranslate.Views.Pages;
+using System.Windows;
 
 namespace STranslate.Views;
 
-/// <summary>
-/// GlobalPromptEditWindow.xaml 的交互逻辑
-/// </summary>
 public partial class GlobalPromptEditWindow
 {
     public GlobalPromptEditWindow()
     {
         InitializeComponent();
 
-        // 从依赖注入获取ViewModel
-        var viewModel = Ioc.Default.GetRequiredService<GlobalPromptViewModel>();
-        var page = new GlobalPromptPage(viewModel);
-        ContentFrame.Content = page;
+        // 获取依赖
+        var settings = Ioc.Default.GetRequiredService<Settings>();
+        var serviceManager = Ioc.Default.GetRequiredService<ServiceManager>();
+        
+        // 创建 ViewModel
+        DataContext = new GlobalPromptViewModel(settings, serviceManager);
+    }
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
     }
 }
