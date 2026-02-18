@@ -118,7 +118,7 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="40" />
                                 </Grid.ColumnDefinitions>
                                 <control:EditableTextBlock
                                     Grid.Column="0"
@@ -128,13 +128,12 @@
                                     ToolTipService.ToolTip="{Binding GlobalPrompt.Name}" />
                                 <TextBlock
                                     Grid.Column="1"
-                                    Margin="8,0,0,0"
+                                    Margin="8,0,4,0"
                                     FontSize="{DynamicResource STControlFontSize11}"
                                     Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                     Text="{Binding ReferenceCount, StringFormat='({0})'}" />
                                 <ui:ToggleSwitch
                                     Grid.Column="2"
-                                    Margin="8,0,0,0"
                                     IsOn="{Binding IsEnabled}"
                                     OffContent=""
                                     OnContent="" />
