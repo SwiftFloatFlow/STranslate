@@ -123,8 +123,8 @@
                                     Grid.Column="0"
                                     Margin="5,0,0,0"
                                     FontSize="{DynamicResource STControlFontSize13}"
-                                    Text="{Binding GlobalPrompt.Name}"
-                                    ToolTipService.ToolTip="{Binding GlobalPrompt.Name}" />
+                                    Text="{Binding Name}"
+                                    ToolTipService.ToolTip="{Binding Name}" />
                                 <ui:ToggleSwitch
                                     Grid.Column="1"
                                     IsOn="{Binding IsEnabled}"
@@ -211,7 +211,7 @@
                         dd:DragDrop.IsDragSource="True"
                         dd:DragDrop.IsDropTarget="True"
                         Background="Transparent"
-                        ItemsSource="{Binding SelectedPrompt.GlobalPrompt.Items}"
+                        ItemsSource="{Binding SelectedPrompt.Items}"
                         SelectedItem="{Binding SelectedPromptItem}">
                         <ListBox.ItemContainerStyle>
                             <Style BasedOn="{StaticResource {x:Type ListBoxItem}}" TargetType="ListBoxItem">

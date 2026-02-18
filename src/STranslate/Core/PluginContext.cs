@@ -12,6 +12,10 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
 {
     private IPluginSavable Savable { get => field; set => field = value; } = null!;
     private object? _currentSettings;
+    private readonly List<Action<IReadOnlyList<GlobalPrompt>>> _globalPromptsChangedCallbacks = [];
+    private readonly object _callbacksLock = new();
+    private Settings? _settings;
+    private bool _disposed;
 
     public PluginMetaData MetaData => metaData;
 
@@ -78,8 +82,74 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
         ThemeManager.SetRequestedTheme(window, Ioc.Default.GetRequiredService<Settings>().ColorScheme);
     }
 
+    public void RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback)
+    {
+        bool shouldSubscribe = false;
+        lock (_callbacksLock)
+        {
+            if (!_globalPromptsChangedCallbacks.Contains(callback))
+            {
+                _globalPromptsChangedCallbacks.Add(callback);
+                shouldSubscribe = _globalPromptsChangedCallbacks.Count == 1;
+            }
+        }
+
+        if (shouldSubscribe)
+        {
+            SubscribeToGlobalPromptsChanged();
+        }
+    }
+
+    public void UnregisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback)
+    {
+        lock (_callbacksLock)
+        {
+            _globalPromptsChangedCallbacks.Remove(callback);
+        }
+    }
+
+    internal void RaiseGlobalPromptsChanged(IReadOnlyList<GlobalPrompt> globalPrompts)
+    {
+        List<Action<IReadOnlyList<GlobalPrompt>>> callbacksCopy;
+        lock (_callbacksLock)
+        {
+            callbacksCopy = [.. _globalPromptsChangedCallbacks];
+        }
+
+        foreach (var callback in callbacksCopy)
+        {
+            try
+            {
+                callback(globalPrompts);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "GlobalPromptsChanged callback error");
+            }
+        }
+    }
+
+    private void SubscribeToGlobalPromptsChanged()
+    {
+        _settings ??= Ioc.Default.GetRequiredService<Settings>();
+        _settings.GlobalPromptsChanged += OnSettingsGlobalPromptsChanged;
+    }
+
+    private void OnSettingsGlobalPromptsChanged(object? sender, IReadOnlyList<GlobalPrompt> globalPrompts)
+    {
+        RaiseGlobalPromptsChanged(globalPrompts);
+    }
+
     public void Dispose()
     {
+        if (_disposed) return;
+        _disposed = true;
+
+        if (_settings != null)
+        {
+            _settings.GlobalPromptsChanged -= OnSettingsGlobalPromptsChanged;
+        }
+
         Savable.Delete();
         Savable.Clean();
     }

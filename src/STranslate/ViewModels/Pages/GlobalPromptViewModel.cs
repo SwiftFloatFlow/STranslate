@@ -15,16 +15,16 @@ public partial class GlobalPromptViewModel : ObservableObject
     private readonly Settings _settings;
 
     /// <summary>
-    /// 全局提示词列表（可选择）
+    /// 全局提示词列表
     /// </summary>
     [ObservableProperty]
-    public partial ObservableCollection<SelectableGlobalPrompt> GlobalPrompts { get; set; } = [];
+    public partial ObservableCollection<GlobalPrompt> GlobalPrompts { get; set; } = [];
 
     /// <summary>
     /// 选中的提示词
     /// </summary>
     [ObservableProperty]
-    public partial SelectableGlobalPrompt? SelectedPrompt { get; set; }
+    public partial GlobalPrompt? SelectedPrompt { get; set; }
 
     /// <summary>
     /// 选中的提示项
@@ -41,7 +41,7 @@ public partial class GlobalPromptViewModel : ObservableObject
     /// <summary>
     /// 过滤后的提示词列表
     /// </summary>
-    public IEnumerable<SelectableGlobalPrompt> FilteredPrompts => 
+    public IEnumerable<GlobalPrompt> FilteredPrompts => 
         string.IsNullOrWhiteSpace(SearchText) 
             ? GlobalPrompts 
             : GlobalPrompts.Where(p => p.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
@@ -65,8 +65,7 @@ public partial class GlobalPromptViewModel : ObservableObject
         GlobalPrompts.Clear();
         foreach (var prompt in _settings.GlobalPrompts)
         {
-            var selectable = new SelectableGlobalPrompt(prompt);
-            GlobalPrompts.Add(selectable);
+            GlobalPrompts.Add(prompt);
         }
     }
 
@@ -84,6 +83,7 @@ public partial class GlobalPromptViewModel : ObservableObject
         
         _settings.GlobalPrompts.Add(newPrompt);
         _settings.Save();
+        _settings.RaiseGlobalPromptsChanged();
     }
 
     /// <summary>
@@ -94,12 +94,9 @@ public partial class GlobalPromptViewModel : ObservableObject
     {
         if (SelectedPrompt == null) return;
 
-        var promptToRemove = _settings.GlobalPrompts.FirstOrDefault(p => p.Id == SelectedPrompt.Id);
-        if (promptToRemove != null)
-        {
-            _settings.GlobalPrompts.Remove(promptToRemove);
-            _settings.Save();
-        }
+        _settings.GlobalPrompts.Remove(SelectedPrompt);
+        _settings.Save();
+        _settings.RaiseGlobalPromptsChanged();
     }
 
     /// <summary>
@@ -110,9 +107,10 @@ public partial class GlobalPromptViewModel : ObservableObject
     {
         if (SelectedPrompt == null) return;
 
-        var cloned = SelectedPrompt.GlobalPrompt.Clone();
+        var cloned = SelectedPrompt.Clone();
         _settings.GlobalPrompts.Add(cloned);
         _settings.Save();
+        _settings.RaiseGlobalPromptsChanged();
     }
 
     /// <summary>
@@ -123,11 +121,12 @@ public partial class GlobalPromptViewModel : ObservableObject
     {
         if (SelectedPrompt == null) return;
 
-        var index = _settings.GlobalPrompts.IndexOf(SelectedPrompt.GlobalPrompt);
+        var index = _settings.GlobalPrompts.IndexOf(SelectedPrompt);
         if (index > 0)
         {
             _settings.GlobalPrompts.Move(index, index - 1);
             _settings.Save();
+            _settings.RaiseGlobalPromptsChanged();
         }
     }
 
@@ -139,11 +138,12 @@ public partial class GlobalPromptViewModel : ObservableObject
     {
         if (SelectedPrompt == null) return;
 
-        var index = _settings.GlobalPrompts.IndexOf(SelectedPrompt.GlobalPrompt);
+        var index = _settings.GlobalPrompts.IndexOf(SelectedPrompt);
         if (index < _settings.GlobalPrompts.Count - 1)
         {
             _settings.GlobalPrompts.Move(index, index + 1);
             _settings.Save();
+            _settings.RaiseGlobalPromptsChanged();
         }
     }
 
@@ -156,9 +156,10 @@ public partial class GlobalPromptViewModel : ObservableObject
         if (SelectedPrompt == null) return;
 
         var newItem = new PromptItem("system", "");
-        SelectedPrompt.GlobalPrompt.Items.Add(newItem);
+        SelectedPrompt.Items.Add(newItem);
         SelectedPromptItem = newItem;
         _settings.Save();
+        _settings.RaiseGlobalPromptsChanged();
     }
 
     /// <summary>
@@ -169,9 +170,10 @@ public partial class GlobalPromptViewModel : ObservableObject
     {
         if (SelectedPrompt == null || SelectedPromptItem == null) return;
 
-        SelectedPrompt.GlobalPrompt.Items.Remove(SelectedPromptItem);
+        SelectedPrompt.Items.Remove(SelectedPromptItem);
         SelectedPromptItem = null;
         _settings.Save();
+        _settings.RaiseGlobalPromptsChanged();
     }
 
     /// <summary>
@@ -181,6 +183,7 @@ public partial class GlobalPromptViewModel : ObservableObject
     private void Save(Window? window)
     {
         _settings.Save();
+        _settings.RaiseGlobalPromptsChanged();
         window?.Close();
     }
 

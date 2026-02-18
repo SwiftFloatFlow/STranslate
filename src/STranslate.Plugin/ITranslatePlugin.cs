@@ -126,21 +126,6 @@ public abstract class LlmTranslatePluginBase : TranslatePluginBase, ILlm
         // 触发属性变更通知（如果需要）
         OnPropertyChanged(nameof(SelectedPrompt));
     }
-
-    /// <summary>
-    /// 判断是否为全局提示词（辅助方法，供插件UI使用）
-    /// </summary>
-    public virtual bool IsGlobalPrompt(Prompt prompt)
-    {
-        if (prompt == null) return false;
-
-        // 第一优先级：通过 Tag 判断
-        if (prompt.Tag is string tag && tag.StartsWith("Global:"))
-            return true;
-
-        // 第二优先级：通过名称前缀判断
-        return prompt.Name.StartsWith("[Global:") || prompt.Name.StartsWith("[Global]");
-    }
 }
 
 /// <summary>

@@ -89,4 +89,18 @@ public interface IPluginContext : IDisposable
     /// <param name="id">全局提示词的唯一标识</param>
     /// <returns>匹配的全局提示词，如果不存在则返回null</returns>
     GlobalPrompt? GetGlobalPromptById(string id);
+
+    /// <summary>
+    /// 注册全局提示词变更回调。
+    /// 当全局提示词发生添加、删除、修改或启用状态变化时，主软件会调用此回调通知插件。
+    /// </summary>
+    /// <param name="callback">回调函数，参数为变更后的全局提示词只读列表</param>
+    void RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback);
+
+    /// <summary>
+    /// 注销全局提示词变更回调。
+    /// 插件卸载时应调用此方法以避免内存泄漏。
+    /// </summary>
+    /// <param name="callback">之前注册的回调函数</param>
+    void UnregisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback);
 }

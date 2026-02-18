@@ -9,6 +9,7 @@
 - **明确分离**: 全局提示词和局部提示词完全分开管理
 - **插件自主**: 插件决定是否使用、如何使用全局提示词
 - **接口暴露**: 通过 `IPluginContext` 接口获取全局提示词
+- **实时通知**: 支持事件回调，当全局提示词变更时主动通知插件
 - **无隐式行为**: 不自动合并、不自动同步
 
 ## 核心接口
@@ -30,6 +31,20 @@ public interface IPluginContext : IDisposable
     /// 根据ID获取特定的全局提示词（仅当已启用时）
     /// </summary>
     GlobalPrompt? GetGlobalPromptById(string id);
+
+    /// <summary>
+    /// 注册全局提示词变更回调。
+    /// 当全局提示词发生添加、删除、修改或启用状态变化时，主软件会调用此回调通知插件。
+    /// </summary>
+    /// <param name="callback">回调函数，参数为变更后的全局提示词只读列表</param>
+    void RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback);
+
+    /// <summary>
+    /// 注销全局提示词变更回调。
+    /// 插件卸载时应调用此方法以避免内存泄漏。
+    /// </summary>
+    /// <param name="callback">之前注册的回调函数</param>
+    void UnregisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback);
 }
 ```
 
@@ -126,7 +141,42 @@ public void UseGlobalPrompt(string promptId)
 }
 ```
 
-### 3. 合并显示（可选）
+### 3. 监听全局提示词变更（推荐）
+
+```csharp
+public class MyLlmPlugin : LlmTranslatePluginBase
+{
+    public override void Initialize()
+    {
+        // 注册变更回调，实时获取更新
+        Context.RegisterGlobalPromptsChangedCallback(OnGlobalPromptsChanged);
+        
+        // 初始加载
+        RefreshGlobalPrompts(Context.GetGlobalPrompts());
+    }
+
+    private void OnGlobalPromptsChanged(IReadOnlyList<GlobalPrompt> globalPrompts)
+    {
+        // 收到通知后立即刷新
+        RefreshGlobalPrompts(globalPrompts);
+    }
+
+    private void RefreshGlobalPrompts(IReadOnlyList<GlobalPrompt> globalPrompts)
+    {
+        // 更新插件内部状态
+        // ...
+    }
+
+    public override void Dispose()
+    {
+        // 注销回调，避免内存泄漏
+        Context.UnregisterGlobalPromptsChangedCallback(OnGlobalPromptsChanged);
+        base.Dispose();
+    }
+}
+```
+
+### 4. 合并显示（可选）
 
 ```csharp
 // 插件可以选择在UI中合并显示
@@ -149,7 +199,7 @@ public ObservableCollection<Prompt> AllPrompts
 }
 ```
 
-### 4. 保存时区分
+### 5. 保存时区分
 
 ```csharp
 public void SaveSettings()
@@ -168,6 +218,58 @@ private bool IsGlobalPrompt(Prompt prompt)
 {
     return prompt.Tag?.ToString()?.StartsWith("Global:") == true;
 }
+```
+
+## 事件回调机制
+
+### 工作原理
+
+当用户在主软件中修改全局提示词（添加、删除、编辑或更改启用状态）时，主软件会：
+
+1. 触发 `Settings.GlobalPromptsChanged` 事件
+2. `PluginContext` 接收事件并调用所有已注册的回调
+3. 插件收到回调后可立即更新内部状态
+
+### 回调注册时机
+
+```csharp
+// 推荐：在插件初始化时注册
+public override void Initialize()
+{
+    Context.RegisterGlobalPromptsChangedCallback(OnGlobalPromptsChanged);
+}
+
+// 必须：在插件释放时注销
+public override void Dispose()
+{
+    Context.UnregisterGlobalPromptsChangedCallback(OnGlobalPromptsChanged);
+}
+```
+
+### 线程安全
+
+- 回调可能在任意线程上执行
+- 如果需要更新 UI，请使用调度器：
+
+```csharp
+private void OnGlobalPromptsChanged(IReadOnlyList<GlobalPrompt> globalPrompts)
+{
+    Application.Current.Dispatcher.Invoke(() =>
+    {
+        // 安全地更新 UI
+        RefreshGlobalPromptsUI(globalPrompts);
+    });
+}
+```
+
+### 多次注册保护
+
+接口内部会自动忽略重复注册：
+
+```csharp
+// 这只会注册一次
+Context.RegisterGlobalPromptsChangedCallback(MyCallback);
+Context.RegisterGlobalPromptsChangedCallback(MyCallback); // 被忽略
 ```
 
 ## 用户界面
@@ -200,6 +302,7 @@ private bool IsGlobalPrompt(Prompt prompt)
 | 状态追踪 | 复杂（引用计数） | 简单（IsEnabled） |
 | 保存处理 | 需要过滤 | 各管各的 |
 | 灵活性 | 低 | 高 |
+| 实时更新 | 不支持 | 支持（事件回调） |
 
 ## 文件结构
 
@@ -213,9 +316,10 @@ private bool IsGlobalPrompt(Prompt prompt)
 
 | 文件 | 修改内容 |
 |------|----------|
-| `IPluginContext.cs` | 添加 GetGlobalPrompts/GetGlobalPromptById |
-| `PluginContext.cs` | 实现新接口方法（含 IsEnabled 过滤） |
-| `Settings.cs` | 添加 GlobalPrompts 集合 |
+| `IPluginContext.cs` | 添加 GetGlobalPrompts/GetGlobalPromptById/RegisterGlobalPromptsChangedCallback/UnregisterGlobalPromptsChangedCallback |
+| `PluginContext.cs` | 实现新接口方法（含 IsEnabled 过滤和事件订阅） |
+| `Settings.cs` | 添加 GlobalPrompts 集合和 GlobalPromptsChanged 事件 |
+| `GlobalPromptViewModel.cs` | 在修改全局提示词后调用 RaiseGlobalPromptsChanged() |
 
 ### 删除文件（相比方案一）
 
@@ -242,7 +346,11 @@ if (prompt.Tag?.ToString()?.StartsWith("Global:") == true)
 
 ### Q: 修改全局提示词后，插件会自动更新吗？
 
-A: 不会自动更新。插件需要在下次调用 `GetGlobalPrompts()` 时获取最新数据。
+A: **会**。如果插件注册了 `RegisterGlobalPromptsChangedCallback` 回调，主软件会在全局提示词变更时主动通知插件。
+
+### Q: 如果插件不注册回调会怎样？
+
+A: 插件需要在下次调用 `GetGlobalPrompts()` 时获取最新数据，无法实时感知变更。
 
 ### Q: 插件可以修改全局提示词吗？
 
@@ -254,7 +362,16 @@ A:
 - **全局提示词开关**: 控制是否**暴露给插件**（能否被获取）
 - **局部提示词开关**: 控制是否在**翻译时启用**（是否被使用）
 
+### Q: 回调中的异常会影响其他插件吗？
+
+A: **不会**。每个回调的异常会被单独捕获并记录日志，不会影响其他回调的执行。
+
 ## 版本历史
+
+- **v2.1** (2026-02-18): 添加事件回调机制
+  - 新增 RegisterGlobalPromptsChangedCallback/UnregisterGlobalPromptsChangedCallback 接口
+  - 支持实时通知插件全局提示词变更
+  - 线程安全的回调管理
 
 - **v2.0** (2026-02-18): 接口暴露方式实现
   - 通过 IPluginContext 接口获取全局提示词

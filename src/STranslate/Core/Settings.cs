@@ -56,6 +56,20 @@ public partial class Settings : ObservableObject
     private readonly object _globalPromptsLock = new();
 
     /// <summary>
+    /// 全局提示词变更事件
+    /// </summary>
+    public event EventHandler<IReadOnlyList<GlobalPrompt>>? GlobalPromptsChanged;
+
+    /// <summary>
+    /// 触发全局提示词变更事件
+    /// </summary>
+    public void RaiseGlobalPromptsChanged()
+    {
+        var snapshot = GetEnabledGlobalPromptsSnapshot();
+        GlobalPromptsChanged?.Invoke(this, snapshot);
+    }
+
+    /// <summary>
     /// 获取已启用的全局提示词快照（线程安全）
     /// </summary>
     /// <returns>只读的全局提示词列表</returns>
