@@ -72,12 +72,21 @@
                         <Run Text="{DynamicResource GlobalPrompts}" />
                         <Run Text=":" />
                     </TextBlock>
-                    <control:IconButton
+                    <Button
                         Grid.Column="1"
                         Margin="0,0,5,0"
-                        Command="{Binding EditGlobalPromptsCommand}"
-                        FontSize="{DynamicResource STControlFontSize8}"
-                        Icon="{x:Static ui:FluentSystemIcons.Edit_20_Regular}" />
+                        Command="{Binding EditGlobalPromptsCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:FontIcon
+                                FontFamily="{DynamicResource SymbolThemeFontFamily}"
+                                FontSize="16"
+                                Glyph="&#xE70F;" />
+                            <TextBlock
+                                Margin="4,0,0,0"
+                                VerticalAlignment="Center"
+                                Text="编辑" />
+                        </StackPanel>
+                    </Button>
                 </Grid>
                 
                 <Separator

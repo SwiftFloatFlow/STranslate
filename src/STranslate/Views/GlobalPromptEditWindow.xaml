@@ -5,7 +5,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
-    xmlns:vm="clr-namespace:STranslate.ViewModels.Pages"
     Title="{DynamicResource GlobalPrompts}"
     Width="1000"
     Height="700"
@@ -19,11 +18,7 @@
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
 
-    <Window.DataContext>
-        <vm:GlobalPromptViewModel />
-    </Window.DataContext>
-
     <Grid Margin="20,40,20,20">
-        <Frame Source="/Views/Pages/GlobalPromptPage.xaml" NavigationUIVisibility="Hidden" />
+        <Frame x:Name="ContentFrame" NavigationUIVisibility="Hidden" />
     </Grid>
 </Window>
