@@ -674,4 +674,8 @@
     <sys:String x:Key="EditPrompt_Content">编辑</sys:String>
     <sys:String x:Key="Temperature">温度控制</sys:String>
     <sys:String x:Key="Temperature_Description">控制着模型输出的随机性</sys:String>
+
+    <!--  // Global Prompts //  -->
+    <sys:String x:Key="GlobalPromptsDescription">管理全局提示词，可在多个AI翻译服务间共享使用</sys:String>
+    <sys:String x:Key="GlobalPromptsManage">管理全局提示词</sys:String>
 </ResourceDictionary>

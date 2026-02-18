@@ -684,6 +684,32 @@
                 </ui:SettingsCard>
 
                 <!--#endregion-->
+
+                <!--#region Global Prompts-->
+
+                <TextBlock
+                    Margin="0,16,0,4"
+                    Style="{DynamicResource BodyStrongTextBlockStyle}"
+                    Text="{DynamicResource GlobalPrompts}" />
+                <ui:SettingsCard Description="{DynamicResource GlobalPromptsDescription}" Header="{DynamicResource GlobalPromptsManage}">
+                    <ui:SettingsCard.HeaderIcon>
+                        <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.ChatBubblesQuestion_20_Regular}" />
+                    </ui:SettingsCard.HeaderIcon>
+                    <Button Command="{Binding EditGlobalPromptsCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:FontIcon
+                                FontFamily="{DynamicResource SymbolThemeFontFamily}"
+                                FontSize="16"
+                                Glyph="&#xE70F;" />
+                            <TextBlock
+                                Margin="4,0,0,0"
+                                VerticalAlignment="Center"
+                                Text="{DynamicResource Edit}" />
+                        </StackPanel>
+                    </Button>
+                </ui:SettingsCard>
+
+                <!--#endregion-->
             </ikw:SimpleStackPanel>
         </ui:ScrollViewerEx>
     </Grid>

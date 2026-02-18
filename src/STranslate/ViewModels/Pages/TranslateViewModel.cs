@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.Input;
 using STranslate.Services;
 using STranslate.Plugin;
-using STranslate.Views;
 
 namespace STranslate.ViewModels.Pages;
 
@@ -19,12 +18,4 @@ public partial class TranslateViewModel(TranslateService service) : ServiceViewM
 
     [RelayCommand]
     private void DeactiveImTran() => Service.DeactiveImTran();
-
-    [RelayCommand]
-    private void EditGlobalPrompts()
-    {
-        // 打开全局提示词编辑窗口
-        var window = new GlobalPromptEditWindow();
-        window.ShowDialog();
-    }
 }

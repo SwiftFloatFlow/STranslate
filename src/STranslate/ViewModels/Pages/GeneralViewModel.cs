@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Input;
 using STranslate.Core;
 using STranslate.Helpers;
 using STranslate.Plugin;
+using STranslate.Views;
 
 namespace STranslate.ViewModels.Pages;
 
@@ -25,6 +26,13 @@ public partial class GeneralViewModel : SearchViewModelBase
 
     [RelayCommand]
     private void ResetFontSize() => Settings.FontSize = 14;
+
+    [RelayCommand]
+    private void EditGlobalPrompts()
+    {
+        var window = new GlobalPromptEditWindow();
+        window.ShowDialog();
+    }
 
     public List<int> ScreenNumbers
     {

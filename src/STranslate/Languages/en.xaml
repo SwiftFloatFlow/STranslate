@@ -673,4 +673,8 @@
     <sys:String x:Key="EditPrompt_Content">Edit</sys:String>
     <sys:String x:Key="Temperature">Temperature Control</sys:String>
     <sys:String x:Key="Temperature_Description">Controls the randomness of the model's output</sys:String>
+
+    <!--  // Global Prompts //  -->
+    <sys:String x:Key="GlobalPromptsDescription">Manage global prompts that can be shared across multiple AI translation services</sys:String>
+    <sys:String x:Key="GlobalPromptsManage">Manage Global Prompts</sys:String>
 </ResourceDictionary>
