@@ -71,16 +71,18 @@
                 <Button
                     Grid.Column="2"
                     Margin="0,0,5,0"
+                    Padding="8,4"
                     Command="{Binding EditGlobalPromptsCommand}">
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <ui:FontIcon
                             FontFamily="{DynamicResource SymbolThemeFontFamily}"
-                            FontSize="16"
+                            FontSize="14"
                             Glyph="&#xE70F;" />
                         <TextBlock
-                            Margin="4,0,0,0"
+                            Margin="6,0,0,0"
                             VerticalAlignment="Center"
-                            Text="{DynamicResource Edit}" />
+                            FontSize="{DynamicResource STControlFontSize13}"
+                            Text="编辑" />
                     </StackPanel>
                 </Button>
                 
