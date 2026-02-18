@@ -20,12 +20,6 @@ public partial class SelectableGlobalPrompt : ObservableObject
     public partial bool IsSelected { get; set; }
 
     /// <summary>
-    /// 引用计数（显示有多少服务在使用此提示词）
-    /// </summary>
-    [ObservableProperty]
-    public partial int ReferenceCount { get; set; }
-
-    /// <summary>
     /// 是否启用
     /// </summary>
     [ObservableProperty]
@@ -50,11 +44,4 @@ public partial class SelectableGlobalPrompt : ObservableObject
     /// 提示词内容数量
     /// </summary>
     public int ItemCount => GlobalPrompt.Items.Count;
-
-    /// <summary>
-    /// 显示文本（名称 + 引用数）
-    /// </summary>
-    public string DisplayText => ReferenceCount > 0 
-        ? $"{Name} ({ReferenceCount})" 
-        : Name;
 }

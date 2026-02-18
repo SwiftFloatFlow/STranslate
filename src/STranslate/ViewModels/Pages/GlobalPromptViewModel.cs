@@ -13,7 +13,6 @@ namespace STranslate.ViewModels.Pages;
 public partial class GlobalPromptViewModel : ObservableObject
 {
     private readonly Settings _settings;
-    private readonly ServiceManager _serviceManager;
 
     /// <summary>
     /// 全局提示词列表（可选择）
@@ -47,10 +46,9 @@ public partial class GlobalPromptViewModel : ObservableObject
             ? GlobalPrompts 
             : GlobalPrompts.Where(p => p.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
 
-    public GlobalPromptViewModel(Settings settings, ServiceManager serviceManager)
+    public GlobalPromptViewModel(Settings settings)
     {
         _settings = settings;
-        _serviceManager = serviceManager;
 
         // 初始化列表
         RefreshGlobalPrompts();
@@ -68,19 +66,8 @@ public partial class GlobalPromptViewModel : ObservableObject
         foreach (var prompt in _settings.GlobalPrompts)
         {
             var selectable = new SelectableGlobalPrompt(prompt);
-            selectable.ReferenceCount = CalculateReferenceCount(prompt.Id);
             GlobalPrompts.Add(selectable);
         }
-    }
-
-    /// <summary>
-    /// 计算引用计数
-    /// </summary>
-    private int CalculateReferenceCount(string globalPromptId)
-    {
-        return _serviceManager.Services
-            .Where(s => s.Options?.ReferencedGlobalPromptIds.Contains(globalPromptId) == true)
-            .Count();
     }
 
     /// <summary>

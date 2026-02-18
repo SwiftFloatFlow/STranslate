@@ -14,10 +14,9 @@ public partial class GlobalPromptEditWindow
 
         // 获取依赖
         var settings = Ioc.Default.GetRequiredService<Settings>();
-        var serviceManager = Ioc.Default.GetRequiredService<ServiceManager>();
         
         // 创建 ViewModel
-        DataContext = new GlobalPromptViewModel(settings, serviceManager);
+        DataContext = new GlobalPromptViewModel(settings);
 
         // 应用主题
         ThemeManager.SetRequestedTheme(this, settings.ColorScheme);
