@@ -11,6 +11,7 @@
 
     <!--  // Navigation //  -->
     <sys:String x:Key="General">常规</sys:String>
+    <sys:String x:Key="GlobalPrompts">全局提示词</sys:String>
     <sys:String x:Key="Services">服务</sys:String>
     <sys:String x:Key="Translate">文本翻译</sys:String>
     <sys:String x:Key="Ocr">文本识别</sys:String>

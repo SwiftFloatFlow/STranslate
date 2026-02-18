@@ -1,0 +1,192 @@
+<ui:Page
+    x:Class="STranslate.Views.Pages.GlobalPromptPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:control="clr-namespace:STranslate.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dd="urn:gong-wpf-dragdrop"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.inkore.net/lib/ui/wpf/modern"
+    xmlns:vm="clr-namespace:STranslate.ViewModels.Pages"
+    Title="GlobalPrompts"
+    d:DataContext="{d:DesignInstance Type=vm:GlobalPromptViewModel,
+                                     IsDesignTimeCreatable=False}"
+    d:DesignHeight="600"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+
+    <Grid Margin="20,10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- 标题和搜索 -->
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock
+                VerticalAlignment="Center"
+                Style="{DynamicResource {x:Static ui:ThemeKeys.SubtitleTextBlockStyleKey}}"
+                Text="{DynamicResource GlobalPrompts}" />
+            
+            <ui:AutoSuggestBox
+                Grid.Column="1"
+                Width="250"
+                VerticalAlignment="Center"
+                PlaceholderText="{DynamicResource SearchGlobalPrompts}"
+                QueryIcon="Find"
+                Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        </Grid>
+
+        <!-- 工具栏 -->
+        <ToolBar Grid.Row="1" Margin="0,0,0,12">
+            <Button Command="{Binding AddGlobalPromptCommand}" ToolTip="{DynamicResource Add}">
+                <ui:BitmapIcon ShowAsMonochrome="False" UriSource="/Resources/add.png" />
+            </Button>
+            <Button Command="{Binding CloneGlobalPromptCommand}" ToolTip="{DynamicResource Clone}">
+                <ui:BitmapIcon ShowAsMonochrome="False" UriSource="/Resources/copy.png" />
+            </Button>
+            <Button Command="{Binding DeleteGlobalPromptCommand}" ToolTip="{DynamicResource Delete}">
+                <ui:BitmapIcon ShowAsMonochrome="False" UriSource="/Resources/delete.png" />
+            </Button>
+            <Separator />
+            <Button Command="{Binding MoveUpCommand}" ToolTip="{DynamicResource MoveUp}">
+                <ui:BitmapIcon ShowAsMonochrome="False" UriSource="/Resources/up.png" />
+            </Button>
+            <Button Command="{Binding MoveDownCommand}" ToolTip="{DynamicResource MoveDown}">
+                <ui:BitmapIcon ShowAsMonochrome="False" UriSource="/Resources/down.png" />
+            </Button>
+        </ToolBar>
+
+        <!-- 内容区域 -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- 左侧列表 -->
+            <ui:ElevationBorder
+                Grid.Column="0"
+                Background="{DynamicResource SettingsCardBackground}"
+                BorderBrush="{DynamicResource ControlElevationBorderBrush}">
+                <ListBox
+                    x:Name="PromptListBox"
+                    dd:DragDrop.IsDragSource="True"
+                    dd:DragDrop.IsDropTarget="True"
+                    ItemsSource="{Binding FilteredPrompts}"
+                    SelectedItem="{Binding SelectedPrompt}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    Text="{Binding DisplayText}"
+                                    TextTrimming="CharacterEllipsis" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Foreground="{DynamicResource {x:Static ui:ThemeKeys.TextFillColorSecondaryBrushKey}}"
+                                    Text="{Binding ItemCount, StringFormat='({0})'}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ui:ElevationBorder>
+
+            <!-- 右侧编辑区 -->
+            <ui:ElevationBorder
+                Grid.Column="2"
+                Background="{DynamicResource SettingsCardBackground}"
+                BorderBrush="{DynamicResource ControlElevationBorderBrush}">
+                <Grid Margin="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- 名称 -->
+                    <StackPanel Grid.Row="0" Margin="0,0,0,16">
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            Foreground="{DynamicResource {x:Static ui:ThemeKeys.TextFillColorSecondaryBrushKey}}"
+                            Text="{DynamicResource Name}" />
+                        <ui:TextBox
+                            x:Name="PromptNameTextBox"
+                            Text="{Binding SelectedPrompt.GlobalPrompt.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+                    <!-- 引用计数 -->
+                    <StackPanel Grid.Row="1" Margin="0,0,0,16">
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            Foreground="{DynamicResource {x:Static ui:ThemeKeys.TextFillColorSecondaryBrushKey}}"
+                            Text="{DynamicResource ReferenceCount}" />
+                        <TextBlock Text="{Binding SelectedPrompt.ReferenceCount}" />
+                    </StackPanel>
+
+                    <!-- 提示词内容 -->
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock
+                            Grid.Row="0"
+                            Margin="0,0,0,4"
+                            Foreground="{DynamicResource {x:Static ui:ThemeKeys.TextFillColorSecondaryBrushKey}}"
+                            Text="{DynamicResource PromptContent}" />
+                        
+                        <ItemsControl Grid.Row="1" ItemsSource="{Binding SelectedPrompt.GlobalPrompt.Items}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <ComboBox
+                                            Grid.Column="0"
+                                            Margin="0,0,8,0"
+                                            SelectedItem="{Binding Role, Mode=TwoWay}">
+                                            <ComboBoxItem Content="system" />
+                                            <ComboBoxItem Content="user" />
+                                            <ComboBoxItem Content="assistant" />
+                                        </ComboBox>
+                                        <ui:TextBox
+                                            Grid.Column="1"
+                                            AcceptsReturn="True"
+                                            Text="{Binding Content, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            TextWrapping="Wrap" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+
+                    <!-- 空状态 -->
+                    <TextBlock
+                        Grid.RowSpan="3"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource {x:Static ui:ThemeKeys.TextFillColorSecondaryBrushKey}}"
+                        Text="{DynamicResource SelectGlobalPromptToEdit}"
+                        Visibility="{Binding SelectedPrompt, Converter={StaticResource NullToVisibilityConverter}}" />
+                </Grid>
+            </ui:ElevationBorder>
+        </Grid>
+    </Grid>
+</ui:Page>
