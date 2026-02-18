@@ -123,7 +123,7 @@
                             Margin="0,0,0,4"
                             Foreground="{DynamicResource {x:Static ui:ThemeKeys.TextFillColorSecondaryBrushKey}}"
                             Text="{DynamicResource Name}" />
-                        <ui:TextBox
+                        <TextBox
                             x:Name="PromptNameTextBox"
                             Text="{Binding SelectedPrompt.GlobalPrompt.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
@@ -166,7 +166,7 @@
                                             <ComboBoxItem Content="user" />
                                             <ComboBoxItem Content="assistant" />
                                         </ComboBox>
-                                        <ui:TextBox
+                                        <TextBox
                                             Grid.Column="1"
                                             AcceptsReturn="True"
                                             Text="{Binding Content, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
