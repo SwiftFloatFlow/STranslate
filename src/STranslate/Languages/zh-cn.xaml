@@ -678,4 +678,7 @@
     <!--  // Global Prompts //  -->
     <sys:String x:Key="GlobalPromptsDescription">管理全局提示词，可在多个AI翻译服务间共享使用</sys:String>
     <sys:String x:Key="GlobalPromptsManage">管理全局提示词</sys:String>
+    <sys:String x:Key="GlobalPromptsList">全局提示词列表</sys:String>
+    <sys:String x:Key="GlobalPromptDetails">提示词详情</sys:String>
+    <sys:String x:Key="Clone">克隆</sys:String>
 </ResourceDictionary>

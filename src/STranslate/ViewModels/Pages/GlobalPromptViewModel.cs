@@ -29,6 +29,12 @@ public partial class GlobalPromptViewModel : ObservableObject
     public partial SelectableGlobalPrompt? SelectedPrompt { get; set; }
 
     /// <summary>
+    /// 选中的提示项
+    /// </summary>
+    [ObservableProperty]
+    public partial PromptItem? SelectedPromptItem { get; set; }
+
+    /// <summary>
     /// 搜索关键词
     /// </summary>
     [ObservableProperty]
@@ -162,6 +168,42 @@ public partial class GlobalPromptViewModel : ObservableObject
             _settings.GlobalPrompts.Move(index, index + 1);
             _settings.Save();
         }
+    }
+
+    /// <summary>
+    /// 添加提示项
+    /// </summary>
+    [RelayCommand]
+    private void AddPromptItem()
+    {
+        if (SelectedPrompt == null) return;
+
+        var newItem = new PromptItem("system", "");
+        SelectedPrompt.GlobalPrompt.Items.Add(newItem);
+        SelectedPromptItem = newItem;
+        _settings.Save();
+    }
+
+    /// <summary>
+    /// 删除提示项
+    /// </summary>
+    [RelayCommand]
+    private void RemovePromptItem()
+    {
+        if (SelectedPrompt == null || SelectedPromptItem == null) return;
+
+        SelectedPrompt.GlobalPrompt.Items.Remove(SelectedPromptItem);
+        SelectedPromptItem = null;
+        _settings.Save();
+    }
+
+    /// <summary>
+    /// 关闭窗口
+    /// </summary>
+    [RelayCommand]
+    private void Close(Window? window)
+    {
+        window?.Close();
     }
 
     partial void OnSearchTextChanged(string value)
