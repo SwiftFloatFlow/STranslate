@@ -13,9 +13,9 @@
     xmlns:vm="clr-namespace:STranslate.ViewModels"
     x:Name="STSettingsWindow"
     Title="{DynamicResource Settings}"
-    Width="1000"
+    Width="1100"
     Height="760"
-    MinWidth="940"
+    MinWidth="1040"
     MinHeight="600"
     control:SnackbarBehavior.EnableSnackbar="True"
     d:DataContext="{d:DesignInstance Type=vm:SettingsWindowViewModel,
