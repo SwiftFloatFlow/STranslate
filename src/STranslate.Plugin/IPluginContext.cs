@@ -75,4 +75,18 @@ public interface IPluginContext : IDisposable
     /// </summary>
     /// <param name="window">需要应用主题的窗口实例</param>
     void ApplyTheme(Window window);
+
+    /// <summary>
+    /// 获取所有全局提示词列表（只读）。
+    /// 插件可以从中选择需要的提示词，但不应该修改这些提示词。
+    /// </summary>
+    /// <returns>全局提示词的只读列表</returns>
+    IReadOnlyList<GlobalPrompt> GetGlobalPrompts();
+
+    /// <summary>
+    /// 根据ID获取特定的全局提示词。
+    /// </summary>
+    /// <param name="id">全局提示词的唯一标识</param>
+    /// <returns>匹配的全局提示词，如果不存在则返回null</returns>
+    GlobalPrompt? GetGlobalPromptById(string id);
 }

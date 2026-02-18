@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using STranslate.Models;
+using STranslate.Plugin;
 
 namespace STranslate.ViewModels;
 

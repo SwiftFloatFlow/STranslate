@@ -57,45 +57,18 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
 
     public void SaveSettingStorage<T>() where T : new()
     {
-        if (_currentSettings is T settings)
-        {
-            ObservableCollection<Prompt>? originalPrompts = null;
-            bool filterSuccess = false;
-            
-            try
-            {
-                // 尝试过滤全局提示词
-                if (ServicePromptMerger.TryFilterGlobalPrompts(settings, out var filtered))
-                {
-                    var prop = typeof(T).GetProperty("Prompts")!;
-                    originalPrompts = prop.GetValue(settings) as ObservableCollection<Prompt>;
-                    prop.SetValue(settings, new ObservableCollection<Prompt>(filtered));
-                    filterSuccess = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogWarning(ex, "过滤全局提示词失败");
-            }
+        Savable?.Save();
+    }
 
-            try
-            {
-                Savable?.Save();
-            }
-            finally
-            {
-                // 恢复原始提示词列表
-                if (filterSuccess && originalPrompts != null)
-                {
-                    var prop = typeof(T).GetProperty("Prompts")!;
-                    prop.SetValue(settings, originalPrompts);
-                }
-            }
-        }
-        else
-        {
-            Savable?.Save();
-        }
+    public IReadOnlyList<GlobalPrompt> GetGlobalPrompts()
+    {
+        return Ioc.Default.GetRequiredService<Settings>().GlobalPrompts.ToList().AsReadOnly();
+    }
+
+    public GlobalPrompt? GetGlobalPromptById(string id)
+    {
+        return Ioc.Default.GetRequiredService<Settings>().GlobalPrompts
+            .FirstOrDefault(p => p.Id == id);
     }
 
     public void ApplyTheme(Window window)

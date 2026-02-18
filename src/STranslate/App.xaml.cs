@@ -91,7 +91,6 @@ public partial class App : ISingleInstanceApp, INavigation, IDisposable
                     // 注册核心服务
                     services.AddSingleton<PluginManager>();
                     services.AddSingleton<ServiceManager>();
-                    services.AddSingleton<GlobalPromptManager>();
                     services.AddSingleton<PluginService>();
                     services.AddSingleton<TranslateService>();
                     services.AddSingleton<OcrService>();
@@ -195,11 +194,6 @@ public partial class App : ISingleInstanceApp, INavigation, IDisposable
         _pluginManager = Ioc.Default.GetRequiredService<PluginManager>();
         _pluginManager.LoadPlugins();
         Ioc.Default.GetRequiredService<ServiceManager>().LoadServices();
-        
-        // 初始化全局提示词管理器
-        var globalPromptManager = Ioc.Default.GetRequiredService<GlobalPromptManager>();
-        globalPromptManager.InitializeAllServices();
-        
         Ioc.Default.GetRequiredService<SqlService>().InitializeDB();
 
         RegisterAppDomainExceptions();

@@ -133,20 +133,6 @@ public partial class TranslationOptions : ObservableObject
     [JsonIgnore]
     public partial bool TemporaryDisplay { get; set; } = false;
     [ObservableProperty] public partial bool AutoBackTranslation { get; set; } = false;
-
-    /// <summary>
-    /// 引用的全局提示词ID列表
-    /// </summary>
-    [ObservableProperty]
-    [JsonPropertyName("referencedGlobalPromptIds")]
-    public partial ObservableCollection<string> ReferencedGlobalPromptIds { get; set; } = [];
-
-    /// <summary>
-    /// 全局提示词启用状态字典（Key: 全局提示词ID, Value: 是否启用）
-    /// </summary>
-    [ObservableProperty]
-    [JsonPropertyName("globalPromptStates")]
-    public partial Dictionary<string, bool> GlobalPromptStates { get; set; } = [];
 }
 
 /// <summary>

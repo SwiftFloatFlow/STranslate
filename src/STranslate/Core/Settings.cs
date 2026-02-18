@@ -2,7 +2,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using iNKORE.UI.WPF.Modern;
 using STranslate.Helpers;
-using STranslate.Models;
 using STranslate.Plugin;
 using STranslate.Views;
 using Serilog.Core;

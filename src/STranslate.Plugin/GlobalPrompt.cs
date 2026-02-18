@@ -1,8 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using STranslate.Plugin;
 using System.Collections.ObjectModel;
 
-namespace STranslate.Models;
+namespace STranslate.Plugin;
 
 /// <summary>
 /// 全局提示词定义
@@ -27,26 +26,23 @@ public partial class GlobalPrompt : ObservableObject
     public ObservableCollection<PromptItem> Items { get; set; } = [];
 
     /// <summary>
-    /// 转换为普通 Prompt（注入到插件时使用）
+    /// 转换为普通 Prompt（供插件使用）
     /// </summary>
-    /// <param name="isEnabled">是否默认启用</param>
+    /// <param name="isEnabled">是否启用</param>
     /// <returns>转换后的 Prompt</returns>
     public Prompt ToPrompt(bool isEnabled = false)
     {
         var prompt = new Prompt
         {
-            // V4.0: 双重ID保障 - ID同时编码在名称和Tag中
-            Name = $"[Global:{Id}] {Name}",  // 格式: [Global:GUID] 显示名称
+            Name = $"[Global:{Id}] {Name}",
             IsEnabled = isEnabled
         };
         
-        // 复制所有 PromptItem
         foreach (var item in Items)
         {
             prompt.Items.Add(item.Clone());
         }
         
-        // V4.0: ID同时存储在Tag中（优先识别）
         prompt.Tag = $"Global:{Id}";
         
         return prompt;
@@ -59,7 +55,7 @@ public partial class GlobalPrompt : ObservableObject
     {
         return new GlobalPrompt
         {
-            Id = Id,  // ID保持不变
+            Id = Id,
             Name = Name + " (副本)",
             Items = new ObservableCollection<PromptItem>(
                 Items.Select(i => i.Clone())
