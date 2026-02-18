@@ -100,12 +100,6 @@
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
 
-                <ui:NavigationViewItem Content="{DynamicResource GlobalPrompts}" Tag="GlobalPromptPage">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:BitmapIcon ShowAsMonochrome="False" UriSource="/Resources/prompt.png" />
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
-
                 <ui:NavigationViewItem Content="{DynamicResource Services}" IsExpanded="True">
                     <ui:NavigationViewItem.Icon>
                         <ui:BitmapIcon ShowAsMonochrome="False" UriSource="/Resources/services.png" />

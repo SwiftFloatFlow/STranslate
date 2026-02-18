@@ -35,6 +35,12 @@
             <Grid HorizontalAlignment="Right" DockPanel.Dock="Right">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
@@ -52,8 +58,41 @@
                     Style="{DynamicResource TextBlockInfoStyle}"
                     Text="&#xF4A3;"
                     ToolTip="{DynamicResource SpecialServiceInfo}" />
+                
+                <!-- 全局提示词 -->
+                <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Margin="5,0"
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource {x:Static ui:ThemeKeys.TextFillColorSecondaryBrushKey}}">
+                        <Run Text="{DynamicResource GlobalPrompts}" />
+                        <Run Text=":" />
+                    </TextBlock>
+                    <control:IconButton
+                        Grid.Column="1"
+                        Margin="0,0,5,0"
+                        Command="{Binding EditGlobalPromptsCommand}"
+                        FontSize="{DynamicResource STControlFontSize8}"
+                        Icon="{x:Static ui:FluentSystemIcons.Edit_20_Regular}" />
+                </Grid>
+                
+                <Separator
+                    Grid.Column="2"
+                    Width="20"
+                    Height="1"
+                    VerticalAlignment="Center"
+                    RenderTransformOrigin="0.5,0.5">
+                    <Separator.RenderTransform>
+                        <RotateTransform Angle="90" />
+                    </Separator.RenderTransform>
+                </Separator>
+                
                 <Grid
-                    Grid.Column="1"
+                    Grid.Column="3"
                     dd:DragDrop.DropHandler="{StaticResource ImTranDropHandler}"
                     dd:DragDrop.IsDropTarget="True"
                     Background="Transparent">
@@ -134,7 +173,7 @@
                         Visibility="{Binding Service.ImageTranslateService, Converter={cnvt:EqualToVisibilityInverseConverter}}" />
                 </Grid>
                 <Separator
-                    Grid.Column="2"
+                    Grid.Column="4"
                     Width="20"
                     Height="1"
                     VerticalAlignment="Center"
@@ -144,7 +183,7 @@
                     </Separator.RenderTransform>
                 </Separator>
                 <Grid
-                    Grid.Column="3"
+                    Grid.Column="5"
                     dd:DragDrop.DropHandler="{StaticResource ReplaceDropHandler}"
                     dd:DragDrop.IsDropTarget="True"
                     Background="Transparent">
