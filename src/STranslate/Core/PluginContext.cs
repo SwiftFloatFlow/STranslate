@@ -62,16 +62,12 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
 
     public IReadOnlyList<GlobalPrompt> GetGlobalPrompts()
     {
-        return Ioc.Default.GetRequiredService<Settings>().GlobalPrompts
-            .Where(p => p.IsEnabled)
-            .ToList()
-            .AsReadOnly();
+        return Ioc.Default.GetRequiredService<Settings>().GetEnabledGlobalPromptsSnapshot();
     }
 
     public GlobalPrompt? GetGlobalPromptById(string id)
     {
-        return Ioc.Default.GetRequiredService<Settings>().GlobalPrompts
-            .FirstOrDefault(p => p.Id == id && p.IsEnabled);
+        return Ioc.Default.GetRequiredService<Settings>().GetGlobalPromptByIdSnapshot(id);
     }
 
     public void ApplyTheme(Window window)

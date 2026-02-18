@@ -55,14 +55,30 @@ public partial class GlobalPrompt : ObservableObject
     }
 
     /// <summary>
-    /// 克隆全局提示词
+    /// 克隆全局提示词（用于编辑窗口复制，生成新ID）
     /// </summary>
     public GlobalPrompt Clone()
     {
         return new GlobalPrompt
         {
-            Id = Id,
+            Id = Guid.NewGuid().ToString("N"),  // 生成新ID，避免重复
             Name = Name + " (副本)",
+            IsEnabled = IsEnabled,
+            Items = new ObservableCollection<PromptItem>(
+                Items.Select(i => i.Clone())
+            )
+        };
+    }
+
+    /// <summary>
+    /// 创建只读副本（用于接口返回，保护原始数据）
+    /// </summary>
+    internal GlobalPrompt CloneForRead()
+    {
+        return new GlobalPrompt
+        {
+            Id = Id,
+            Name = Name,
             IsEnabled = IsEnabled,
             Items = new ObservableCollection<PromptItem>(
                 Items.Select(i => i.Clone())

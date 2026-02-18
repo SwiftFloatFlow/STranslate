@@ -50,6 +50,39 @@ public partial class Settings : ObservableObject
     /// </summary>
     [ObservableProperty] public partial ObservableCollection<GlobalPrompt> GlobalPrompts { get; set; } = [];
 
+    /// <summary>
+    /// 全局提示词集合的锁对象（用于线程安全访问）
+    /// </summary>
+    private readonly object _globalPromptsLock = new();
+
+    /// <summary>
+    /// 获取已启用的全局提示词快照（线程安全）
+    /// </summary>
+    /// <returns>只读的全局提示词列表</returns>
+    public IReadOnlyList<GlobalPrompt> GetEnabledGlobalPromptsSnapshot()
+    {
+        lock (_globalPromptsLock)
+        {
+            return GlobalPrompts
+                .Where(p => p.IsEnabled)
+                .Select(p => p.CloneForRead())
+                .ToList()
+                .AsReadOnly();
+        }
+    }
+
+    /// <summary>
+    /// 根据ID获取全局提示词快照（线程安全，仅返回已启用的）
+    /// </summary>
+    public GlobalPrompt? GetGlobalPromptByIdSnapshot(string id)
+    {
+        lock (_globalPromptsLock)
+        {
+            var prompt = GlobalPrompts.FirstOrDefault(p => p.Id == id && p.IsEnabled);
+            return prompt?.CloneForRead();
+        }
+    }
+
     [ObservableProperty] public partial HistoryLimit HistoryLimit { get; set; } = HistoryLimit.Limit1000;
 
     [ObservableProperty] public partial bool IsColorSchemeVisible { get; set; } = true;
