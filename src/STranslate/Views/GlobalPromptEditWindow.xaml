@@ -78,7 +78,7 @@
                 <Button
                     Padding="12,6"
                     Command="{Binding CloneGlobalPromptCommand}"
-                    Content="{DynamicResource Clone}"
+                    Content="{DynamicResource Copy}"
                     FontSize="{DynamicResource STControlFontSize12}" />
                 <Button
                     Padding="12,6"
@@ -118,6 +118,7 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <control:EditableTextBlock
                                     Grid.Column="0"
@@ -131,6 +132,12 @@
                                     FontSize="{DynamicResource STControlFontSize11}"
                                     Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                     Text="{Binding ReferenceCount, StringFormat='({0})'}" />
+                                <ui:ToggleSwitch
+                                    Grid.Column="2"
+                                    Margin="8,0,0,0"
+                                    IsOn="{Binding IsEnabled}"
+                                    OffContent=""
+                                    OnContent="" />
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -254,28 +261,64 @@
                         BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1"
                         CornerRadius="6">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock
-                                Grid.Column="0"
-                                Margin="0,0,12,0"
-                                VerticalAlignment="Center"
-                                FontWeight="Medium"
-                                Text="{DynamicResource Role}" />
-                            <ComboBox
-                                Grid.Column="1"
-                                Padding="10,6"
-                                FontSize="{DynamicResource STControlFontSize13}"
-                                IsEnabled="{Binding SelectedPromptItem, Converter={cnvt:NullToBoolInverseConverter}}"
-                                SelectedItem="{Binding SelectedPromptItem.Role, UpdateSourceTrigger=PropertyChanged}">
-                                <ComboBoxItem Content="system" />
-                                <ComboBoxItem Content="user" />
-                                <ComboBoxItem Content="assistant" />
-                            </ComboBox>
-                        </Grid>
+                        <ikw:SimpleStackPanel Spacing="5">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Margin="0,0,12,0"
+                                    VerticalAlignment="Center"
+                                    FontWeight="Medium"
+                                    Text="{DynamicResource Role}" />
+                                <ComboBox
+                                    Grid.Column="1"
+                                    Padding="10,6"
+                                    FontSize="{DynamicResource STControlFontSize13}"
+                                    IsEnabled="{Binding SelectedPromptItem, Converter={cnvt:NullToBoolInverseConverter}}"
+                                    SelectedItem="{Binding SelectedPromptItem.Role, UpdateSourceTrigger=PropertyChanged}">
+                                    <ComboBoxItem Content="system" />
+                                    <ComboBoxItem Content="user" />
+                                    <ComboBoxItem Content="assistant" />
+                                </ComboBox>
+                            </Grid>
+
+                            <!--  使用说明  -->
+                            <Border
+                                Padding="12,8"
+                                Background="{DynamicResource SystemFillColorAttentionBackgroundBrush}"
+                                BorderBrush="{DynamicResource SystemFillColorAttentionBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4">
+                                <ikw:SimpleStackPanel Spacing="4">
+                                    <TextBlock
+                                        FontSize="{DynamicResource STControlFontSize12}"
+                                        FontWeight="SemiBold"
+                                        Foreground="{DynamicResource SystemFillColorAttentionBrush}"
+                                        Text="{DynamicResource CustomPromptInstructionTitle}" />
+                                    <TextBlock
+                                        FontSize="{DynamicResource STControlFontSize11}"
+                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                        TextWrapping="Wrap">
+                                        <Run Text="{DynamicResource CustomPromptInstructionDesc1}" />
+                                        <LineBreak />
+                                        <Run FontWeight="SemiBold" Text="{DynamicResource CustomPromptInstructionDesc2}" />
+                                        <Run Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" Text="$source" />
+                                        <Run Text="{DynamicResource CustomPromptInstructionDesc3}" />
+                                        <Run
+                                            FontSize="{DynamicResource STControlFontSize10}"
+                                            Foreground="{DynamicResource SystemFillColorCautionBrush}"
+                                            Text="{DynamicResource CustomPromptInstructionDesc4}" />
+                                        <Run Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" Text="$target" />
+                                        <Run Text="{DynamicResource CustomPromptInstructionDesc5}" />
+                                        <Run Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" Text="$content" />
+                                        <Run Text="{DynamicResource CustomPromptInstructionDesc6}" />
+                                    </TextBlock>
+                                </ikw:SimpleStackPanel>
+                            </Border>
+                        </ikw:SimpleStackPanel>
                     </Border>
 
                     <!--  内容编辑  -->
@@ -312,9 +355,19 @@
             <Button
                 MinWidth="90"
                 Padding="16,8"
-                Command="{Binding CloseCommand}"
+                Command="{Binding SaveCommand}"
                 CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                Content="{DynamicResource Close}"
+                Content="{DynamicResource Save}"
+                FontSize="{DynamicResource STControlFontSize13}"
+                FontWeight="Medium"
+                IsDefault="True"
+                Style="{StaticResource AccentButtonStyle}" />
+            <Button
+                MinWidth="90"
+                Padding="16,8"
+                Command="{Binding CancelCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                Content="{DynamicResource Cancel}"
                 FontSize="{DynamicResource STControlFontSize13}"
                 IsCancel="True" />
         </ikw:SimpleStackPanel>

@@ -25,6 +25,12 @@ public partial class SelectableGlobalPrompt : ObservableObject
     [ObservableProperty]
     public partial int ReferenceCount { get; set; }
 
+    /// <summary>
+    /// 是否启用
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsEnabled { get; set; }
+
     public SelectableGlobalPrompt(GlobalPrompt globalPrompt)
     {
         GlobalPrompt = globalPrompt;

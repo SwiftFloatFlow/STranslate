@@ -101,27 +101,18 @@ public partial class GlobalPromptViewModel : ObservableObject
     }
 
     /// <summary>
-    /// 删除选中的全局提示词
+    /// 删除选中的全局提示词（直接删除，无需确认）
     /// </summary>
     [RelayCommand]
     private void DeleteGlobalPrompt()
     {
         if (SelectedPrompt == null) return;
 
-        var result = MessageBox.Show(
-            $"确定要删除全局提示词 \"{SelectedPrompt.Name}\" 吗？\n\n注意：这会导致所有引用此提示词的服务失去该提示词。",
-            "确认删除",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
-
-        if (result == MessageBoxResult.Yes)
+        var promptToRemove = _settings.GlobalPrompts.FirstOrDefault(p => p.Id == SelectedPrompt.Id);
+        if (promptToRemove != null)
         {
-            var promptToRemove = _settings.GlobalPrompts.FirstOrDefault(p => p.Id == SelectedPrompt.Id);
-            if (promptToRemove != null)
-            {
-                _settings.GlobalPrompts.Remove(promptToRemove);
-                _settings.Save();
-            }
+            _settings.GlobalPrompts.Remove(promptToRemove);
+            _settings.Save();
         }
     }
 
@@ -198,10 +189,20 @@ public partial class GlobalPromptViewModel : ObservableObject
     }
 
     /// <summary>
-    /// 关闭窗口
+    /// 保存并关闭窗口
     /// </summary>
     [RelayCommand]
-    private void Close(Window? window)
+    private void Save(Window? window)
+    {
+        _settings.Save();
+        window?.Close();
+    }
+
+    /// <summary>
+    /// 取消并关闭窗口
+    /// </summary>
+    [RelayCommand]
+    private void Cancel(Window? window)
     {
         window?.Close();
     }
