@@ -75,7 +75,7 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
             }
             catch (Exception ex)
             {
-                Logger.LogWarning($"过滤失败: {ex.Message}");
+                Logger.LogWarning(ex, "过滤全局提示词失败");
             }
 
             try
