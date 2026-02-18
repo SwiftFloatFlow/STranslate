@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using STranslate.Plugin;
+using System.Collections.ObjectModel;
 using System.IO;
 
 namespace STranslate.Core;
@@ -9,7 +10,7 @@ public class ServiceManager
     private readonly PluginManager _pluginManager;
     private readonly ServiceSettings _serviceSettings;
     private readonly ILogger<ServiceManager> _logger;
-    private readonly List<Service> _services;
+    private readonly ObservableCollection<Service> _services;
 
     public ServiceManager(PluginManager pluginManager, ServiceSettings serviceSettings, ILogger<ServiceManager> logger)
     {
@@ -20,7 +21,26 @@ public class ServiceManager
 
         Directory.CreateDirectory(DataLocation.PluginSettingsDirectory);
     }
+
+    /// <summary>
+    /// 所有服务集合（向后兼容）
+    /// </summary>
     public IEnumerable<Service> AllServices => _services;
+
+    /// <summary>
+    /// 服务集合（可观察，用于事件监听）
+    /// </summary>
+    public ObservableCollection<Service> Services => _services;
+
+    /// <summary>
+    /// 服务添加事件
+    /// </summary>
+    public event EventHandler<Service>? ServiceAdded;
+
+    /// <summary>
+    /// 服务移除事件
+    /// </summary>
+    public event EventHandler<Service>? ServiceRemoved;
 
     public void LoadServices()
     {
@@ -137,6 +157,9 @@ public class ServiceManager
         service.Initialize();
         _services.Add(service);
 
+        // 触发服务添加事件
+        ServiceAdded?.Invoke(this, service);
+
         var serviceDataCollection = GetServiceDataCollection(type);
         serviceDataCollection.Add(new ServiceData(service.ServiceID, service.DisplayName, service.IsEnabled));
         _serviceSettings.Save();
@@ -152,6 +175,9 @@ public class ServiceManager
     {
         service.Dispose();
         _services.Remove(service);
+
+        // 触发服务移除事件
+        ServiceRemoved?.Invoke(this, service);
 
         var serviceDataCollection = GetServiceDataCollection(type);
         var serviceData = serviceDataCollection.FirstOrDefault(s => s.SvcID == service.ServiceID);

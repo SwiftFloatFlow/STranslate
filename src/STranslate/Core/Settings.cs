@@ -1,11 +1,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using iNKORE.UI.WPF.Modern;
-using Serilog.Core;
-using Serilog.Events;
 using STranslate.Helpers;
+using STranslate.Models;
 using STranslate.Plugin;
 using STranslate.Views;
+using Serilog.Core;
+using Serilog.Events;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing.Imaging;
 using System.Windows.Media;
@@ -43,6 +45,11 @@ public partial class Settings : ObservableObject
     [ObservableProperty] public partial bool HideNotifyIcon { get; set; } = false;
 
     [ObservableProperty] public partial ElementTheme ColorScheme { get; set; }
+
+    /// <summary>
+    /// 全局提示词列表
+    /// </summary>
+    [ObservableProperty] public partial ObservableCollection<GlobalPrompt> GlobalPrompts { get; set; } = [];
 
     [ObservableProperty] public partial HistoryLimit HistoryLimit { get; set; } = HistoryLimit.Limit1000;
 

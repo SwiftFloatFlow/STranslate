@@ -11,6 +11,7 @@ namespace STranslate.Core;
 public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginContext
 {
     private IPluginSavable Savable { get => field; set => field = value; } = null!;
+    private object? _currentSettings;
 
     public PluginMetaData MetaData => metaData;
 
@@ -50,10 +51,52 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
             storage.Save();
 
         Savable = storage;
+        _currentSettings = data;
         return data;
     }
 
-    public void SaveSettingStorage<T>() where T : new() => Savable?.Save();
+    public void SaveSettingStorage<T>() where T : new()
+    {
+        if (_currentSettings is T settings)
+        {
+            ObservableCollection<Prompt>? originalPrompts = null;
+            bool filterSuccess = false;
+            
+            try
+            {
+                // 尝试过滤全局提示词
+                if (ServicePromptMerger.TryFilterGlobalPrompts(settings, out var filtered))
+                {
+                    var prop = typeof(T).GetProperty("Prompts")!;
+                    originalPrompts = prop.GetValue(settings) as ObservableCollection<Prompt>;
+                    prop.SetValue(settings, new ObservableCollection<Prompt>(filtered));
+                    filterSuccess = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning($"过滤失败: {ex.Message}");
+            }
+
+            try
+            {
+                Savable?.Save();
+            }
+            finally
+            {
+                // 恢复原始提示词列表
+                if (filterSuccess && originalPrompts != null)
+                {
+                    var prop = typeof(T).GetProperty("Prompts")!;
+                    prop.SetValue(settings, originalPrompts);
+                }
+            }
+        }
+        else
+        {
+            Savable?.Save();
+        }
+    }
 
     public void ApplyTheme(Window window)
     {

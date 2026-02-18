@@ -96,9 +96,53 @@ public abstract partial class TranslatePluginBase : ObservableObject, ITranslate
 public abstract class LlmTranslatePluginBase : TranslatePluginBase, ILlm
 {
     /// <summary>
-    /// Prompts
+    /// Prompts 集合（用于UI绑定）
     /// </summary>
     public ObservableCollection<Prompt> Prompts { get; set; } = [];
+
+    // V4.0: 内部快照，用于翻译时读取（线程安全）
+    private IReadOnlyList<Prompt> _promptsSnapshot = [];
+    private readonly ReaderWriterLockSlim _snapshotLock = new();
+    private DateTime _lastSnapshotUpdate = DateTime.MinValue;
+
+    /// <summary>
+    /// 获取提示词快照（翻译时使用，线程安全）
+    /// </summary>
+    public IReadOnlyList<Prompt> GetPromptsSnapshot()
+    {
+        _snapshotLock.EnterReadLock();
+        try
+        {
+            return _promptsSnapshot;
+        }
+        finally
+        {
+            _snapshotLock.ExitReadLock();
+        }
+    }
+
+    /// <summary>
+    /// 更新快照（当 Prompts 变化时调用）
+    /// </summary>
+    public void UpdateSnapshot()
+    {
+        _snapshotLock.EnterWriteLock();
+        try
+        {
+            _promptsSnapshot = Prompts.ToList();
+            _lastSnapshotUpdate = DateTime.Now;
+        }
+        finally
+        {
+            _snapshotLock.ExitWriteLock();
+        }
+    }
+
+    /// <summary>
+    /// 获取上次快照更新时间
+    /// </summary>
+    public DateTime LastSnapshotUpdate => _lastSnapshotUpdate;
+
     /// <summary>
     /// 选择的Prompt
     /// </summary>
@@ -106,6 +150,15 @@ public abstract class LlmTranslatePluginBase : TranslatePluginBase, ILlm
     {
         get => Prompts.FirstOrDefault(p => p.IsEnabled);
         set => SelectPrompt(value);
+    }
+
+    protected LlmTranslatePluginBase()
+    {
+        // 订阅 Prompts 变化，更新快照
+        Prompts.CollectionChanged += (s, e) => UpdateSnapshot();
+
+        // 初始快照
+        UpdateSnapshot();
     }
 
     /// <summary>
@@ -125,6 +178,12 @@ public abstract class LlmTranslatePluginBase : TranslatePluginBase, ILlm
         // 触发属性变更通知（如果需要）
         OnPropertyChanged(nameof(SelectedPrompt));
     }
+
+    /// <summary>
+    /// 判断是否为全局提示词（辅助方法，供插件UI使用）
+    /// </summary>
+    public virtual bool IsGlobalPrompt(Prompt prompt) =>
+        prompt?.Name?.StartsWith("[Global:") == true || prompt?.Name?.StartsWith("[Global]") == true;
 }
 
 /// <summary>

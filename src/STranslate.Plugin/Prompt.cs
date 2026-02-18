@@ -25,6 +25,12 @@ public partial class Prompt : ObservableObject
     [ObservableProperty] public partial bool IsEnabled { get; set; }
 
     /// <summary>
+    /// 标签（用于存储全局提示词ID等元数据，不序列化）
+    /// </summary>
+    [JsonIgnore]
+    public object? Tag { get; set; }
+
+    /// <summary>
     /// Prompt
     /// </summary>
     public Prompt()
