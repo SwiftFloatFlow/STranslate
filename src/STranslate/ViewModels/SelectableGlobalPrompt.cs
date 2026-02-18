@@ -19,12 +19,6 @@ public partial class SelectableGlobalPrompt : ObservableObject
     [ObservableProperty]
     public partial bool IsSelected { get; set; }
 
-    /// <summary>
-    /// 是否启用
-    /// </summary>
-    [ObservableProperty]
-    public partial bool IsEnabled { get; set; }
-
     public SelectableGlobalPrompt(GlobalPrompt globalPrompt)
     {
         GlobalPrompt = globalPrompt;
@@ -44,4 +38,14 @@ public partial class SelectableGlobalPrompt : ObservableObject
     /// 提示词内容数量
     /// </summary>
     public int ItemCount => GlobalPrompt.Items.Count;
+
+    /// <summary>
+    /// 是否启用（透传到 GlobalPrompt.IsEnabled）
+    /// 启用后才会通过接口暴露给插件使用
+    /// </summary>
+    public bool IsEnabled
+    {
+        get => GlobalPrompt.IsEnabled;
+        set => GlobalPrompt.IsEnabled = value;
+    }
 }

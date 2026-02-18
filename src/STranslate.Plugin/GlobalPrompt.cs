@@ -21,6 +21,12 @@ public partial class GlobalPrompt : ObservableObject
     public partial string Name { get; set; } = "新全局提示词";
 
     /// <summary>
+    /// 是否启用（启用后才会通过接口暴露给插件）
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsEnabled { get; set; } = true;
+
+    /// <summary>
     /// 提示词内容列表
     /// </summary>
     public ObservableCollection<PromptItem> Items { get; set; } = [];
@@ -57,6 +63,7 @@ public partial class GlobalPrompt : ObservableObject
         {
             Id = Id,
             Name = Name + " (副本)",
+            IsEnabled = IsEnabled,
             Items = new ObservableCollection<PromptItem>(
                 Items.Select(i => i.Clone())
             )
