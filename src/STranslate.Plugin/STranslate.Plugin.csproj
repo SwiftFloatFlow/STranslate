@@ -9,11 +9,11 @@
         <!-- NuGet 包信息 -->
         <!--<GeneratePackageOnBuild>true</GeneratePackageOnBuild>-->
         <PackageId>STranslate.Plugin</PackageId>
-<PackageVersion>1.2.0-fork</PackageVersion>
-        <Authors>SwiftFloatFlow; zggsong</Authors>
-        <Description>STranslate plugin framework with auto-packaging support (Fork version with Global Prompts and Change Notification support)</Description>
-        <PackageTags>stranslate; global-prompts; event-callback</PackageTags>
-        <RepositoryUrl>https://github.com/SwiftFloatFlow/STranslate</RepositoryUrl>
+        <PackageVersion>1.0.8</PackageVersion>
+        <Authors>zggsong</Authors>
+        <Description>STranslate plugin framework with auto-packaging support</Description>
+        <PackageTags>stranslate</PackageTags>
+        <RepositoryUrl>https://github.com/STranslate/STranslate</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
