@@ -6,6 +6,9 @@ using System.Windows;
 
 namespace STranslate.Views;
 
+/// <summary>
+/// 全局提示词编辑窗口
+/// </summary>
 public partial class GlobalPromptEditWindow
 {
     public GlobalPromptEditWindow()

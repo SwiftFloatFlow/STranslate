@@ -82,7 +82,7 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
         ThemeManager.SetRequestedTheme(window, Ioc.Default.GetRequiredService<Settings>().ColorScheme);
     }
 
-    public void RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback)
+    public IDisposable RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback, IDisposable? lifetime = null)
     {
         bool shouldSubscribe = false;
         lock (_callbacksLock)
@@ -98,7 +98,51 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
         {
             SubscribeToGlobalPromptsChanged();
         }
+
+        // 创建注销句柄
+        var unregisterHandle = new CallbackUnregisterHandle(this, callback);
+
+        // 如果提供了 lifetime，在 lifetime 释放时自动注销
+        if (lifetime != null)
+        {
+            var weakCallback = new WeakReference<Action<IReadOnlyList<GlobalPrompt>>>(callback);
+            var weakContext = new WeakReference<PluginContext>(this);
+            
+            // 订阅 lifetime 的释放事件
+            if (lifetime is Window window)
+            {
+                // 如果是窗口，在 Closed 事件中注销
+                window.Closed += (s, e) =>
+                {
+                    if (weakCallback.TryGetTarget(out var target) && weakContext.TryGetTarget(out var context))
+                    {
+                        context.UnregisterGlobalPromptsChangedCallback(target);
+                    }
+                };
+            }
+            else
+            {
+                // 如果是其他 IDisposable，尝试使用 Dispose 模式
+                // 这里使用一个弱引用追踪器
+                TrackLifetimeDisposal(lifetime, callback);
+            }
+        }
+
+        return unregisterHandle;
     }
+
+    private void TrackLifetimeDisposal(IDisposable lifetime, Action<IReadOnlyList<GlobalPrompt>> callback)
+    {
+        // 创建一个弱引用的追踪器，当 lifetime 被 GC 回收时，自动注销回调
+        var weakLifetime = new WeakReference<IDisposable>(lifetime);
+        var weakCallback = new WeakReference<Action<IReadOnlyList<GlobalPrompt>>>(callback);
+        var weakContext = new WeakReference<PluginContext>(this);
+
+        // 在下次触发事件时清理已释放的 lifetime 关联的回调
+        _lifetimeTrackedCallbacks.Add((weakLifetime, weakCallback));
+    }
+
+    private readonly List<(WeakReference<IDisposable> Lifetime, WeakReference<Action<IReadOnlyList<GlobalPrompt>>> Callback)> _lifetimeTrackedCallbacks = new();
 
     public void UnregisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback)
     {
@@ -152,5 +196,28 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
 
         Savable.Delete();
         Savable.Clean();
+    }
+
+    /// <summary>
+    /// 回调注销句柄
+    /// </summary>
+    private class CallbackUnregisterHandle : IDisposable
+    {
+        private readonly PluginContext _context;
+        private readonly Action<IReadOnlyList<GlobalPrompt>> _callback;
+        private bool _disposed;
+
+        public CallbackUnregisterHandle(PluginContext context, Action<IReadOnlyList<GlobalPrompt>> callback)
+        {
+            _context = context;
+            _callback = callback;
+        }
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+            _context.UnregisterGlobalPromptsChangedCallback(_callback);
+        }
     }
 }

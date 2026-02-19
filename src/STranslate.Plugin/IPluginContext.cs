@@ -95,11 +95,14 @@ public interface IPluginContext : IDisposable
     /// 当全局提示词发生添加、删除、修改或启用状态变化时，主软件会调用此回调通知插件。
     /// </summary>
     /// <param name="callback">回调函数，参数为变更后的全局提示词只读列表</param>
-    void RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback);
+    /// <param name="lifetime">回调的生命周期管理器。如果提供，当管理器被释放时自动注销回调</param>
+    /// <returns>用于手动注销回调的句柄，可调用 Dispose 注销。如果提供了 lifetime 参数，则无需手动调用</returns>
+    IDisposable RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback, IDisposable? lifetime = null);
 
     /// <summary>
     /// 注销全局提示词变更回调。
     /// 插件卸载时应调用此方法以避免内存泄漏。
+    /// 注意：如果注册时提供了 lifetime 参数，回调会在 lifetime 释放时自动注销，无需手动调用此方法。
     /// </summary>
     /// <param name="callback">之前注册的回调函数</param>
     void UnregisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback);

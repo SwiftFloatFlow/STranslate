@@ -232,6 +232,8 @@ private bool IsGlobalPrompt(Prompt prompt)
 
 ### 回调注册时机
 
+#### 方式一：手动管理（适合常驻监听）
+
 ```csharp
 // 推荐：在插件初始化时注册
 public override void Initialize()
@@ -245,6 +247,50 @@ public override void Dispose()
     Context.UnregisterGlobalPromptsChangedCallback(OnGlobalPromptsChanged);
 }
 ```
+
+#### 方式二：窗口生命周期管理（推荐，避免内存泄漏）
+
+**适用场景**：插件只在特定窗口打开时需要监听全局提示词变更（如设置窗口、配置窗口）。
+
+由于 STranslate 是常驻托盘软件，窗口关闭后插件不需要继续监听，此时应释放回调避免内存泄漏。
+
+```csharp
+public partial class MyPluginSettingsWindow : Window
+{
+    private IDisposable? _callbackHandle;
+
+    public MyPluginSettingsWindow()
+    {
+        InitializeComponent();
+        
+        // 窗口加载时注册回调，传入窗口作为生命周期管理器
+        // 当窗口关闭时，回调会自动注销，无需手动处理
+        _callbackHandle = Context.RegisterGlobalPromptsChangedCallback(
+            OnGlobalPromptsChanged, 
+            lifetime: this  // 传入窗口对象
+        );
+    }
+
+    private void OnGlobalPromptsChanged(IReadOnlyList<GlobalPrompt> globalPrompts)
+    {
+        // 刷新界面显示
+        RefreshUI(globalPrompts);
+    }
+
+    // 也可以手动注销（如果需要提前释放）
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        _callbackHandle?.Dispose(); // 立即注销
+        this.Close();
+    }
+}
+```
+
+**优势**：
+- ✅ 自动管理回调生命周期，窗口关闭即释放
+- ✅ 避免常驻托盘软件的内存泄漏问题
+- ✅ 代码更简洁，无需在 Dispose 中处理
+- ✅ 向后兼容，不传 `lifetime` 参数时行为不变
 
 ### 线程安全
 
