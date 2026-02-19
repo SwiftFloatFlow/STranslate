@@ -40,16 +40,16 @@ public partial class GlobalPrompt : ObservableObject
     {
         var prompt = new Prompt
         {
-            Name = $"[Global:{Id}] {Name}",
-            IsEnabled = isEnabled
+            Name = this.Name,
+            IsEnabled = isEnabled,
+            Tag = $"Global:{this.Id}"
         };
         
-        foreach (var item in Items)
+        // 关键：显式创建 PromptItem，确保 Role 和 Content 正确传递
+        foreach (var item in this.Items)
         {
-            prompt.Items.Add(item.Clone());
+            prompt.Items.Add(new PromptItem(item.Role, item.Content));
         }
-        
-        prompt.Tag = $"Global:{Id}";
         
         return prompt;
     }

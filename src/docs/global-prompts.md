@@ -37,11 +37,14 @@ public interface IPluginContext : IDisposable
     /// 当全局提示词发生添加、删除、修改或启用状态变化时，主软件会调用此回调通知插件。
     /// </summary>
     /// <param name="callback">回调函数，参数为变更后的全局提示词只读列表</param>
-    void RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback);
+    /// <param name="lifetime">可选的生命周期管理器（如窗口对象），当管理器释放时自动注销回调</param>
+    /// <returns>用于手动注销回调的句柄</returns>
+    IDisposable RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback, IDisposable? lifetime = null);
 
     /// <summary>
     /// 注销全局提示词变更回调。
     /// 插件卸载时应调用此方法以避免内存泄漏。
+    /// 注意：如果注册时提供了 lifetime 参数，回调会在 lifetime 释放时自动注销。
     /// </summary>
     /// <param name="callback">之前注册的回调函数</param>
     void UnregisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback);
@@ -58,13 +61,42 @@ public partial class GlobalPrompt : ObservableObject
     public bool IsEnabled { get; set; } = true; // 是否启用（启用后才暴露给插件）
     public ObservableCollection<PromptItem> Items { get; set; }  // 内容列表
     
-    // 转换为可用的 Prompt
+    // 转换为可用的 Prompt（保留原始名称，正确传递角色）
     public Prompt ToPrompt(bool isEnabled = false);
     
     // 克隆
     public GlobalPrompt Clone();
 }
 ```
+
+### ToPrompt 方法详解
+
+`ToPrompt()` 方法将 `GlobalPrompt` 转换为插件可用的 `Prompt` 对象：
+
+```csharp
+public Prompt ToPrompt(bool isEnabled = false)
+{
+    var prompt = new Prompt
+    {
+        Name = this.Name,           // 保持原始名称
+        IsEnabled = isEnabled,
+        Tag = $"Global:{this.Id}"   // ID 存储在 Tag 中，用于识别来源
+    };
+    
+    // 显式创建 PromptItem，确保 Role 和 Content 正确传递
+    foreach (var item in this.Items)
+    {
+        prompt.Items.Add(new PromptItem(item.Role, item.Content));
+    }
+    
+    return prompt;
+}
+```
+
+**关键特性：**
+- ✅ **保持原始名称**：不添加前缀，插件获取用户定义的真实名称
+- ✅ **正确传递角色**：显式创建 PromptItem，确保 system/user/assistant 角色正确传递
+- ✅ **ID 标识**：通过 `Tag` 属性标识来源，格式为 `"Global:{Id}"`
 
 ## 启用/禁用机制
 
@@ -140,6 +172,47 @@ public void UseGlobalPrompt(string promptId)
     }
 }
 ```
+
+### 2.1 正确处理角色（重要）
+
+全局提示词的 `Items` 集合包含多个 `PromptItem`，每个都有明确的 `Role`（角色）属性：
+
+```csharp
+public void ProcessGlobalPrompt(GlobalPrompt globalPrompt)
+{
+    // 转换为 Prompt
+    var prompt = globalPrompt.ToPrompt(isEnabled: true);
+    
+    // 遍历 Items，每个都有独立的角色
+    foreach (var item in prompt.Items)
+    {
+        // item.Role 可能是: "system", "user", "assistant"
+        // item.Content 是对应的内容
+        Console.WriteLine($"角色: {item.Role}, 内容: {item.Content}");
+    }
+    
+    // 按角色分别处理
+    var systemMessage = prompt.Items.FirstOrDefault(i => i.Role == "system");
+    var userMessage = prompt.Items.FirstOrDefault(i => i.Role == "user");
+    
+    if (systemMessage != null)
+    {
+        // system 消息通常用于定义 AI 的行为
+        // 例如: "你是一个专业的翻译助手"
+    }
+    
+    if (userMessage != null)
+    {
+        // user 消息通常是具体的指令
+        // 例如: "请翻译以下内容："
+    }
+}
+```
+
+**关键点：**
+- ✅ 每个角色独立存储，不会被合并或丢失
+- ✅ 插件可以按角色分别处理或组合使用
+- ✅ 直接将 `prompt.Items` 传递给 AI API 时，角色信息会正确保留
 
 ### 3. 监听全局提示词变更（推荐）
 
@@ -412,7 +485,30 @@ A:
 
 A: **不会**。每个回调的异常会被单独捕获并记录日志，不会影响其他回调的执行。
 
+### Q: ToPrompt() 会保留角色信息吗？
+
+A: **会**。`ToPrompt()` 方法显式创建 `PromptItem`，确保每个 item 的 `Role`（system/user/assistant）和 `Content` 都正确传递。插件可以直接使用 `prompt.Items` 发送给 AI API，角色信息会被正确识别。
+
+### Q: 如何识别一个 Prompt 来自哪个全局提示词？
+
+A: 通过 `Tag` 属性判断：
+```csharp
+// Tag 格式为 "Global:{Id}"
+if (prompt.Tag?.ToString()?.StartsWith("Global:") == true)
+{
+    var globalPromptId = prompt.Tag.ToString().Substring(7); // 提取 ID
+    // 这是来自 ID 为 globalPromptId 的全局提示词
+}
+```
+
 ## 版本历史
+
+- **v2.2** (2026-02-19): 优化角色处理和内存管理
+  - 修改 `ToPrompt()` 方法，显式创建 PromptItem 确保 Role 正确传递
+  - 保持原始名称，不再添加 `[Global:{Id}]` 前缀
+  - 添加窗口生命周期管理，避免常驻托盘软件的内存泄漏
+  - `RegisterGlobalPromptsChangedCallback` 返回 IDisposable，支持自动注销
+  - 新增 `lifetime` 参数，窗口关闭时自动注销回调
 
 - **v2.1** (2026-02-18): 添加事件回调机制
   - 新增 RegisterGlobalPromptsChangedCallback/UnregisterGlobalPromptsChangedCallback 接口
