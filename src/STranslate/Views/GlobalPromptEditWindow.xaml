@@ -211,7 +211,7 @@
                         dd:DragDrop.IsDragSource="True"
                         dd:DragDrop.IsDropTarget="True"
                         Background="Transparent"
-                        ItemsSource="{Binding SelectedPrompt.Items}"
+                        ItemsSource="{Binding SelectedPrompt.Items, UpdateSourceTrigger=PropertyChanged}"
                         SelectedItem="{Binding SelectedPromptItem}">
                         <ListBox.ItemContainerStyle>
                             <Style BasedOn="{StaticResource {x:Type ListBoxItem}}" TargetType="ListBoxItem">

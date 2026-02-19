@@ -12,7 +12,7 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
 {
     private IPluginSavable Savable { get => field; set => field = value; } = null!;
     private object? _currentSettings;
-    private readonly List<Action<IReadOnlyList<GlobalPrompt>>> _globalPromptsChangedCallbacks = [];
+    private readonly List<Action<IReadOnlyList<Prompt>>> _globalPromptsChangedCallbacks = [];
     private readonly object _callbacksLock = new();
     private Settings? _settings;
     private bool _disposed;
@@ -64,14 +64,9 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
         Savable?.Save();
     }
 
-    public IReadOnlyList<GlobalPrompt> GetGlobalPrompts()
+    public IReadOnlyList<Prompt> GetGlobalPrompts()
     {
         return Ioc.Default.GetRequiredService<Settings>().GetEnabledGlobalPromptsSnapshot();
-    }
-
-    public GlobalPrompt? GetGlobalPromptById(string id)
-    {
-        return Ioc.Default.GetRequiredService<Settings>().GetGlobalPromptByIdSnapshot(id);
     }
 
     public void ApplyTheme(Window window)
@@ -82,7 +77,7 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
         ThemeManager.SetRequestedTheme(window, Ioc.Default.GetRequiredService<Settings>().ColorScheme);
     }
 
-    public IDisposable RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback, IDisposable? lifetime = null)
+    public IDisposable RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<Prompt>> callback, IDisposable? lifetime = null)
     {
         bool shouldSubscribe = false;
         lock (_callbacksLock)
@@ -105,7 +100,7 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
         // 如果提供了 lifetime，在 lifetime 释放时自动注销
         if (lifetime != null)
         {
-            var weakCallback = new WeakReference<Action<IReadOnlyList<GlobalPrompt>>>(callback);
+            var weakCallback = new WeakReference<Action<IReadOnlyList<Prompt>>>(callback);
             var weakContext = new WeakReference<PluginContext>(this);
             
             // 订阅 lifetime 的释放事件
@@ -131,20 +126,20 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
         return unregisterHandle;
     }
 
-    private void TrackLifetimeDisposal(IDisposable lifetime, Action<IReadOnlyList<GlobalPrompt>> callback)
+    private void TrackLifetimeDisposal(IDisposable lifetime, Action<IReadOnlyList<Prompt>> callback)
     {
         // 创建一个弱引用的追踪器，当 lifetime 被 GC 回收时，自动注销回调
         var weakLifetime = new WeakReference<IDisposable>(lifetime);
-        var weakCallback = new WeakReference<Action<IReadOnlyList<GlobalPrompt>>>(callback);
+        var weakCallback = new WeakReference<Action<IReadOnlyList<Prompt>>>(callback);
         var weakContext = new WeakReference<PluginContext>(this);
 
         // 在下次触发事件时清理已释放的 lifetime 关联的回调
         _lifetimeTrackedCallbacks.Add((weakLifetime, weakCallback));
     }
 
-    private readonly List<(WeakReference<IDisposable> Lifetime, WeakReference<Action<IReadOnlyList<GlobalPrompt>>> Callback)> _lifetimeTrackedCallbacks = new();
+    private readonly List<(WeakReference<IDisposable> Lifetime, WeakReference<Action<IReadOnlyList<Prompt>>> Callback)> _lifetimeTrackedCallbacks = new();
 
-    public void UnregisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback)
+    public void UnregisterGlobalPromptsChangedCallback(Action<IReadOnlyList<Prompt>> callback)
     {
         lock (_callbacksLock)
         {
@@ -152,9 +147,9 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
         }
     }
 
-    internal void RaiseGlobalPromptsChanged(IReadOnlyList<GlobalPrompt> globalPrompts)
+    internal void RaiseGlobalPromptsChanged(IReadOnlyList<Prompt> globalPrompts)
     {
-        List<Action<IReadOnlyList<GlobalPrompt>>> callbacksCopy;
+        List<Action<IReadOnlyList<Prompt>>> callbacksCopy;
         lock (_callbacksLock)
         {
             callbacksCopy = [.. _globalPromptsChangedCallbacks];
@@ -179,7 +174,7 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
         _settings.GlobalPromptsChanged += OnSettingsGlobalPromptsChanged;
     }
 
-    private void OnSettingsGlobalPromptsChanged(object? sender, IReadOnlyList<GlobalPrompt> globalPrompts)
+    private void OnSettingsGlobalPromptsChanged(object? sender, IReadOnlyList<Prompt> globalPrompts)
     {
         RaiseGlobalPromptsChanged(globalPrompts);
     }
@@ -204,10 +199,10 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
     private class CallbackUnregisterHandle : IDisposable
     {
         private readonly PluginContext _context;
-        private readonly Action<IReadOnlyList<GlobalPrompt>> _callback;
+        private readonly Action<IReadOnlyList<Prompt>> _callback;
         private bool _disposed;
 
-        public CallbackUnregisterHandle(PluginContext context, Action<IReadOnlyList<GlobalPrompt>> callback)
+        public CallbackUnregisterHandle(PluginContext context, Action<IReadOnlyList<Prompt>> callback)
         {
             _context = context;
             _callback = callback;

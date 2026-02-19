@@ -46,9 +46,9 @@ public partial class Settings : ObservableObject
     [ObservableProperty] public partial ElementTheme ColorScheme { get; set; }
 
     /// <summary>
-    /// 全局提示词列表
+    /// 全局提示词列表（使用Prompt类型，IsEnabled控制是否暴露给插件）
     /// </summary>
-    [ObservableProperty] public partial ObservableCollection<GlobalPrompt> GlobalPrompts { get; set; } = [];
+    [ObservableProperty] public partial ObservableCollection<Prompt> GlobalPrompts { get; set; } = [];
 
     /// <summary>
     /// 全局提示词集合的锁对象（用于线程安全访问）
@@ -58,7 +58,7 @@ public partial class Settings : ObservableObject
     /// <summary>
     /// 全局提示词变更事件
     /// </summary>
-    public event EventHandler<IReadOnlyList<GlobalPrompt>>? GlobalPromptsChanged;
+    public event EventHandler<IReadOnlyList<Prompt>>? GlobalPromptsChanged;
 
     /// <summary>
     /// 触发全局提示词变更事件
@@ -73,27 +73,15 @@ public partial class Settings : ObservableObject
     /// 获取已启用的全局提示词快照（线程安全）
     /// </summary>
     /// <returns>只读的全局提示词列表</returns>
-    public IReadOnlyList<GlobalPrompt> GetEnabledGlobalPromptsSnapshot()
+    public IReadOnlyList<Prompt> GetEnabledGlobalPromptsSnapshot()
     {
         lock (_globalPromptsLock)
         {
             return GlobalPrompts
                 .Where(p => p.IsEnabled)
-                .Select(p => p.CloneForRead())
+                .Select(p => p.Clone())
                 .ToList()
                 .AsReadOnly();
-        }
-    }
-
-    /// <summary>
-    /// 根据ID获取全局提示词快照（线程安全，仅返回已启用的）
-    /// </summary>
-    public GlobalPrompt? GetGlobalPromptByIdSnapshot(string id)
-    {
-        lock (_globalPromptsLock)
-        {
-            var prompt = GlobalPrompts.FirstOrDefault(p => p.Id == id && p.IsEnabled);
-            return prompt?.CloneForRead();
         }
     }
 
@@ -394,9 +382,36 @@ public partial class Settings : ObservableObject
         {
             throw new InvalidOperationException("Storage is not set. Please call SetStorage() before Initialize().");
         }
+        
+        // 配置迁移：从旧版本（带 Id 字段的 GlobalPrompt）迁移到新版本
+        MigrateGlobalPromptsIfNeeded();
+        
         ApplyLogLevel();
         ApplyStartup();
         ApplyStartMode();
+    }
+
+    /// <summary>
+    /// 迁移全局提示词配置
+    /// 从旧版本（带 Id 字段的 GlobalPrompt）迁移到新版本（统一 Prompt 类）
+    /// </summary>
+    private void MigrateGlobalPromptsIfNeeded()
+    {
+        // 检查是否需要迁移：如果有任何 Prompt 的 Items 为 null，说明可能是旧配置
+        bool needsMigration = false;
+        foreach (var prompt in GlobalPrompts)
+        {
+            if (prompt.Items == null)
+            {
+                prompt.Items = new ObservableCollection<PromptItem>();
+                needsMigration = true;
+            }
+        }
+
+        if (needsMigration)
+        {
+            Save();
+        }
     }
 
     public void LazyInitialize()

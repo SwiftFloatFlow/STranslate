@@ -77,18 +77,12 @@ public interface IPluginContext : IDisposable
     void ApplyTheme(Window window);
 
     /// <summary>
-    /// 获取所有全局提示词列表（只读）。
+    /// 获取所有已启用的全局提示词列表（只读）。
     /// 插件可以从中选择需要的提示词，但不应该修改这些提示词。
+    /// 注意：只返回 IsEnabled = true 的全局提示词。
     /// </summary>
     /// <returns>全局提示词的只读列表</returns>
-    IReadOnlyList<GlobalPrompt> GetGlobalPrompts();
-
-    /// <summary>
-    /// 根据ID获取特定的全局提示词。
-    /// </summary>
-    /// <param name="id">全局提示词的唯一标识</param>
-    /// <returns>匹配的全局提示词，如果不存在则返回null</returns>
-    GlobalPrompt? GetGlobalPromptById(string id);
+    IReadOnlyList<Prompt> GetGlobalPrompts();
 
     /// <summary>
     /// 注册全局提示词变更回调。
@@ -97,7 +91,7 @@ public interface IPluginContext : IDisposable
     /// <param name="callback">回调函数，参数为变更后的全局提示词只读列表</param>
     /// <param name="lifetime">回调的生命周期管理器。如果提供，当管理器被释放时自动注销回调</param>
     /// <returns>用于手动注销回调的句柄，可调用 Dispose 注销。如果提供了 lifetime 参数，则无需手动调用</returns>
-    IDisposable RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback, IDisposable? lifetime = null);
+    IDisposable RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<Prompt>> callback, IDisposable? lifetime = null);
 
     /// <summary>
     /// 注销全局提示词变更回调。
@@ -105,5 +99,5 @@ public interface IPluginContext : IDisposable
     /// 注意：如果注册时提供了 lifetime 参数，回调会在 lifetime 释放时自动注销，无需手动调用此方法。
     /// </summary>
     /// <param name="callback">之前注册的回调函数</param>
-    void UnregisterGlobalPromptsChangedCallback(Action<IReadOnlyList<GlobalPrompt>> callback);
+    void UnregisterGlobalPromptsChangedCallback(Action<IReadOnlyList<Prompt>> callback);
 }
