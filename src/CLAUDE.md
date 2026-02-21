@@ -61,6 +61,7 @@ dotnet build STranslate.slnx --configuration Debug
 
 ### 功能特性
 - [**功能特性**](docs/features.md) - 热键系统、剪贴板监听、历史记录
+- [**全局提示词**](docs/global-prompts.md) - 全局提示词功能、接口定义、插件使用示例
 
 ### 存储与配置
 - [**存储与配置**](docs/storage.md) - 设置架构、存储位置
@@ -78,6 +79,7 @@ dotnet build STranslate.slnx --configuration Debug
 | 了解项目结构 | [项目概述](docs/overview.md) |
 | 构建项目 | CLAUDE.md 快速构建 或 [项目概述](docs/overview.md) |
 | 开发插件 | [插件开发指南](docs/plugin.md) |
+| 使用全局提示词 | [全局提示词](docs/global-prompts.md) |
 | 修改热键功能 | [功能特性](docs/features.md) |
 | 修改剪贴板监听 | [功能特性](docs/features.md) |
 | 修改历史记录 | [功能特性](docs/features.md) |

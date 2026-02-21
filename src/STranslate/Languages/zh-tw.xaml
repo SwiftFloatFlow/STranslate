@@ -383,6 +383,7 @@
     <sys:String x:Key="TranslateFail">翻譯失敗</sys:String>
 
     <!--  // Prompt //  -->
+    <sys:String x:Key="GlobalPrompts">全域提示詞</sys:String>
     <sys:String x:Key="NewPrompt">新提示詞</sys:String>
     <sys:String x:Key="NewPromptSuffix">_新</sys:String>
     <sys:String x:Key="EditPrompt">編輯提示詞</sys:String>

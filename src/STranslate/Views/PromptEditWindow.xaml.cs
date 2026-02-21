@@ -6,10 +6,20 @@ namespace STranslate.Views;
 
 public partial class PromptEditWindow
 {
-    public PromptEditWindow(ObservableCollection<Prompt> prompts, List<string>? roles = default)
+    /// <summary>
+    /// 指示是否为有效保存（内容有变化）
+    /// </summary>
+    public bool HasValidSave { get; private set; }
+
+    public PromptEditWindow(ObservableCollection<Prompt> prompts, List<string>? roles = default, bool isMutualExclusion = true)
     {
         InitializeComponent();
 
-        DataContext = new PromptEditViewModel(prompts, roles);
+        var viewModel = new PromptEditViewModel(prompts, roles, isMutualExclusion);
+        viewModel.SaveRequested += (hasChanges) =>
+        {
+            HasValidSave = hasChanges;
+        };
+        DataContext = viewModel;
     }
 }

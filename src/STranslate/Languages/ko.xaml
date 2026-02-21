@@ -368,6 +368,7 @@
     <sys:String x:Key="TranslateCancel">번역 취소</sys:String>
     <sys:String x:Key="TranslateFail">번역 실패</sys:String>
 
+    <sys:String x:Key="GlobalPrompts">전역 프롬프트</sys:String>
     <sys:String x:Key="NewPrompt">새 프롬프트</sys:String>
     <sys:String x:Key="NewPromptSuffix">_신규</sys:String>
     <sys:String x:Key="EditPrompt">프롬프트 편집</sys:String>

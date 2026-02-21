@@ -383,6 +383,7 @@
     <sys:String x:Key="TranslateFail">Translate failed</sys:String>
 
     <!--  // Prompt //  -->
+    <sys:String x:Key="GlobalPrompts">Global Prompts</sys:String>
     <sys:String x:Key="NewPrompt">New Prompt</sys:String>
     <sys:String x:Key="NewPromptSuffix">_New</sys:String>
     <sys:String x:Key="EditPrompt">Edit Prompt</sys:String>

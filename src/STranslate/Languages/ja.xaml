@@ -368,6 +368,7 @@
     <sys:String x:Key="TranslateCancel">翻訳キャンセル</sys:String>
     <sys:String x:Key="TranslateFail">翻訳失敗</sys:String>
 
+    <sys:String x:Key="GlobalPrompts">グローバルプロンプト</sys:String>
     <sys:String x:Key="NewPrompt">新しいプロンプト</sys:String>
     <sys:String x:Key="NewPromptSuffix">_新規</sys:String>
     <sys:String x:Key="EditPrompt">プロンプトを編集</sys:String>

@@ -30,7 +30,7 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
 
     public Window GetPromptEditWindow(ObservableCollection<Prompt> prompts, List<string>? roles = default)
     {
-        var window = new PromptEditWindow(prompts, roles)
+        var window = new PromptEditWindow(prompts, roles, isMutualExclusion: true)
         {
             Owner = Application.Current.Windows.OfType<SettingsWindow>().FirstOrDefault()
         };
@@ -38,6 +38,61 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
         ThemeManager.SetRequestedTheme(window, Enum.Parse<ElementTheme>(Ioc.Default.GetRequiredService<Settings>().ColorScheme.ToString()));
 
         return window;
+    }
+
+    public IReadOnlyList<Prompt> GetGlobalPrompts()
+    {
+        var settings = Ioc.Default.GetRequiredService<Settings>();
+        return settings.GlobalPrompts
+            .Where(p => p.IsEnabled)
+            .Select(p =>
+            {
+                var clone = p.Clone();
+                clone.IsEnabled = false;
+                return clone;
+            })
+            .ToList().AsReadOnly();
+    }
+
+    public Window GetGlobalPromptEditWindow()
+    {
+        var settings = Ioc.Default.GetRequiredService<Settings>();
+        var window = new PromptEditWindow(settings.GlobalPrompts, roles: null, isMutualExclusion: false)
+        {
+            Owner = Application.Current.Windows.OfType<SettingsWindow>().FirstOrDefault()
+        };
+
+        ThemeManager.SetRequestedTheme(window, Enum.Parse<ElementTheme>(settings.ColorScheme.ToString()));
+
+        return window;
+    }
+
+    public IDisposable RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<Prompt>> callback, int delayMs = 100)
+    {
+        var settings = Ioc.Default.GetRequiredService<Settings>();
+
+        settings.GlobalPromptsChanged += OnGlobalPromptsChanged;
+
+        return new CallbackRegistration(() =>
+        {
+            Task.Delay(delayMs).ContinueWith(_ =>
+            {
+                settings.GlobalPromptsChanged -= OnGlobalPromptsChanged;
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+        });
+
+        void OnGlobalPromptsChanged(IReadOnlyList<Prompt> prompts)
+        {
+            var clonedPrompts = prompts
+                .Select(p =>
+                {
+                    var clone = p.Clone();
+                    clone.IsEnabled = false;
+                    return clone;
+                })
+                .ToList().AsReadOnly();
+            callback(clonedPrompts);
+        }
     }
 
     public T LoadSettingStorage<T>() where T : new()
@@ -67,5 +122,20 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
     {
         Savable.Delete();
         Savable.Clean();
+    }
+}
+
+/// <summary>
+/// 回调注册的可释放对象，用于注销全局提示词变更回调
+/// </summary>
+file class CallbackRegistration(Action unregister) : IDisposable
+{
+    private bool _disposed = false;
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        unregister?.Invoke();
     }
 }
