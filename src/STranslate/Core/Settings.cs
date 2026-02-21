@@ -181,6 +181,25 @@ public partial class Settings : ObservableObject
     /// </summary>
     public event Action<IReadOnlyList<Prompt>>? GlobalPromptsChanged;
 
+    partial void OnGlobalPromptsChanged(ObservableCollection<Prompt>? oldValue, ObservableCollection<Prompt>? newValue)
+    {
+        if (oldValue != null)
+        {
+            oldValue.CollectionChanged -= OnGlobalPromptsCollectionChanged;
+        }
+
+        if (newValue != null)
+        {
+            newValue.CollectionChanged += OnGlobalPromptsCollectionChanged;
+        }
+    }
+
+    private void OnGlobalPromptsCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        // 触发 PropertyChanged 以自动保存
+        OnPropertyChanged(nameof(GlobalPrompts));
+    }
+
     /// <summary>
     /// 触发全局提示词变更通知（仅由全局提示词窗口有效保存时调用）
     /// </summary>
