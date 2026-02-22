@@ -212,7 +212,7 @@ public partial class PromptEditViewModel : ObservableObject, IDisposable
         return name;
     }
 
-    public bool CanRemovePrompt() => SelectedPrompt is not null && (IsMutualExclusion ? Prompts.Count > 1 : Prompts.Count > 0);
+    public bool CanRemovePrompt() => SelectedPrompt is not null && Prompts.Count > 1;
 
     [RelayCommand(CanExecute = nameof(CanRemovePrompt))]
     private void RemovePrompt()
