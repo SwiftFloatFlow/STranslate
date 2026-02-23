@@ -64,12 +64,6 @@ public interface IPluginContext : IDisposable
     IReadOnlyList<Prompt> GetGlobalPrompts();
 
     /// <summary>
-    /// 获取全局提示词编辑窗口
-    /// </summary>
-    /// <returns>全局提示词编辑窗口实例</returns>
-    Window GetGlobalPromptEditWindow();
-
-    /// <summary>
     /// 注册全局提示词变更回调
     /// </summary>
     /// <param name="callback">回调函数，参数为启用的全局提示词列表</param>

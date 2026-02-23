@@ -304,13 +304,7 @@ public partial class PromptEditViewModel : ObservableObject, IDisposable
         window.Close();
     }
 
-    // 清理资源
-    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
-    {
-        base.OnPropertyChanged(e);
-    }
-
-    // 添加析构函数来清理事件监听
+    // 清理事件监听
     public void Dispose()
     {
         foreach (var prompt in Prompts)

@@ -21,5 +21,7 @@ public partial class PromptEditWindow
             HasValidSave = hasChanges;
         };
         DataContext = viewModel;
+
+        Closing += (s, e) => viewModel.Dispose();
     }
 }

@@ -54,19 +54,6 @@ public class PluginContext(PluginMetaData metaData, string serviceId) : IPluginC
             .ToList().AsReadOnly();
     }
 
-    public Window GetGlobalPromptEditWindow()
-    {
-        var settings = Ioc.Default.GetRequiredService<Settings>();
-        var window = new PromptEditWindow(settings.GlobalPrompts, roles: null, isMutualExclusion: false)
-        {
-            Owner = Application.Current.Windows.OfType<SettingsWindow>().FirstOrDefault()
-        };
-
-        ThemeManager.SetRequestedTheme(window, Enum.Parse<ElementTheme>(settings.ColorScheme.ToString()));
-
-        return window;
-    }
-
     public IDisposable RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<Prompt>> callback, int delayMs = 100)
     {
         var settings = Ioc.Default.GetRequiredService<Settings>();
