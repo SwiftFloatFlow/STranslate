@@ -1,6 +1,7 @@
 using STranslate.Plugin;
 using STranslate.ViewModels;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace STranslate.Views;
 
@@ -16,12 +17,20 @@ public partial class PromptEditWindow
         InitializeComponent();
 
         var viewModel = new PromptEditViewModel(prompts, roles, isMutualExclusion);
-        viewModel.SaveRequested += (hasChanges) =>
-        {
-            HasValidSave = hasChanges;
-        };
+        viewModel.SaveRequested += OnSaveRequested;
         DataContext = viewModel;
 
-        Closing += (s, e) => viewModel.Dispose();
+        Closing += OnClosing;
+    }
+
+    private void OnSaveRequested(bool hasChanges) => HasValidSave = hasChanges;
+
+    private void OnClosing(object? s, CancelEventArgs e)
+    {
+        if (DataContext is PromptEditViewModel viewModel)
+        {
+            viewModel.SaveRequested -= OnSaveRequested;
+            viewModel.Dispose();
+        }
     }
 }
