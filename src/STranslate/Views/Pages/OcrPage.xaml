@@ -16,6 +16,10 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
 
+    <ui:Page.Resources>
+        <control:ImTranOcrServiceDropHandler x:Key="ImTranOcrDropHandler" />
+    </ui:Page.Resources>
+
     <Grid Margin="20,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -26,6 +30,106 @@
                 DockPanel.Dock="Left"
                 Style="{DynamicResource {x:Static ui:ThemeKeys.SubtitleTextBlockStyleKey}}"
                 Text="{DynamicResource Ocr}" />
+            <Grid HorizontalAlignment="Right" DockPanel.Dock="Right">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.Resources>
+                    <Style BasedOn="{StaticResource {x:Type control:IconButton}}" TargetType="control:IconButton">
+                        <Setter Property="Padding" Value="5" />
+                    </Style>
+                    <Style BasedOn="{StaticResource {x:Type Image}}" TargetType="Image">
+                        <Setter Property="Height" Value="{DynamicResource STControlFontSize16}" />
+                    </Style>
+                </Grid.Resources>
+                <TextBlock
+                    Margin="0,0,4,0"
+                    Style="{DynamicResource TextBlockInfoStyle}"
+                    Text="&#xF4A3;"
+                    ToolTip="{DynamicResource SpecialServiceInfo}" />
+                <Grid
+                    Grid.Column="1"
+                    dd:DragDrop.DropHandler="{StaticResource ImTranOcrDropHandler}"
+                    dd:DragDrop.IsDropTarget="True"
+                    Background="Transparent">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Margin="5,0"
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource {x:Static ui:ThemeKeys.TextFillColorSecondaryBrushKey}}">
+                        <Run Text="{DynamicResource ImTranOcrService}" />
+                        <Run Text=":" />
+                    </TextBlock>
+                    <ui:ElevationBorder
+                        Grid.Column="1"
+                        MinWidth="100"
+                        MinHeight="30"
+                        Padding="8,2"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Background="{DynamicResource SettingsCardBackground}"
+                        BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="5"
+                        FlowDirection="LeftToRight"
+                        Visibility="{Binding Service.ImageTranslateOcrService, Converter={cnvt:EqualToVisibilityInverseConverter}}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Image Source="{Binding Service.ImageTranslateOcrService.MetaData.IconPath}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                Margin="5,0"
+                                VerticalAlignment="Center"
+                                FontSize="{DynamicResource STControlFontSize12}"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource {x:Static ui:ThemeKeys.SystemFillColorSuccessBrushKey}}"
+                                Text="{Binding Service.ImageTranslateOcrService.DisplayName}"
+                                TextTrimming="CharacterEllipsis"
+                                ToolTipService.ToolTip="{Binding Service.ImageTranslateOcrService.DisplayName}" />
+                            <control:Badge
+                                Grid.Column="2"
+                                Margin="2,0"
+                                FontSize="{DynamicResource STControlFontSize10}"
+                                IsOfficial="{Binding Service.ImageTranslateOcrService.MetaData.IsPrePlugin}" />
+                        </Grid>
+                    </ui:ElevationBorder>
+                    <ui:ElevationBorder
+                        Grid.Column="1"
+                        MinWidth="100"
+                        MinHeight="30"
+                        Margin="0,0,5,0"
+                        Padding="8,2"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Background="{DynamicResource SettingsCardBackground}"
+                        BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="5"
+                        Visibility="{Binding Service.ImageTranslateOcrService, Converter={cnvt:EqualToVisibilityConverter}}">
+                        <TextBlock
+                            Margin="5,0"
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource {x:Static ui:ThemeKeys.TextFillColorSecondaryBrushKey}}"
+                            Text="{DynamicResource NoServiceEnabled}" />
+                    </ui:ElevationBorder>
+                    <control:IconButton
+                        Grid.Column="2"
+                        Margin="0,0,5,0"
+                        Command="{Binding DeactiveImTranOcrCommand}"
+                        FontSize="{DynamicResource STControlFontSize8}"
+                        Icon="{x:Static ui:FluentSystemIcons.Delete_20_Regular}"
+                        Visibility="{Binding Service.ImageTranslateOcrService, Converter={cnvt:EqualToVisibilityInverseConverter}}" />
+                </Grid>
+            </Grid>
         </DockPanel>
         <Grid Grid.Row="1" Margin="0,0,0,20">
             <Grid.ColumnDefinitions>
@@ -46,8 +150,10 @@
                     dd:DragDrop.IsDragSource="True"
                     dd:DragDrop.IsDropTarget="True"
                     dd:DragDrop.UseDefaultDragAdorner="True"
+                    ActiveImTranOcrCommand="{Binding ActiveImTranOcrCommand}"
                     DeleteCommand="{Binding DeleteCommand}"
                     DuplicateCommand="{Binding DuplicateCommand}"
+                    ImTranOcrService="{Binding Service.ImageTranslateOcrService}"
                     ItemsSource="{Binding Service.Services}"
                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                     ScrollViewer.VerticalScrollBarVisibility="Auto"

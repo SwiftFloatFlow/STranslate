@@ -35,6 +35,18 @@ public class ServicePanel : ListBox
             typeof(ICommand),
             typeof(ServicePanel));
 
+    public ICommand? ActiveImTranOcrCommand
+    {
+        get => (ICommand?)GetValue(ActiveImTranOcrCommandProperty);
+        set => SetValue(ActiveImTranOcrCommandProperty, value);
+    }
+
+    public static readonly DependencyProperty ActiveImTranOcrCommandProperty =
+        DependencyProperty.Register(
+            nameof(ActiveImTranOcrCommand),
+            typeof(ICommand),
+            typeof(ServicePanel));
+
     public ICommand? DeleteCommand
     {
         get => (ICommand?)GetValue(DeleteCommandProperty);
@@ -83,4 +95,15 @@ public class ServicePanel : ListBox
             typeof(Service),
             typeof(ServicePanel));
 
+    public Service? ImTranOcrService
+    {
+        get => (Service?)GetValue(ImTranOcrServiceProperty);
+        set => SetValue(ImTranOcrServiceProperty, value);
+    }
+
+    public static readonly DependencyProperty ImTranOcrServiceProperty =
+        DependencyProperty.Register(
+            nameof(ImTranOcrService),
+            typeof(Service),
+            typeof(ServicePanel));
 }

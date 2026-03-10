@@ -195,6 +195,8 @@
     <sys:String x:Key="SpecialServiceInfo">左側のサービスをここにドラッグするか、右クリックで有効化してください</sys:String>
     <sys:String x:Key="AsReplaceSvc">置換翻訳として使用</sys:String>
     <sys:String x:Key="AsImTranSvc">画像翻訳として使用</sys:String>
+    <sys:String x:Key="ImTranOcrService">画像翻訳OCR</sys:String>
+    <sys:String x:Key="AsImTranOcrSvc">画像翻訳OCRとして使用</sys:String>
     <sys:String x:Key="TransExecMode">翻訳モード</sys:String>
     <sys:String x:Key="TransExecAutomatic">自動実行</sys:String>
     <sys:String x:Key="TransExecManual">手動実行</sys:String>

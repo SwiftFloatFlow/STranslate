@@ -200,6 +200,8 @@
     <sys:String x:Key="SpecialServiceInfo">拖拽左侧服务至此或者右键选择以启用</sys:String>
     <sys:String x:Key="AsReplaceSvc">替换翻译</sys:String>
     <sys:String x:Key="AsImTranSvc">图片翻译</sys:String>
+    <sys:String x:Key="ImTranOcrService">图片翻译OCR</sys:String>
+    <sys:String x:Key="AsImTranOcrSvc">图片翻译OCR</sys:String>
     <sys:String x:Key="TransExecMode">翻译模式</sys:String>
     <sys:String x:Key="TransExecAutomatic">自动执行</sys:String>
     <sys:String x:Key="TransExecManual">手动执行</sys:String>

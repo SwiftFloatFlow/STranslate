@@ -714,7 +714,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task ImageTranslateAsync()
     {
-        var ocrPlugin = GetOcrSvcAndNotify();
+        var ocrPlugin = GetImageTranslateOcrSvcAndNotify();
         if (ocrPlugin == null)
             return;
 
@@ -750,7 +750,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         if (bitmap == null) return;
 
-        ocrPlugin ??= GetOcrSvcAndNotify();
+        ocrPlugin ??= GetImageTranslateOcrSvcAndNotify();
         if (ocrPlugin == null)
             return;
 
@@ -858,6 +858,35 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                     });
                 },
                 "当前未配置或者启用OCR服务，请先前往「设置-服务-文本识别」配置后使用该功能");
+            return default;
+        }
+
+        return svc;
+    }
+
+    private IOcrPlugin? GetImageTranslateOcrSvcAndNotify()
+    {
+        var svc = OcrService.GetImageTranslateOcrSvcOrDefault();
+        if (svc == null)
+        {
+            _notification.ShowWithButton(
+                "无法获取图片翻译 OCR 服务",
+                "点击前往",
+                () =>
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        SingletonWindowOpener
+                            .Open<SettingsWindow>()
+                            .Activate();
+
+                        Application.Current.Windows
+                                .OfType<SettingsWindow>()
+                                .First()
+                                .Navigate(nameof(OcrPage));
+                    });
+                },
+                "当前未配置图片翻译 OCR 服务且无可用 OCR 服务，请先前往「设置-服务-文本识别」进行配置");
             return default;
         }
 

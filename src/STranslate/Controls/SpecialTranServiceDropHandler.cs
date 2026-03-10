@@ -80,3 +80,37 @@ public class ImTranServiceDropHandler : IDropTarget
         }
     }
 }
+
+public class ImTranOcrServiceDropHandler : IDropTarget
+{
+    public void DragOver(IDropInfo dropInfo)
+    {
+        if (dropInfo.Data is Service)
+        {
+            dropInfo.Effects = DragDropEffects.Copy;
+            dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
+        }
+        else
+        {
+            dropInfo.Effects = DragDropEffects.None;
+        }
+    }
+
+    public void Drop(IDropInfo dropInfo)
+    {
+        if (dropInfo.Data is Service service)
+        {
+            var target = dropInfo.VisualTarget as FrameworkElement;
+            while (target != null)
+            {
+                if (target.DataContext is OcrViewModel viewModel)
+                {
+                    viewModel.ActiveImTranOcrCommand?.Execute(service);
+                    break;
+                }
+                target = target.Parent as FrameworkElement;
+                target ??= System.Windows.Media.VisualTreeHelper.GetParent(dropInfo.VisualTarget as DependencyObject) as FrameworkElement;
+            }
+        }
+    }
+}
