@@ -1,5 +1,9 @@
 Reference this package to develop a plugin for [STranslate](https://github.com/STranslate/STranslate).
 
+## v1.0.9 - 2026-03-12
+
+- 添加同步主题能力给插件 @SwiftFloatFlow
+
 ## v1.0.8 - 2026-01-13
 
 - 生词本插件添加 SaveWithNoteAsync 方法，支持保存带笔记的生词（翻译结果作为笔记）
