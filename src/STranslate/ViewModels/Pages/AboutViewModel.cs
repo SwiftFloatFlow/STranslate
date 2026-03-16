@@ -41,7 +41,7 @@ public partial class AboutViewModel(
             snackbar.ShowWarning(i18n.GetTranslation("NoCheckUpdataInDev"));
             return;
         }
-        await updaterService.UpdateAppAsync(silentUpdate: false);
+        await updaterService.UpdateAppAsync();
     }
 
     [RelayCommand]

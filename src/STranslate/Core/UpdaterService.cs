@@ -30,14 +30,12 @@ public class UpdaterService(
     /// <summary>
     /// 手动检查并执行更新流程。
     /// </summary>
-    /// <param name="silentUpdate">为 <c>false</c> 时会展示完整交互提示。</param>
-    public async Task UpdateAppAsync(bool silentUpdate = true)
+    public async Task UpdateAppAsync()
     {
         await UpdateLock.WaitAsync();
         try
         {
-            if (!silentUpdate)
-                notification.Show(i18n.GetTranslation("UpdateCheck"), i18n.GetTranslation("CheckingForUpdates"));
+            notification.Show(i18n.GetTranslation("UpdateCheck"), i18n.GetTranslation("CheckingForUpdates"));
 
             var updateManager = new UpdateManager(new GithubSource(Constant.Github, accessToken: default, prerelease: false));
 
@@ -45,8 +43,7 @@ public class UpdaterService(
 
             if (newUpdateInfo == null)
             {
-                if (!silentUpdate)
-                    MessageBox.Show(i18n.GetTranslation("NoUpdateInfoFound"), Constant.AppName);
+                MessageBox.Show(i18n.GetTranslation("NoUpdateInfoFound"), Constant.AppName);
                 logger.LogInformation("No update info found.");
                 return;
             }
@@ -58,24 +55,13 @@ public class UpdaterService(
 
             if (newReleaseVersion <= currentVersion)
             {
-                if (!silentUpdate)
-                    MessageBox.Show(i18n.GetTranslation("AlreadyLatestVersion"), Constant.AppName);
+                MessageBox.Show(i18n.GetTranslation("AlreadyLatestVersion"), Constant.AppName);
                 logger.LogInformation("You are already on the latest version.");
                 return;
             }
 
-            if (!silentUpdate)
-            {
-                var dialogResult = await new UpdateChangelogDialog(newReleaseVersion.ToString()).ShowAsync();
-                if (dialogResult != ContentDialogResult.Primary)
-                {
-                    logger.LogInformation("User cancelled the update.");
-                    return;
-                }
-            }
-            else if (MessageBox.Show(string.Format(i18n.GetTranslation("NewVersionFound"), newReleaseVersion),
-                         Constant.AppName,
-                         MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+            var dialogResult = await new UpdateChangelogDialog(newReleaseVersion.ToString()).ShowAsync();
+            if (dialogResult != ContentDialogResult.Primary)
             {
                 logger.LogInformation("User cancelled the update.");
                 return;
@@ -97,8 +83,7 @@ public class UpdaterService(
 
             var newVersionTips = NewVersionTips(newReleaseVersion.ToString());
 
-            if (!silentUpdate)
-                notification.Show(i18n.GetTranslation("UpdateReady"), newVersionTips);
+            notification.Show(i18n.GetTranslation("UpdateReady"), newVersionTips);
             logger.LogInformation($"Update success:{newVersionTips}");
 
             if (MessageBox.Show(newVersionTips, Constant.AppName, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
@@ -115,8 +100,7 @@ public class UpdaterService(
             else
                 logger.LogError(e, $"Error Occurred");
 
-            if (!silentUpdate)
-                notification.Show(i18n.GetTranslation("UpdateFailed"), i18n.GetTranslation("UpdateFailedMessage"));
+            notification.Show(i18n.GetTranslation("UpdateFailed"), i18n.GetTranslation("UpdateFailedMessage"));
         }
         finally
         {
