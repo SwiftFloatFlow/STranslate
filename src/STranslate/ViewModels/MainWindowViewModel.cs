@@ -17,6 +17,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Windows.Win32;
 
 namespace STranslate.ViewModels;
 
@@ -655,7 +656,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         else
             _snackbar.ShowInfo(_i18n.GetTranslation("AutoTranslateDisabled"));
     }
-
+    
     #endregion
 
     #endregion
@@ -713,7 +714,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task ImageTranslateAsync()
     {
-        var ocrPlugin = GetOcrSvcAndNotify();
+        var ocrPlugin = GetImageTranslateOcrSvcAndNotify();
         if (ocrPlugin == null)
             return;
 
@@ -749,7 +750,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         if (bitmap == null) return;
 
-        ocrPlugin ??= GetOcrSvcAndNotify();
+        ocrPlugin ??= GetImageTranslateOcrSvcAndNotify();
         if (ocrPlugin == null)
             return;
 
@@ -857,6 +858,35 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                     });
                 },
                 "当前未配置或者启用OCR服务，请先前往「设置-服务-文本识别」配置后使用该功能");
+            return default;
+        }
+
+        return svc;
+    }
+
+    private IOcrPlugin? GetImageTranslateOcrSvcAndNotify()
+    {
+        var svc = OcrService.GetImageTranslateOcrSvcOrDefault();
+        if (svc == null)
+        {
+            _notification.ShowWithButton(
+                "无法获取图片翻译 OCR 服务",
+                "点击前往",
+                () =>
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        SingletonWindowOpener
+                            .Open<SettingsWindow>()
+                            .Activate();
+
+                        Application.Current.Windows
+                                .OfType<SettingsWindow>()
+                                .First()
+                                .Navigate(nameof(OcrPage));
+                    });
+                },
+                "当前未配置图片翻译 OCR 服务且无可用 OCR 服务，请先前往「设置-服务-文本识别」进行配置");
             return default;
         }
 
@@ -1148,18 +1178,29 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task CrosswordTranslateAsync()
     {
-        var (success, text) = await GetTextAsync();
-        if (success && !string.IsNullOrWhiteSpace(text))
+        var (success, text) = await GetTextAsync(showFailureNotification: false);
+        if (!success || string.IsNullOrWhiteSpace(text))
         {
-            ExecuteTranslate(Utilities.LinebreakHandler(text, Settings.LineBreakHandleType));
+            HandleCrosswordFetchFailed();
+            return;
         }
+
+        ExecuteTranslate(Utilities.LinebreakHandler(text, Settings.LineBreakHandleType));
     }
 
     public void CrosswordTranslateByCtrlSameCHandler()
     {
-        var text = ClipboardHelper.GetText()?.Trim();
-        if (string.IsNullOrWhiteSpace(text)) return;
-        ExecuteTranslate(Utilities.LinebreakHandler(text, Settings.LineBreakHandleType));
+        _ = Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            var text = ClipboardHelper.GetText()?.Trim();
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                HandleCrosswordFetchFailed();
+                return;
+            }
+
+            ExecuteTranslate(Utilities.LinebreakHandler(text, Settings.LineBreakHandleType));
+        });
     }
 
     [RelayCommand]
@@ -1549,6 +1590,13 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                 Settings.MainWindowTop = -18000;
                 return;
             }
+
+            if (Settings.WindowScreen == WindowScreenType.FollowMouse)
+            {
+                UpdatePositionNearCursor();
+                return;
+            }
+
             if (Settings.WindowScreen == WindowScreenType.RememberLastLaunchLocation)
             {
                 var previousScreenWidth = Settings.PreviousScreenWidth;
@@ -1606,6 +1654,48 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         }
     }
 
+    private void UpdatePositionNearCursor()
+    {
+        if (!PInvoke.GetCursorPos(out var cursorPosition))
+            return;
+
+        const double horizontalOffset = 16;
+        const double verticalOffset = 20;
+        const double edgePadding = 8;
+
+        var cursorDip = Win32Helper.TransformPixelsToDIP(MainWindow, cursorPosition.X, cursorPosition.Y);
+
+        var screen = MonitorInfo.GetCursorDisplayMonitor();
+        var workAreaTopLeft = Win32Helper.TransformPixelsToDIP(MainWindow, screen.WorkingArea.X, screen.WorkingArea.Y);
+        var workAreaBottomRight = Win32Helper.TransformPixelsToDIP(
+            MainWindow,
+            screen.WorkingArea.X + screen.WorkingArea.Width,
+            screen.WorkingArea.Y + screen.WorkingArea.Height);
+
+        var windowWidth = MainWindow.ActualWidth > 0 ? MainWindow.ActualWidth : Settings.MainWindowWidth;
+        var windowHeight = MainWindow.ActualHeight > 0 ? MainWindow.ActualHeight : MainWindow.MinHeight;
+
+        var left = cursorDip.X + horizontalOffset;
+        var top = cursorDip.Y + verticalOffset;
+
+        if (left + windowWidth > workAreaBottomRight.X - edgePadding)
+            left = cursorDip.X - windowWidth - horizontalOffset;
+
+        if (top + windowHeight > workAreaBottomRight.Y - edgePadding)
+            top = cursorDip.Y - windowHeight - verticalOffset;
+
+        var minLeft = workAreaTopLeft.X + edgePadding;
+        var minTop = workAreaTopLeft.Y + edgePadding;
+        var maxLeft = workAreaBottomRight.X - windowWidth - edgePadding;
+        var maxTop = workAreaBottomRight.Y - windowHeight - edgePadding;
+
+        if (maxLeft < minLeft) maxLeft = minLeft;
+        if (maxTop < minTop) maxTop = minTop;
+
+        Settings.MainWindowLeft = Math.Clamp(left, minLeft, maxLeft);
+        Settings.MainWindowTop = Math.Clamp(top, minTop, maxTop);
+    }
+
     private void AdjustPositionForResolutionChange()
     {
         var screenWidth = SystemParameters.VirtualScreenWidth;
@@ -1656,6 +1746,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         switch (Settings.WindowScreen)
         {
             case WindowScreenType.Cursor:
+            case WindowScreenType.FollowMouse:
                 screen = MonitorInfo.GetCursorDisplayMonitor();
                 break;
             case WindowScreenType.Focus:
@@ -1779,7 +1870,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         SaveToVocabularyCancelCommand.Execute(null);
     }
 
-    private async Task<(bool success, string text)> GetTextAsync()
+    private async Task<(bool success, string text)> GetTextAsync(bool showFailureNotification = true)
     {
         try
         {
@@ -1787,7 +1878,10 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             if (string.IsNullOrEmpty(text))
             {
                 _logger.LogWarning("取词失败，可能：未选中文本、文本禁止复制、取词间隔过短、文本所属软件权限高于本软件");
-                _notification.Show("未识别到文本", "请确保选中要翻译的文本\n若问题仍然存在请尝试以管理员权限重启软件");
+                if (showFailureNotification)
+                {
+                    _notification.Show("未识别到文本", "请确保选中要翻译的文本\n若问题仍然存在请尝试以管理员权限重启软件");
+                }
                 return (false, string.Empty);
             }
             return (true, text);
@@ -1797,6 +1891,12 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             _logger.LogError(ex, "获取剪贴板异常请重试");
             return (false, string.Empty);
         }
+    }
+
+    private void HandleCrosswordFetchFailed()
+    {
+        InputClear();
+        _snackbar.ShowWarning(_i18n.GetTranslation("CrosswordTranslateFetchFailed"), 3000);
     }
 
     private void StartProcess()

@@ -51,11 +51,17 @@
     <sys:String x:Key="General_SecondLanguageDescription">목표 언어가 자동이고 원본 언어가 제1 언어일 때, 목표 언어로 제2 언어를 사용합니다.</sys:String>
     <sys:String x:Key="General_HttpTimeout">시간 초과</sys:String>
     <sys:String x:Key="General_HttpTimeoutDescription">네트워크 요청 시간 초과 시간, 단위: 초.</sys:String>
+    <sys:String x:Key="General_UseClipboardOutput">텍스트 출력 시 클립보드 사용</sys:String>
+    <sys:String x:Key="General_UseClipboardOutputDescription">활성화하면 클립보드 Ctrl+V로 텍스트를 출력하고, 비활성화하면 키보드 시뮬레이션 입력을 사용합니다(기본값).</sys:String>
     <sys:String x:Key="General_TranslateOnPaste">붙여넣기 시 즉시 번역</sys:String>
     <sys:String x:Key="General_TranslateOnPasteDescription">입력 상자에 텍스트를 붙여넣으면 즉시 번역을 실행합니다.</sys:String>
     <sys:String x:Key="General_AutoTranslate">자동 번역</sys:String>
     <sys:String x:Key="General_AutoTranslateDescription">입력 후 일정 시간 대기 후 자동으로 번역을 실행합니다.</sys:String>
+    <sys:String x:Key="General_InstantTranslate">즉시 번역</sys:String>
+    <sys:String x:Key="General_InstantTranslateDescription">아래 작업이 발생하면 즉시 번역을 실행합니다.</sys:String>
     <sys:String x:Key="General_AutoTranslateButtonVisible">메인 화면에 자동 번역 버튼 표시</sys:String>
+    <sys:String x:Key="General_AutoTranslateOnPromptChanged">프롬프트 전환 후 자동 번역</sys:String>
+    <sys:String x:Key="General_AutoTranslateOnPromptChangedDescription">AI 번역 서비스의 프롬프트를 전환하면 즉시 번역을 다시 실행합니다.</sys:String>
     <sys:String x:Key="General_AutoTranslateDelay">자동 번역 지연</sys:String>
     <sys:String x:Key="General_AutoTranslateDelayDescription">입력 후 대기 시간, 단위: 밀리초.</sys:String>
     <sys:String x:Key="General_LineBreakHandleType">단어 선택 줄 바꿈 처리</sys:String>
@@ -93,6 +99,12 @@
     <sys:String x:Key="General_ShowOcrButtonDescription">메인 화면 제목 표시줄에 OCR 버튼을 표시합니다.</sys:String>
     <sys:String x:Key="General_ShowClipboardMonitor">클립보드 모니터링 버튼 표시</sys:String>
     <sys:String x:Key="General_ShowClipboardMonitorDescription">메인 화면 제목 표시줄에 클립보드 모니터링 전환 버튼을 표시합니다.</sys:String>
+    <sys:String x:Key="General_MainHeaderConfig">메인 헤더 버튼 배치</sys:String>
+    <sys:String x:Key="General_MainHeaderConfigDescription">윗줄은 미리보기, 아랫줄은 컨트롤 풀입니다. 풀에서 미리보기로 드래그하면 표시되고, 다시 풀로 드래그하면 숨겨집니다. 미리보기 안에서 드래그해 순서도 바꿀 수 있습니다.</sys:String>
+    <sys:String x:Key="General_MainHeaderPreview">미리보기(메인 Header)</sys:String>
+    <sys:String x:Key="General_MainHeaderPool">컨트롤 풀(숨김)</sys:String>
+    <sys:String x:Key="General_MainHeaderShowAll">모두 표시</sys:String>
+    <sys:String x:Key="General_MainHeaderHideAll">모두 숨기기</sys:String>
     <sys:String x:Key="General_FontSize">글꼴 크기</sys:String>
     <sys:String x:Key="General_FontSizeDescription">「우클릭 메뉴」를 제외한 모든 글꼴 크기를 조정합니다.</sys:String>
     <sys:String x:Key="General_OutputShowingControl">출력 표시 제어</sys:String>
@@ -110,6 +122,21 @@
     <sys:String x:Key="General_CopyAfterTranslationNotAutomatic">「자동 실행」이 아닌 서비스 번역 후 복사</sys:String>
     <sys:String x:Key="General_CopyAfterOcr">OCR 후 복사</sys:String>
     <sys:String x:Key="General_CopyAfterOcrDescription">모든 텍스트 인식 상황에서 인식 후 결과를 자동으로 복사합니다.</sys:String>
+    <sys:String x:Key="General_PluginMarketCdnSource">플러그인 마켓 CDN 소스</sys:String>
+    <sys:String x:Key="General_PluginMarketCdnSourceDescription">플러그인 마켓 데이터의 CDN 가속 서비스 선택 (GitHub 직접 연결은 캐시 지연 없음)</sys:String>
+    <sys:String x:Key="General_CustomCdnUrl">사용자 지정 CDN URL</sys:String>
+    <sys:String x:Key="General_CustomCdnUrlDescription">사용자 지정 CDN URL 템플릿 입력, {author}, {repo}, {branch}, {path}를 자리 표시자로 사용</sys:String>
+
+    <!--  // PluginMarketCdnSourceType //  -->
+    <sys:String x:Key="PluginMarketCdnSourceTypeJsDelivr">jsDelivr CDN (권장)</sys:String>
+    <sys:String x:Key="PluginMarketCdnSourceTypeGitHubRaw">GitHub 직접 연결</sys:String>
+    <sys:String x:Key="PluginMarketCdnSourceTypeCustom">사용자 지정</sys:String>
+
+    <!--  // PluginDownloadProxyType //  -->
+    <sys:String x:Key="PluginDownloadProxyTypeGitHub">GitHub 직접 연결</sys:String>
+    <sys:String x:Key="PluginDownloadProxyTypeGhProxyMirror">mirror.ghproxy.com</sys:String>
+    <sys:String x:Key="PluginDownloadProxyTypeGhProxyNet">ghproxy.net</sys:String>
+    <sys:String x:Key="PluginDownloadProxyTypeCustom">사용자 지정</sys:String>
 
     <sys:String x:Key="GlobalHotkeys">전역 단축키</sys:String>
     <sys:String x:Key="SoftwareHotkeys">소프트웨어 단축키</sys:String>
@@ -122,6 +149,7 @@
     <sys:String x:Key="Hotkey_CrosswordTranslateIsUseCtrlSameC">Ctrl+C+C로 드래그 번역을 사용하시겠습니까?</sys:String>
     <sys:String x:Key="Hotkey_CrosswordTranslateTraditional">기존 단축키</sys:String>
     <sys:String x:Key="Hotkey_CrosswordTranslateByCtrlSameCDescription">마우스로 텍스트를 선택하고 빠르게 Ctrl+C+C를 눌러 번역합니다.</sys:String>
+    <sys:String x:Key="CrosswordTranslateFetchFailed">선택 텍스트를 가져오지 못했습니다. 입력 번역을 열었습니다.</sys:String>
     <sys:String x:Key="Hotkey_MouseHookTranslate">마우스 감지</sys:String>
     <sys:String x:Key="Hotkey_MouseHookTranslateDescription">마우스 드래그 텍스트 선택 번역 감지를 켜고 끄는 단축키입니다.</sys:String>
     <sys:String x:Key="Hotkey_ReplaceTranslate">치환 번역</sys:String>
@@ -169,6 +197,8 @@
     <sys:String x:Key="SpecialServiceInfo">왼쪽 서비스를 이곳으로 드래그하거나 우클릭하여 활성화하세요.</sys:String>
     <sys:String x:Key="AsReplaceSvc">치환 번역으로 사용</sys:String>
     <sys:String x:Key="AsImTranSvc">이미지 번역으로 사용</sys:String>
+    <sys:String x:Key="ImTranOcrService">이미지 번역 OCR</sys:String>
+    <sys:String x:Key="AsImTranOcrSvc">이미지 번역 OCR로 사용</sys:String>
     <sys:String x:Key="TransExecMode">번역 모드</sys:String>
     <sys:String x:Key="TransExecAutomatic">자동 실행</sys:String>
     <sys:String x:Key="TransExecManual">수동 실행</sys:String>
@@ -183,6 +213,25 @@
     <sys:String x:Key="SearchPlugin">플러그인 검색</sys:String>
     <sys:String x:Key="SearchPluginToolTip">Ctrl+F를 눌러 플러그인 검색</sys:String>
     <sys:String x:Key="DropInstallPlugin">놓아서 플러그인 설치</sys:String>
+
+    <!--  // Plugin Market //  -->
+    <sys:String x:Key="PluginMarketRefresh">새로고침</sys:String>
+    <sys:String x:Key="PluginMarketDownload">다운로드</sys:String>
+    <sys:String x:Key="PluginMarketUpgrade">업그레이드</sys:String>
+    <sys:String x:Key="PluginMarketInstalled">설치됨</sys:String>
+    <sys:String x:Key="PluginMarketDownloading">다운로드 중</sys:String>
+    <sys:String x:Key="Back">뒤로</sys:String>
+    <sys:String x:Key="PluginMarketLoading">로드 중...</sys:String>
+    <sys:String x:Key="PluginMarketLoadError">로드 실패</sys:String>
+    <sys:String x:Key="PluginMarketNoPlugins">플러그인 없음</sys:String>
+    <sys:String x:Key="PluginMarketCurrentVersion">현재 버전</sys:String>
+    <sys:String x:Key="PluginMarketLatestVersion">최신 버전</sys:String>
+    <sys:String x:Key="PluginDownloadCancelled">다운로드가 취소되었습니다</sys:String>
+    <sys:String x:Key="PluginActionDownload">플러그인 다운로드</sys:String>
+    <sys:String x:Key="PluginActionUpgrade">플러그인 업그레이드</sys:String>
+    <sys:String x:Key="PluginActionInstalled">설치됨</sys:String>
+    <sys:String x:Key="PluginActionPendingRestart">재시작 대기중</sys:String>
+    <sys:String x:Key="PluginActionWebsite">프로젝트 페이지</sys:String>
 
     <sys:String x:Key="Network_EnableExternalCall">외부 호출 활성화</sys:String>
     <sys:String x:Key="Network_EnableExternalCallDescription">외부 호출 기능 활성화 또는 비활성화</sys:String>
@@ -267,7 +316,19 @@
     <sys:String x:Key="UserDataLocation">사용자 데이터 위치</sys:String>
     <sys:String x:Key="UserDataLocationDescription">사용자 설정 및 설치된 플러그인은 사용자 데이터 폴더에 저장됩니다. 이 위치는 포터블 모드 여부에 따라 다를 수 있습니다.</sys:String>
     <sys:String x:Key="OpenDirectory">디렉터리 열기</sys:String>
-    <sys:String x:Key="DeveloperTools">개발자 도구</sys:String>
+    <sys:String x:Key="PortableModeDescription">사용자 데이터 저장 위치를 앱 폴더와 로밍 프로필 사이에서 전환합니다. 전환하면 데이터가 이동되고 앱이 자동으로 다시 시작됩니다.</sys:String>
+    <sys:String x:Key="PortableModeStatePortable">포터블 모드</sys:String>
+    <sys:String x:Key="PortableModeStateRoaming">로밍 모드</sys:String>
+    <sys:String x:Key="EnablePortableMode">포터블 모드 활성화</sys:String>
+    <sys:String x:Key="DisablePortableMode">포터블 모드 비활성화</sys:String>
+    <sys:String x:Key="ConfirmRestartAndEnablePortableMode">재시작 후 포터블 모드를 활성화하시겠습니까?</sys:String>
+    <sys:String x:Key="ConfirmRestartAndDisablePortableMode">재시작 후 포터블 모드를 비활성화하시겠습니까?</sys:String>
+    <sys:String x:Key="PortableModeDisableRoamingConflict">Roaming 데이터 디렉터리가 이미 존재합니다. 수동으로 처리한 후 다시 시도하세요.</sys:String>
+    <sys:String x:Key="PortableModeEnableSuccess">포터블 모드가 활성화되었습니다</sys:String>
+    <sys:String x:Key="PortableModeDisableSuccess">포터블 모드가 비활성화되고 Roaming 모드로 복원되었습니다</sys:String>
+    <sys:String x:Key="PortableModeEnableFailed">포터블 모드 활성화에 실패했습니다</sys:String>
+    <sys:String x:Key="PortableModeDisableFailed">포터블 모드 비활성화에 실패했습니다</sys:String>
+    <sys:String x:Key="PortableModeHostStartFailed">포터블 모드 작업 시작 실패: {0}</sys:String>
     <sys:String x:Key="ClearCache">캐시 삭제</sys:String>
     <sys:String x:Key="ClearLogs">로그 삭제</sys:String>
     <sys:String x:Key="SettingsDirectory">설정 디렉터리</sys:String>
@@ -303,6 +364,8 @@
     <sys:String x:Key="RestoreBackup">백업 복원</sys:String>
     <sys:String x:Key="Version">버전</sys:String>
     <sys:String x:Key="CheckUpdate">업데이트 확인</sys:String>
+    <sys:String x:Key="General_AutoCheckUpdate">자동 업데이트 확인</sys:String>
+    <sys:String x:Key="General_AutoCheckUpdateDescription">주기적으로 새 버전을 확인하고, 발견 시 트레이 알림으로 안내합니다.</sys:String>
     <sys:String x:Key="NoCheckUpdataInDev">개발 모드에서는 업데이트 확인 금지</sys:String>
     <sys:String x:Key="Donate">후원</sys:String>
     <sys:String x:Key="OfficialWebsite">공식 홈페이지</sys:String>
@@ -457,6 +520,14 @@
     <sys:String x:Key="PluginTypeTts">음성 합성</sys:String>
     <sys:String x:Key="PluginTypeVocabulary">단어장</sys:String>
 
+    <sys:String x:Key="PluginMarketSettings">고급 설정</sys:String>
+    <sys:String x:Key="PluginMarketSettingsChanged">CDN 소스 설정이 변경되었습니다. 지금 플러그인 목록을 새로고침하시겠습니까?</sys:String>
+    <sys:String x:Key="PluginDownloadProxy">다운로드 프록시</sys:String>
+    <sys:String x:Key="PluginDownloadProxyDescription">GitHub Releases 다운로드 가속에 사용</sys:String>
+    <sys:String x:Key="PluginDownloadProxyUrl">사용자 지정 프록시 URL</sys:String>
+    <sys:String x:Key="PluginDownloadProxyUrlDescription">사용자 지정 프록시 주소 입력</sys:String>
+    <sys:String x:Key="PluginDownloadProxyUrlExample">예시: https://mirror.ghproxy.com/</sys:String>
+
     <sys:String x:Key="ProxyTypeSystem">시스템 프록시</sys:String>
     <sys:String x:Key="ProxyTypeHttp">HTTP 프록시</sys:String>
     <sys:String x:Key="ProxyTypeSocks5">Socks5 프록시</sys:String>
@@ -471,6 +542,7 @@
 
     <sys:String x:Key="WindowScreenTypeRememberLastLaunchLocation">마지막 실행 위치 기억</sys:String>
     <sys:String x:Key="WindowScreenTypeCursor">마우스 커서가 있는 모니터</sys:String>
+    <sys:String x:Key="WindowScreenTypeFollowMouse">마우스 따라가기</sys:String>
     <sys:String x:Key="WindowScreenTypeFocus">포커스가 있는 모니터</sys:String>
     <sys:String x:Key="WindowScreenTypePrimary">주 모니터</sys:String>
     <sys:String x:Key="WindowScreenTypeCustom">사용자 정의 모니터</sys:String>
@@ -542,6 +614,9 @@
     <sys:String x:Key="PluginUpgradeConfirm">플러그인 {0}의 설치된 버전 {1}, 새 버전 {2}. 업그레이드하시겠습니까?</sys:String>
     <sys:String x:Key="PluginUpgradeSuccess">플러그인 업그레이드 준비 완료, 재시작 후 적용됩니다.</sys:String>
     <sys:String x:Key="PluginUpgradeFailed">플러그인 업그레이드 실패</sys:String>
+    <sys:String x:Key="RestartNow">지금 재시작</sys:String>
+    <sys:String x:Key="RestartLater">나중에 수동 재시작</sys:String>
+    <sys:String x:Key="PendingRestart">재시작 대기 중</sys:String>
     <sys:String x:Key="BatchOperation">일괄 작업</sys:String>
     <sys:String x:Key="DeleteSelected">선택 항목 삭제</sys:String>
     <sys:String x:Key="NoPluginSelected">선택된 플러그인 없음</sys:String>
@@ -627,11 +702,15 @@
     <sys:String x:Key="NoUpdateInfoFound">업데이트 정보를 찾을 수 없습니다.</sys:String>
     <sys:String x:Key="AlreadyLatestVersion">최신 버전을 사용 중입니다.</sys:String>
     <sys:String x:Key="UpdateAvailable">사용 가능한 업데이트 있음</sys:String>
+    <sys:String x:Key="UpdateOpenAboutButton">업데이트로 이동</sys:String>
+    <sys:String x:Key="UpdateAvailableTrayMessage">새 버전 {0}이(가) 발견되었습니다. 버튼을 눌러 설정-정보에서 업데이트할 수 있습니다.</sys:String>
     <sys:String x:Key="NewVersionFound">새 버전 {0}을(를) 발견했습니다. 다운로드하시겠습니까?</sys:String>
     <sys:String x:Key="PortableDataMoveError">STranslate가 사용자 구성 데이터를 새 업데이트 버전으로 이동할 수 없습니다.&#10;구성 데이터 폴더를 {0}에서 {1}로 수동 이동하세요.</sys:String>
     <sys:String x:Key="UpdateReady">업데이트 준비 완료</sys:String>
     <sys:String x:Key="UpdateFailed">업데이트 실패</sys:String>
     <sys:String x:Key="UpdateFailedMessage">애플리케이션 업데이트에 실패했습니다. 네트워크 연결을 확인하세요.</sys:String>
+    <sys:String x:Key="UpdateChangelogLoading">업데이트 내용을 불러오는 중...</sys:String>
+    <sys:String x:Key="UpdateChangelogLoadFailedMarkdown">업데이트 내용을 불러오지 못했습니다. [여기를 눌러 전체 변경 로그 보기]({0}).</sys:String>
     <sys:String x:Key="NewVersionTips">새 버전 {0}을(를) 사용할 수 있습니다. 업데이트를 적용하기 위해 STranslate를 재시작하시겠습니까?</sys:String>
 
     <sys:String x:Key="Url">엔드포인트</sys:String>

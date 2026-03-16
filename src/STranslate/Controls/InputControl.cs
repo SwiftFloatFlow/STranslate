@@ -218,9 +218,20 @@ public class InputControl : Control
     private TextBox? _textBox;
     private Border? _fontSizeHintBorder;
     private TextBlock? _fontSizeText;
+    private CommandBinding? _pasteBinding;
 
     public override void OnApplyTemplate()
     {
+        // 模板重建时先解绑旧模板事件，避免重复订阅
+        if (_textBox != null)
+        {
+            _textBox.PreviewMouseWheel -= OnTextBoxPreviewMouseWheel;
+            if (_pasteBinding != null)
+            {
+                _textBox.CommandBindings.Remove(_pasteBinding);
+            }
+        }
+
         base.OnApplyTemplate();
 
         _textBox = GetTemplateChild(PartTextBoxName) as TextBox;
@@ -230,8 +241,8 @@ public class InputControl : Control
         // 绑定粘贴命令
         if (_textBox != null)
         {
-            var pasteBinding = new CommandBinding(ApplicationCommands.Paste, OnPasteExecuted);
-            _textBox.CommandBindings.Add(pasteBinding);
+            _pasteBinding = new CommandBinding(ApplicationCommands.Paste, OnPasteExecuted);
+            _textBox.CommandBindings.Add(_pasteBinding);
 
             // 添加鼠标滚轮事件处理
             _textBox.PreviewMouseWheel += OnTextBoxPreviewMouseWheel;

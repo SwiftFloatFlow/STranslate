@@ -1,17 +1,20 @@
 using CommunityToolkit.Mvvm.Input;
 using STranslate.Core;
+using System.ComponentModel;
 using System.Windows.Controls;
 
 namespace STranslate.ViewModels.Pages;
 
 public partial class StandaloneViewModel : SearchViewModelBase
 {
+    private readonly PropertyChangedEventHandler _settingsPropertyChangedHandler;
+
     public StandaloneViewModel(Settings settings, DataProvider dataProvider, Internationalization i18n) : base(i18n, "Standalone_")
     {
         Settings = settings;
         DataProvider = dataProvider;
 
-        Settings.PropertyChanged += (_, e) =>
+        _settingsPropertyChangedHandler = (_, e) =>
         {
             if (e.PropertyName == nameof(Settings.LayoutAnalysisMode))
             {
@@ -40,6 +43,7 @@ public partial class StandaloneViewModel : SearchViewModelBase
                 }
             }
         };
+        Settings.PropertyChanged += _settingsPropertyChangedHandler;
     }
 
     [RelayCommand]
@@ -103,4 +107,14 @@ public partial class StandaloneViewModel : SearchViewModelBase
 
     public Settings Settings { get; }
     public DataProvider DataProvider { get; }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            Settings.PropertyChanged -= _settingsPropertyChangedHandler;
+        }
+
+        base.Dispose(disposing);
+    }
 }

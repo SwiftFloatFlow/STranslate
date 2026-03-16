@@ -44,6 +44,11 @@ public partial class Settings : ObservableObject
 
     [ObservableProperty] public partial bool HideNotifyIcon { get; set; } = false;
 
+    /// <summary>
+    /// 是否启用自动检查更新
+    /// </summary>
+    [ObservableProperty] public partial bool AutoCheckUpdate { get; set; } = true;
+
     [ObservableProperty] public partial ElementTheme ColorScheme { get; set; }
 
     [ObservableProperty] public partial HistoryLimit HistoryLimit { get; set; } = HistoryLimit.Limit1000;
@@ -71,6 +76,7 @@ public partial class Settings : ObservableObject
     [ObservableProperty] public partial bool IsOcrVisible { get; set; } = true;
 
     [ObservableProperty] public partial bool IsClipboardMonitorVisible { get; set; } = true;
+    [ObservableProperty] public partial List<string> MainHeaderVisibleActions { get; set; } = [];
 
     [ObservableProperty] public partial DoubleClickTrayFunction DoubleClickTrayFunction { get; set; }
 
@@ -107,9 +113,21 @@ public partial class Settings : ObservableObject
     [ObservableProperty] public partial LangEnum SecondLanguage { get; set; } = LangEnum.English;
 
     /// <summary>
+    /// 文本输出是否使用剪贴板粘贴。
+    /// false: 键盘模拟输入（默认）
+    /// true: 剪贴板 Ctrl+V
+    /// </summary>
+    [ObservableProperty] public partial bool UseClipboardOutput { get; set; } = false;
+
+    /// <summary>
     /// 粘贴时自动翻译
     /// </summary>
     [ObservableProperty] public partial bool TranslateOnPaste { get; set; } = true;
+    
+    /// <summary>
+    /// 切换提示词后自动翻译
+    /// </summary>
+    [ObservableProperty] public partial bool AutoTranslateOnPromptChanged { get; set; } = false;
 
     [ObservableProperty] public partial bool IsAutoTranslateVisible { get; set; } = true;
 
@@ -127,6 +145,10 @@ public partial class Settings : ObservableObject
     public double PreviousScreenHeight { get; set; }
     [ObservableProperty] public partial int CustomScreenNumber { get; set; } = 1;
     [ObservableProperty] public partial WindowScreenType WindowScreen { get; set; } = WindowScreenType.Cursor;
+    public bool IsWindowAlignVisible =>
+        WindowScreen != WindowScreenType.RememberLastLaunchLocation &&
+        WindowScreen != WindowScreenType.FollowMouse;
+    partial void OnWindowScreenChanged(WindowScreenType value) => OnPropertyChanged(nameof(IsWindowAlignVisible));
     [ObservableProperty] public partial WindowAlignType WindowAlign { get; set; } = WindowAlignType.Center;
     [ObservableProperty] public partial double MainWindowLeft { get; set; }
     [ObservableProperty] public partial double MainWindowTop { get; set; }
@@ -304,6 +326,31 @@ public partial class Settings : ObservableObject
 
     #endregion
 
+    #region Plugin Market Settings
+
+    /// <summary>
+    /// 插件市场CDN源
+    /// </summary>
+    [ObservableProperty] public partial PluginMarketCdnSourceType PluginMarketCdnSource { get; set; } = PluginMarketCdnSourceType.JsDelivr;
+
+    /// <summary>
+    /// 自定义插件市场CDN URL模板
+    /// 可用占位符: {author}, {repo}, {branch}, {path}
+    /// </summary>
+    [ObservableProperty] public partial string CustomPluginMarketCdnUrl { get; set; } = "https://fastly.jsdelivr.net/gh/{author}/{repo}@{branch}/{path}";
+
+    /// <summary>
+    /// 插件下载代理类型
+    /// </summary>
+    [ObservableProperty] public partial PluginDownloadProxyType PluginDownloadProxy { get; set; } = PluginDownloadProxyType.GitHub;
+
+    /// <summary>
+    /// 自定义下载代理URL
+    /// </summary>
+    [ObservableProperty] public partial string CustomDownloadProxyUrl { get; set; } = string.Empty;
+
+    #endregion
+
     #region Image Translate Settings
 
     [ObservableProperty] public partial bool IsImTranShowingAnnotated { get; set; } = false;
@@ -381,12 +428,54 @@ public partial class Settings : ObservableObject
 
     internal void Save() => Storage?.Save();
 
+    public void EnsureMainHeaderVisibleActionsInitialized()
+    {
+        var normalizedActions = MainHeaderActions.Normalize(MainHeaderVisibleActions);
+        if (normalizedActions.Count > 0)
+        {
+            if (!MainHeaderVisibleActions.SequenceEqual(normalizedActions))
+            {
+                MainHeaderVisibleActions = [.. normalizedActions];
+            }
+
+            SyncLegacyMainHeaderVisibility(normalizedActions);
+            return;
+        }
+
+        var migratedActions = new List<string>();
+        if (IsClipboardMonitorVisible) migratedActions.Add(MainHeaderActions.ClipboardMonitor);
+        if (IsAutoTranslateVisible) migratedActions.Add(MainHeaderActions.AutoTranslate);
+        if (IsOcrVisible) migratedActions.Add(MainHeaderActions.Ocr);
+        if (IsImageTranslateVisible) migratedActions.Add(MainHeaderActions.ImageTranslate);
+        if (IsScreenshotTranslateVisible) migratedActions.Add(MainHeaderActions.ScreenshotTranslate);
+        if (IsMouseHookVisible) migratedActions.Add(MainHeaderActions.MouseHook);
+        if (IsColorSchemeVisible) migratedActions.Add(MainHeaderActions.ColorScheme);
+        if (IsHideInputVisible) migratedActions.Add(MainHeaderActions.HideInput);
+        if (IsHistoryNavigationVisible) migratedActions.Add(MainHeaderActions.HistoryNavigation);
+
+        ApplyMainHeaderVisibleActions(migratedActions);
+    }
+
+    public void ApplyMainHeaderVisibleActions(IReadOnlyList<string> actions)
+    {
+        var normalizedActions = MainHeaderActions.Normalize(actions);
+        if (!MainHeaderVisibleActions.SequenceEqual(normalizedActions))
+        {
+            MainHeaderVisibleActions = [.. normalizedActions];
+        }
+
+        SyncLegacyMainHeaderVisibility(normalizedActions);
+    }
+
     public void Initialize()
     {
         if (Storage is null)
         {
             throw new InvalidOperationException("Storage is not set. Please call SetStorage() before Initialize().");
         }
+
+        EnsureMainHeaderVisibleActionsInitialized();
+
         ApplyLogLevel();
         ApplyStartup();
         ApplyStartMode();
@@ -477,6 +566,21 @@ public partial class Settings : ObservableObject
             default:
                 break;
         }
+    }
+
+    private void SyncLegacyMainHeaderVisibility(IReadOnlyList<string> actions)
+    {
+        var actionSet = actions.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        IsClipboardMonitorVisible = actionSet.Contains(MainHeaderActions.ClipboardMonitor);
+        IsAutoTranslateVisible = actionSet.Contains(MainHeaderActions.AutoTranslate);
+        IsOcrVisible = actionSet.Contains(MainHeaderActions.Ocr);
+        IsImageTranslateVisible = actionSet.Contains(MainHeaderActions.ImageTranslate);
+        IsScreenshotTranslateVisible = actionSet.Contains(MainHeaderActions.ScreenshotTranslate);
+        IsMouseHookVisible = actionSet.Contains(MainHeaderActions.MouseHook);
+        IsColorSchemeVisible = actionSet.Contains(MainHeaderActions.ColorScheme);
+        IsHideInputVisible = actionSet.Contains(MainHeaderActions.HideInput);
+        IsHistoryNavigationVisible = actionSet.Contains(MainHeaderActions.HistoryNavigation);
     }
 
     #endregion
@@ -664,6 +768,7 @@ public enum WindowScreenType
 {
     RememberLastLaunchLocation,
     Cursor,
+    FollowMouse,
     Focus,
     Primary,
     Custom
@@ -720,6 +825,21 @@ public enum DoubleClickTrayFunction
     ToggleMouseHook,
     ToggleGlobalHotkeys,
     Exit
+}
+
+public enum PluginMarketCdnSourceType
+{
+    JsDelivr,
+    GitHubRaw,
+    Custom
+}
+
+public enum PluginDownloadProxyType
+{
+    GitHub,
+    GhProxyMirror,
+    GhProxyNet,
+    Custom
 }
 
 #endregion

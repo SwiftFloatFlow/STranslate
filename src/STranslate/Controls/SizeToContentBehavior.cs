@@ -4,6 +4,19 @@ namespace STranslate.Controls;
 
 public static class SizeToContentBehavior
 {
+    private static readonly DependencyProperty SizeChangedHandlerProperty =
+        DependencyProperty.RegisterAttached(
+            "SizeChangedHandler",
+            typeof(SizeChangedEventHandler),
+            typeof(SizeToContentBehavior),
+            new PropertyMetadata(null));
+
+    private static SizeChangedEventHandler? GetSizeChangedHandler(DependencyObject obj)
+        => (SizeChangedEventHandler?)obj.GetValue(SizeChangedHandlerProperty);
+
+    private static void SetSizeChangedHandler(DependencyObject obj, SizeChangedEventHandler? value)
+        => obj.SetValue(SizeChangedHandlerProperty, value);
+
     public static readonly DependencyProperty PersistentSizeToContentProperty =
         DependencyProperty.RegisterAttached(
             "PersistentSizeToContent",
@@ -25,8 +38,19 @@ public static class SizeToContentBehavior
     {
         if (d is Window window)
         {
+            var oldHandler = GetSizeChangedHandler(window);
+            if (oldHandler != null)
+            {
+                window.SizeChanged -= oldHandler;
+                SetSizeChangedHandler(window, null);
+            }
+
             window.SizeToContent = (SizeToContent)e.NewValue;
-            window.SizeChanged += (s, args) =>
+
+            if ((SizeToContent)e.NewValue == SizeToContent.Manual)
+                return;
+
+            SizeChangedEventHandler sizeChangedHandler = (s, args) =>
             {
                 var sizeToContent = GetPersistentSizeToContent(window);
                 if (window.SizeToContent == SizeToContent.Manual && sizeToContent != SizeToContent.Manual)
@@ -34,6 +58,8 @@ public static class SizeToContentBehavior
                     window.SizeToContent = sizeToContent;
                 }
             };
+            SetSizeChangedHandler(window, sizeChangedHandler);
+            window.SizeChanged += sizeChangedHandler;
         }
     }
 }

@@ -7,13 +7,18 @@ using System.Windows.Controls;
 
 namespace STranslate.ViewModels;
 
-public partial class SearchViewModelBase : ObservableObject
+public partial class SearchViewModelBase : ObservableObject, IDisposable
 {
     protected List<string> SettingItems { get; set; } = [];
+    private readonly Internationalization _i18n;
+    private readonly Action _languageChangedHandler;
+    private bool _disposed;
 
     public SearchViewModelBase(Internationalization i18n, string prefix)
     {
-        i18n.OnLanguageChanged += () => UpdateItems(prefix);
+        _i18n = i18n;
+        _languageChangedHandler = () => UpdateItems(prefix);
+        _i18n.OnLanguageChanged += _languageChangedHandler;
 
         UpdateItems(prefix);
     }
@@ -105,5 +110,24 @@ public partial class SearchViewModelBase : ObservableObject
         {
             LocateAction(args.QueryText);
         }
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+            return;
+
+        if (disposing)
+        {
+            _i18n.OnLanguageChanged -= _languageChangedHandler;
+        }
+
+        _disposed = true;
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

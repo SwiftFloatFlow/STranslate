@@ -10,6 +10,8 @@ public partial class NetworkViewModel : SearchViewModelBase
 {
     private readonly IHttpService _httpService;
     private readonly ILogger<NetworkViewModel> _logger;
+    private readonly ExternalCallService _externalCallService;
+    private readonly Action<string> _externalActionHandler;
 
     [ObservableProperty]
     public partial string TestResult { get; set; } = string.Empty;
@@ -34,8 +36,10 @@ public partial class NetworkViewModel : SearchViewModelBase
         DataProvider = dataProvider;
         _httpService = httpService;
         _logger = logger;
+        _externalCallService = externalCallService;
 
-        externalCallService.OnActionOccurred += msg => ExternalServiceStatus = msg;
+        _externalActionHandler = msg => ExternalServiceStatus = msg;
+        _externalCallService.OnActionOccurred += _externalActionHandler;
     }
 
     [RelayCommand]
@@ -80,5 +84,15 @@ public partial class NetworkViewModel : SearchViewModelBase
         Settings.Proxy.ProxyUsername = string.Empty;
         Settings.Proxy.ProxyPassword = string.Empty;
         TestResult = string.Empty;
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _externalCallService.OnActionOccurred -= _externalActionHandler;
+        }
+
+        base.Dispose(disposing);
     }
 }

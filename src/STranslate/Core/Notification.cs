@@ -12,20 +12,22 @@ public class Notification(ILogger<Notification> logger) : INotification
 {
     internal bool legacy = !Win32Helper.IsNotificationSupported();
 
-    private readonly ConcurrentDictionary<string, Action> _notificationActions = new();
+    private readonly ConcurrentDictionary<string, NotificationActionEntry> _notificationActions = new();
+    private const int MaxActionCount = 256;
+    private static readonly TimeSpan ActionTtl = TimeSpan.FromMinutes(30);
+
+    private sealed class NotificationActionEntry(Action action, DateTimeOffset createdAt)
+    {
+        public Action Action { get; } = action;
+        public DateTimeOffset CreatedAt { get; } = createdAt;
+    }
 
     internal void Install()
     {
         if (!legacy)
         {
-            ToastNotificationManagerCompat.OnActivated += toastArgs =>
-            {
-                var actionId = toastArgs.Argument; // Or use toastArgs.UserInput if using input
-                if (_notificationActions.TryGetValue(actionId, out var action))
-                {
-                    action?.Invoke();
-                }
-            };
+            ToastNotificationManagerCompat.OnActivated -= OnActivated;
+            ToastNotificationManagerCompat.OnActivated += OnActivated;
         }
     }
 
@@ -34,7 +36,56 @@ public class Notification(ILogger<Notification> logger) : INotification
         if (!legacy)
         {
             _notificationActions.Clear();
+            ToastNotificationManagerCompat.OnActivated -= OnActivated;
             ToastNotificationManagerCompat.Uninstall();
+        }
+    }
+
+    private void OnActivated(ToastNotificationActivatedEventArgsCompat toastArgs)
+    {
+        var actionId = toastArgs.Argument;
+
+        // 仅执行一次并立刻移除，避免闭包长期滞留在字典中
+        if (_notificationActions.TryRemove(actionId, out var entry))
+        {
+            try
+            {
+                entry.Action?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Notification action execution error");
+            }
+        }
+    }
+
+    private void CleanupNotificationActions()
+    {
+        var now = DateTimeOffset.UtcNow;
+
+        // 先按 TTL 清理过期项
+        foreach (var pair in _notificationActions)
+        {
+            if (now - pair.Value.CreatedAt > ActionTtl)
+            {
+                _notificationActions.TryRemove(pair.Key, out _);
+            }
+        }
+
+        // 再按上限清理最旧项，防止极端场景无限增长
+        if (_notificationActions.Count <= MaxActionCount)
+            return;
+
+        var removeCount = _notificationActions.Count - MaxActionCount;
+        var oldestKeys = _notificationActions
+            .OrderBy(x => x.Value.CreatedAt)
+            .Take(removeCount)
+            .Select(x => x.Key)
+            .ToList();
+
+        foreach (var key in oldestKeys)
+        {
+            _notificationActions.TryRemove(key, out _);
         }
     }
 
@@ -113,7 +164,11 @@ public class Notification(ILogger<Notification> logger) : INotification
                 .AddButton(buttonText, ToastActivationType.Background, guid)
                 .AddAppLogoOverride(new Uri(Icon))
                 .Show();
-            _notificationActions.AddOrUpdate(guid, buttonAction, (key, oldValue) => buttonAction);
+            _notificationActions.AddOrUpdate(
+                guid,
+                new NotificationActionEntry(buttonAction, DateTimeOffset.UtcNow),
+                (key, oldValue) => new NotificationActionEntry(buttonAction, DateTimeOffset.UtcNow));
+            CleanupNotificationActions();
         }
         catch (InvalidOperationException e)
         {

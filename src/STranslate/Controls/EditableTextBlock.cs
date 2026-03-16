@@ -58,59 +58,88 @@ public class EditableTextBlock : Control
             new PropertyMetadata(false));
 
     private string _oldText = string.Empty;
+    private TextBlock? _templateTextBlock;
+    private TextBox? _templateTextBox;
 
     public override void OnApplyTemplate()
     {
+        DetachTemplateEvents();
+
         base.OnApplyTemplate();
 
-        if (GetTemplateChild("PART_TextBlock") is TextBlock tb)
-        {
-            tb.MouseDown += (s, e) =>
-            {
-                if (e.ClickCount == 2)
-                {
-                    IsEditing = true;
-                    _oldText = tb.Text;
+        _templateTextBlock = GetTemplateChild("PART_TextBlock") as TextBlock;
+        _templateTextBox = GetTemplateChild("PART_TextBox") as TextBox;
 
-                    // 延迟到UI渲染后再Focus+SelectAll
-                    Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        if (GetTemplateChild("PART_TextBox") is TextBox box)
-                        {
-                            box.Focus();
-                            box.SelectAll();
-                        }
-                    }), System.Windows.Threading.DispatcherPriority.Input);
-                }
-            };
+        if (_templateTextBlock != null)
+        {
+            _templateTextBlock.MouseDown += OnTextBlockMouseDown;
         }
 
-        if (GetTemplateChild("PART_TextBox") is TextBox box)
+        if (_templateTextBox != null)
         {
-            void CommitEdit()
-            {
-                if (!IsEditing) return;
-                UpdateTextCommand?.Execute((_oldText, box.Text));
+            _templateTextBox.LostFocus += OnTextBoxLostFocus;
+            _templateTextBox.KeyDown += OnTextBoxKeyDown;
+        }
+    }
+
+    private void DetachTemplateEvents()
+    {
+        if (_templateTextBlock != null)
+        {
+            _templateTextBlock.MouseDown -= OnTextBlockMouseDown;
+        }
+
+        if (_templateTextBox != null)
+        {
+            _templateTextBox.LostFocus -= OnTextBoxLostFocus;
+            _templateTextBox.KeyDown -= OnTextBoxKeyDown;
+        }
+    }
+
+    private void OnTextBlockMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not TextBlock textBlock || e.ClickCount != 2)
+            return;
+
+        IsEditing = true;
+        _oldText = textBlock.Text;
+
+        // 延迟到UI渲染后再Focus+SelectAll
+        Dispatcher.BeginInvoke(new Action(() =>
+        {
+            _templateTextBox?.Focus();
+            _templateTextBox?.SelectAll();
+        }), System.Windows.Threading.DispatcherPriority.Input);
+    }
+
+    private void OnTextBoxLostFocus(object sender, RoutedEventArgs e) => CommitEdit();
+
+    private void OnTextBoxKeyDown(object sender, KeyEventArgs e)
+    {
+        if (sender is not TextBox textBox)
+            return;
+
+        switch (e.Key)
+        {
+            case Key.Enter:
+                CommitEdit();
+                e.Handled = true;
+                break;
+            case Key.Escape:
+                // 取消编辑时回退原值
+                textBox.GetBindingExpression(TextBox.TextProperty)?.UpdateTarget();
                 IsEditing = false;
-            }
-
-            box.LostFocus += (s, e) => CommitEdit();
-            box.KeyDown += (s, e) =>
-            {
-                switch (e.Key)
-                {
-                    case Key.Enter:
-                        CommitEdit();
-                        e.Handled = true;
-                        break;
-                    case Key.Escape:
-                        // 取消编辑时回退原值
-                        box.GetBindingExpression(TextBox.TextProperty)?.UpdateTarget();
-                        IsEditing = false;
-                        e.Handled = true;
-                        break;
-                }
-            };
+                e.Handled = true;
+                break;
         }
+    }
+
+    private void CommitEdit()
+    {
+        if (!IsEditing || _templateTextBox == null)
+            return;
+
+        UpdateTextCommand?.Execute((_oldText, _templateTextBox.Text));
+        IsEditing = false;
     }
 }

@@ -1,4 +1,5 @@
 using ObservableCollections;
+using System.Runtime.CompilerServices;
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,7 +8,7 @@ namespace STranslate.Controls;
 
 public static class ListBoxSelectedItemsBehavior
 {
-    private static readonly Dictionary<ListBox, BehaviorState> _states = new();
+    private static readonly ConditionalWeakTable<ListBox, BehaviorState> _states = new();
 
     public static readonly DependencyProperty SelectedItemsProperty =
         DependencyProperty.RegisterAttached(
@@ -30,14 +31,9 @@ public static class ListBoxSelectedItemsBehavior
     {
         if (d is not ListBox listBox) return;
 
-        if (e.OldValue is ObservableList<object> oldList)
+        if (_states.TryGetValue(listBox, out var oldState))
         {
-            if (_states.TryGetValue(listBox, out var state))
-            {
-                oldList.CollectionChanged -= state.Handler;
-                listBox.SelectionChanged -= state.SelectionHandler;
-                _states.Remove(listBox);
-            }
+            RemoveState(listBox, oldState);
         }
 
         if (e.NewValue is ObservableList<object> newList)
@@ -51,18 +47,48 @@ public static class ListBoxSelectedItemsBehavior
 
             state.Handler = (in NotifyCollectionChangedEventArgs<object> args) =>
                 OnViewModelCollectionChanged(state, args);
-
             state.SelectionHandler = (s, args) =>
                 OnSelectionChanged(state, args);
+            state.LoadedHandler = (_, _) => AttachState(state);
+            state.UnloadedHandler = (_, _) => DetachState(state);
 
-            _states[listBox] = state;
+            _states.Add(listBox, state);
+            listBox.Loaded += state.LoadedHandler;
+            listBox.Unloaded += state.UnloadedHandler;
 
-            newList.CollectionChanged += state.Handler;
-            listBox.SelectionChanged += state.SelectionHandler;
-
-            // 初始同步
-            SyncFromViewModel(state);
+            AttachState(state);
         }
+    }
+
+    private static void AttachState(BehaviorState state)
+    {
+        if (state.IsAttached)
+            return;
+
+        state.ViewModelList.CollectionChanged += state.Handler;
+        state.ListBox.SelectionChanged += state.SelectionHandler;
+        state.IsAttached = true;
+
+        // 初始同步
+        SyncFromViewModel(state);
+    }
+
+    private static void DetachState(BehaviorState state)
+    {
+        if (!state.IsAttached)
+            return;
+
+        state.ViewModelList.CollectionChanged -= state.Handler;
+        state.ListBox.SelectionChanged -= state.SelectionHandler;
+        state.IsAttached = false;
+    }
+
+    private static void RemoveState(ListBox listBox, BehaviorState state)
+    {
+        DetachState(state);
+        listBox.Loaded -= state.LoadedHandler;
+        listBox.Unloaded -= state.UnloadedHandler;
+        _states.Remove(listBox);
     }
 
     private static void OnSelectionChanged(BehaviorState state, SelectionChangedEventArgs e)
@@ -139,7 +165,10 @@ public static class ListBoxSelectedItemsBehavior
         public required ListBox ListBox { get; set; }
         public required ObservableList<object> ViewModelList { get; set; }
         public bool IsUpdating { get; set; }
+        public bool IsAttached { get; set; }
         public NotifyCollectionChangedEventHandler<object>? Handler { get; set; }
         public SelectionChangedEventHandler? SelectionHandler { get; set; }
+        public RoutedEventHandler? LoadedHandler { get; set; }
+        public RoutedEventHandler? UnloadedHandler { get; set; }
     }
 }

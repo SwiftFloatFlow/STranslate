@@ -54,11 +54,17 @@
     <sys:String x:Key="General_SecondLanguageDescription">When the target language is set to Auto and the source language is the first language, the target language will use the second language.</sys:String>
     <sys:String x:Key="General_HttpTimeout">Timeout</sys:String>
     <sys:String x:Key="General_HttpTimeoutDescription">Network request timeout in seconds.</sys:String>
+    <sys:String x:Key="General_UseClipboardOutput">Use Clipboard for Text Output</sys:String>
+    <sys:String x:Key="General_UseClipboardOutputDescription">When enabled, text output uses clipboard Ctrl+V; when disabled, simulated keyboard input is used (default).</sys:String>
     <sys:String x:Key="General_TranslateOnPaste">Translate on Paste</sys:String>
     <sys:String x:Key="General_TranslateOnPasteDescription">Execute translation immediately when text is pasted into the input box.</sys:String>
     <sys:String x:Key="General_AutoTranslate">Auto-Translate</sys:String>
     <sys:String x:Key="General_AutoTranslateDescription">Automatically executes translation after a certain waiting time when inputting content.</sys:String>
+    <sys:String x:Key="General_InstantTranslate">Instant Translate</sys:String>
+    <sys:String x:Key="General_InstantTranslateDescription">Run translation immediately when the following actions occur.</sys:String>
     <sys:String x:Key="General_AutoTranslateButtonVisible">Show automatic translation button on main interface</sys:String>
+    <sys:String x:Key="General_AutoTranslateOnPromptChanged">Auto-translate on Prompt Switch</sys:String>
+    <sys:String x:Key="General_AutoTranslateOnPromptChangedDescription">Re-run translation immediately after switching prompt for AI translation services.</sys:String>
     <sys:String x:Key="General_AutoTranslateDelay">Auto-Translate Delay</sys:String>
     <sys:String x:Key="General_AutoTranslateDelayDescription">Waiting time after inputting content, unit: milliseconds.</sys:String>
     <sys:String x:Key="General_LineBreakHandleType">Line Break Handling</sys:String>
@@ -96,6 +102,12 @@
     <sys:String x:Key="General_ShowOcrButtonDescription">Display the OCR button in the title bar of the main interface.</sys:String>
     <sys:String x:Key="General_ShowClipboardMonitor">Show Clipboard Monitor Button</sys:String>
     <sys:String x:Key="General_ShowClipboardMonitorDescription">Display the clipboard monitor toggle button in the title bar of the main interface.</sys:String>
+    <sys:String x:Key="General_MainHeaderConfig">Main Header Button Layout</sys:String>
+    <sys:String x:Key="General_MainHeaderConfigDescription">The top row is Preview and the bottom row is the Action Pool. Drag an item from the pool to Preview to show it, drag it back to hide it, and drag within Preview to reorder.</sys:String>
+    <sys:String x:Key="General_MainHeaderPreview">Preview (Main Header)</sys:String>
+    <sys:String x:Key="General_MainHeaderPool">Action Pool (Hidden)</sys:String>
+    <sys:String x:Key="General_MainHeaderShowAll">Show All</sys:String>
+    <sys:String x:Key="General_MainHeaderHideAll">Hide All</sys:String>
     <sys:String x:Key="General_FontSize">Font Size</sys:String>
     <sys:String x:Key="General_FontSizeDescription">Adjust font size for all elements except the right-click context menu</sys:String>
     <sys:String x:Key="General_OutputShowingControl">Output Display Control</sys:String>
@@ -113,6 +125,21 @@
     <sys:String x:Key="General_CopyAfterTranslationNotAutomatic">Copy after translation for non-"Automatic" services</sys:String>
     <sys:String x:Key="General_CopyAfterOcr">Copy after OCR</sys:String>
     <sys:String x:Key="General_CopyAfterOcrDescription">For all text recognition scenarios, automatically copy the recognition result after OCR.</sys:String>
+    <sys:String x:Key="General_PluginMarketCdnSource">Plugin Market CDN Source</sys:String>
+    <sys:String x:Key="General_PluginMarketCdnSourceDescription">Select CDN acceleration service for plugin market data (GitHub direct has no cache delay)</sys:String>
+    <sys:String x:Key="General_CustomCdnUrl">Custom CDN URL</sys:String>
+    <sys:String x:Key="General_CustomCdnUrlDescription">Enter custom CDN URL template, use {author}, {repo}, {branch}, {path} as placeholders</sys:String>
+
+    <!--  // PluginMarketCdnSourceType //  -->
+    <sys:String x:Key="PluginMarketCdnSourceTypeJsDelivr">jsDelivr CDN (Recommended)</sys:String>
+    <sys:String x:Key="PluginMarketCdnSourceTypeGitHubRaw">GitHub Direct</sys:String>
+    <sys:String x:Key="PluginMarketCdnSourceTypeCustom">Custom</sys:String>
+
+    <!--  // PluginDownloadProxyType //  -->
+    <sys:String x:Key="PluginDownloadProxyTypeGitHub">GitHub Direct</sys:String>
+    <sys:String x:Key="PluginDownloadProxyTypeGhProxyMirror">mirror.ghproxy.com</sys:String>
+    <sys:String x:Key="PluginDownloadProxyTypeGhProxyNet">ghproxy.net</sys:String>
+    <sys:String x:Key="PluginDownloadProxyTypeCustom">Custom</sys:String>
 
     <!--  // Hotkey Page //  -->
     <sys:String x:Key="GlobalHotkeys">Global Hotkeys</sys:String>
@@ -126,6 +153,7 @@
     <sys:String x:Key="Hotkey_CrosswordTranslateIsUseCtrlSameC">Use Ctrl+C+C for text selection translation?</sys:String>
     <sys:String x:Key="Hotkey_CrosswordTranslateTraditional">Traditional Hotkey</sys:String>
     <sys:String x:Key="Hotkey_CrosswordTranslateByCtrlSameCDescription">Quickly press Ctrl+C+C after selecting text with the mouse for text translation.</sys:String>
+    <sys:String x:Key="CrosswordTranslateFetchFailed">Failed to capture selected text, switched to input translation.</sys:String>
     <sys:String x:Key="Hotkey_MouseHookTranslate">Mouse Hook Translate</sys:String>
     <sys:String x:Key="Hotkey_MouseHookTranslateDescription">Shortcut key to enable/disable listening for mouse text selection to trigger translation.</sys:String>
     <sys:String x:Key="Hotkey_ReplaceTranslate">Replace Translation</sys:String>
@@ -174,6 +202,8 @@
     <sys:String x:Key="SpecialServiceInfo">Drag services from the left here, or right-click to select and enable.</sys:String>
     <sys:String x:Key="AsReplaceSvc">Replace Translation</sys:String>
     <sys:String x:Key="AsImTranSvc">Image Translation</sys:String>
+    <sys:String x:Key="ImTranOcrService">Image OCR</sys:String>
+    <sys:String x:Key="AsImTranOcrSvc">Image OCR</sys:String>
     <sys:String x:Key="TransExecMode">Translation Mode</sys:String>
     <sys:String x:Key="TransExecAutomatic">Auto Execute</sys:String>
     <sys:String x:Key="TransExecManual">Manual Execute</sys:String>
@@ -189,6 +219,25 @@
     <sys:String x:Key="SearchPlugin">Search Plugin</sys:String>
     <sys:String x:Key="SearchPluginToolTip">Ctrl+F to search plugins</sys:String>
     <sys:String x:Key="DropInstallPlugin">Release to install plugin</sys:String>
+
+    <!--  // Plugin Market //  -->
+    <sys:String x:Key="PluginMarketRefresh">Refresh</sys:String>
+    <sys:String x:Key="PluginMarketDownload">Download</sys:String>
+    <sys:String x:Key="PluginMarketUpgrade">Upgrade</sys:String>
+    <sys:String x:Key="PluginMarketInstalled">Installed</sys:String>
+    <sys:String x:Key="PluginMarketDownloading">Downloading</sys:String>
+    <sys:String x:Key="Back">Back</sys:String>
+    <sys:String x:Key="PluginMarketLoading">Loading...</sys:String>
+    <sys:String x:Key="PluginMarketLoadError">Failed to load</sys:String>
+    <sys:String x:Key="PluginMarketNoPlugins">No plugins available</sys:String>
+    <sys:String x:Key="PluginMarketCurrentVersion">Current Version</sys:String>
+    <sys:String x:Key="PluginMarketLatestVersion">Latest Version</sys:String>
+    <sys:String x:Key="PluginDownloadCancelled">Download cancelled</sys:String>
+    <sys:String x:Key="PluginActionDownload">Download Plugin</sys:String>
+    <sys:String x:Key="PluginActionUpgrade">Upgrade Plugin</sys:String>
+    <sys:String x:Key="PluginActionInstalled">Installed</sys:String>
+    <sys:String x:Key="PluginActionPendingRestart">Pending Restart</sys:String>
+    <sys:String x:Key="PluginActionWebsite">Project Website</sys:String>
 
     <!--  // Network Page //  -->
     <sys:String x:Key="Network_EnableExternalCall">Enable external call</sys:String>
@@ -277,7 +326,19 @@
     <sys:String x:Key="UserDataLocation">User Data Location</sys:String>
     <sys:String x:Key="UserDataLocationDescription">User settings and installed plugins are saved in the user data folder. This location may vary depending on whether it is in portable mode.</sys:String>
     <sys:String x:Key="OpenDirectory">Open Directory</sys:String>
-    <sys:String x:Key="DeveloperTools">Developer Tools</sys:String>
+    <sys:String x:Key="PortableModeDescription">Switch where STranslate stores user data between the app folder and the roaming profile. Changing this will migrate data and restart the app.</sys:String>
+    <sys:String x:Key="PortableModeStatePortable">Portable Mode</sys:String>
+    <sys:String x:Key="PortableModeStateRoaming">Roaming Mode</sys:String>
+    <sys:String x:Key="EnablePortableMode">Enable Portable Mode</sys:String>
+    <sys:String x:Key="DisablePortableMode">Disable Portable Mode</sys:String>
+    <sys:String x:Key="ConfirmRestartAndEnablePortableMode">Confirm restart and enable portable mode?</sys:String>
+    <sys:String x:Key="ConfirmRestartAndDisablePortableMode">Confirm restart and disable portable mode?</sys:String>
+    <sys:String x:Key="PortableModeDisableRoamingConflict">Roaming data directory already exists. Please handle it manually and try again.</sys:String>
+    <sys:String x:Key="PortableModeEnableSuccess">Portable mode enabled successfully</sys:String>
+    <sys:String x:Key="PortableModeDisableSuccess">Portable mode disabled. Roaming mode restored.</sys:String>
+    <sys:String x:Key="PortableModeEnableFailed">Failed to enable portable mode</sys:String>
+    <sys:String x:Key="PortableModeDisableFailed">Failed to disable portable mode</sys:String>
+    <sys:String x:Key="PortableModeHostStartFailed">Failed to start portable mode operation: {0}</sys:String>
     <sys:String x:Key="ClearCache">Clear Cache</sys:String>
     <sys:String x:Key="ClearLogs">Clear Logs</sys:String>
     <sys:String x:Key="SettingsDirectory">Settings Directory</sys:String>
@@ -313,6 +374,8 @@
     <sys:String x:Key="RestoreBackup">Restore Backup</sys:String>
     <sys:String x:Key="Version">Version</sys:String>
     <sys:String x:Key="CheckUpdate">Check Update</sys:String>
+    <sys:String x:Key="General_AutoCheckUpdate">Auto Check Update</sys:String>
+    <sys:String x:Key="General_AutoCheckUpdateDescription">Periodically checks for new versions. If found, a tray notification will be shown.</sys:String>
     <sys:String x:Key="NoCheckUpdataInDev">Update checking is disabled in development mode</sys:String>
     <sys:String x:Key="Donate">Donate</sys:String>
     <sys:String x:Key="OfficialWebsite">Official website</sys:String>
@@ -473,6 +536,14 @@
     <sys:String x:Key="PluginTypeTts">Tts</sys:String>
     <sys:String x:Key="PluginTypeVocabulary">Vocabulary</sys:String>
 
+    <sys:String x:Key="PluginMarketSettings">Advanced Settings</sys:String>
+    <sys:String x:Key="PluginMarketSettingsChanged">CDN source settings changed. Refresh plugin list now?</sys:String>
+    <sys:String x:Key="PluginDownloadProxy">Download Proxy</sys:String>
+    <sys:String x:Key="PluginDownloadProxyDescription">Used to accelerate GitHub Releases downloads</sys:String>
+    <sys:String x:Key="PluginDownloadProxyUrl">Custom Proxy URL</sys:String>
+    <sys:String x:Key="PluginDownloadProxyUrlDescription">Enter custom proxy address</sys:String>
+    <sys:String x:Key="PluginDownloadProxyUrlExample">Example: https://mirror.ghproxy.com/</sys:String>
+
     <sys:String x:Key="ProxyTypeSystem">System</sys:String>
     <sys:String x:Key="ProxyTypeHttp">HTTP</sys:String>
     <sys:String x:Key="ProxyTypeSocks5">Socks5</sys:String>
@@ -487,6 +558,7 @@
 
     <sys:String x:Key="WindowScreenTypeRememberLastLaunchLocation">RememberLastLaunchLocation</sys:String>
     <sys:String x:Key="WindowScreenTypeCursor">Cursor</sys:String>
+    <sys:String x:Key="WindowScreenTypeFollowMouse">Follow mouse</sys:String>
     <sys:String x:Key="WindowScreenTypeFocus">Focus</sys:String>
     <sys:String x:Key="WindowScreenTypePrimary">Primary</sys:String>
     <sys:String x:Key="WindowScreenTypeCustom">Custom</sys:String>
@@ -559,6 +631,9 @@
     <sys:String x:Key="PluginUpgradeConfirm">Plugin {0} is already installed with version {1}. Upgrade?</sys:String>
     <sys:String x:Key="PluginUpgradeSuccess">Plugin upgrade is ready, will take effect after restart</sys:String>
     <sys:String x:Key="PluginUpgradeFailed">Plugin upgrade failed</sys:String>
+    <sys:String x:Key="RestartNow">Restart Now</sys:String>
+    <sys:String x:Key="RestartLater">Restart Later</sys:String>
+    <sys:String x:Key="PendingRestart">Pending Restart</sys:String>
     <sys:String x:Key="BatchOperation">Batch Operation</sys:String>
     <sys:String x:Key="DeleteSelected">Delete Selected</sys:String>
     <sys:String x:Key="NoPluginSelected">No plugin selected</sys:String>
@@ -652,11 +727,15 @@
     <sys:String x:Key="NoUpdateInfoFound">No update info found.</sys:String>
     <sys:String x:Key="AlreadyLatestVersion">You are already on the latest version.</sys:String>
     <sys:String x:Key="UpdateAvailable">Update Available</sys:String>
+    <sys:String x:Key="UpdateOpenAboutButton">Go to Update</sys:String>
+    <sys:String x:Key="UpdateAvailableTrayMessage">New version {0} found. Click the button to open Settings-About and update.</sys:String>
     <sys:String x:Key="NewVersionFound">New version {0} found. Download?</sys:String>
     <sys:String x:Key="PortableDataMoveError">STranslate was not able to move your user profile data to the new update version.&#10;Please manually move your profile data folder from {0} to {1}</sys:String>
     <sys:String x:Key="UpdateReady">Update Ready</sys:String>
     <sys:String x:Key="UpdateFailed">Update Failed</sys:String>
     <sys:String x:Key="UpdateFailedMessage">Failed to update the application. Please check your connection.</sys:String>
+    <sys:String x:Key="UpdateChangelogLoading">Loading release notes...</sys:String>
+    <sys:String x:Key="UpdateChangelogLoadFailedMarkdown">Failed to load release notes. You can [open the full changelog here]({0}).</sys:String>
     <sys:String x:Key="NewVersionTips">New version {0} is available, would you like to restart STranslate to use the update?</sys:String>
 
     <!--  // LLM Service Configurations for plugins //  -->

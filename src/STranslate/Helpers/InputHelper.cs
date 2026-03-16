@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.DependencyInjection;
 using STranslate.Core;
 using WindowsInput;
 
@@ -6,18 +7,32 @@ namespace STranslate.Helpers;
 public class InputHelper
 {
     private static readonly InputSimulator InputSimulator = new();
+    private static readonly Settings Settings= Ioc.Default.GetRequiredService<Settings>();
 
+    /// <summary>
+    /// 输出文本（根据设置自动选择键盘输入或剪贴板粘贴）。
+    /// </summary>
+    /// <param name="obj">待输出的对象。</param>
     public static void PrintText(object? obj)
     {
-        if (obj == null) return;
-
-        PrintText(obj.ToString());
+        if (obj?.ToString() is { } text)
+            PrintText(text);
     }
 
+    /// <summary>
+    /// 输出文本（根据设置自动选择键盘输入或剪贴板粘贴）。
+    /// </summary>
+    /// <param name="content">待输出文本。</param>
     public static void PrintText(string? content)
     {
         // 检查内容是否为空或仅包含空白字符
         if (string.IsNullOrEmpty(content)) return;
+
+        if (Settings.UseClipboardOutput)
+        {
+            PrintTextWithClipboard(content);
+            return;
+        }
 
         // 分割字符串为多行
         var lines = content.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
@@ -44,16 +59,19 @@ public class InputHelper
     ///     使用粘贴输出
     ///     * 避免部分用户无法正常输出的问题
     /// </summary>
-    /// <param name="content"></param>
+    /// <param name="content">待输出文本。</param>
     public static void PrintTextWithClipboard(string content)
     {
-        // 检查内容是否为空或仅包含空白字符
+        // 空内容直接返回，避免污染剪贴板。
         if (string.IsNullOrEmpty(content)) return;
-        // TODO: 看是不是要尝试重试
         ClipboardHelper.SetText(content);
         ClipboardHelper.SendCtrlCV(false);
     }
 
+    /// <summary>
+    /// 删除指定数量的退格字符。
+    /// </summary>
+    /// <param name="count">退格次数。</param>
     public static void Backspace(int count = 1)
     {
         for (var i = 0; i < count; i++)

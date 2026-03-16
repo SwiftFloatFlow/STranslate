@@ -8,6 +8,7 @@ public class ServiceSettings
 
     public string ReplaceSvcID { get; set; } = string.Empty;
     public string ImageTranslateSvcID { get; set; } = string.Empty;
+    public string ImageTranslateOcrSvcID { get; set; } = string.Empty;
     public List<ServiceData> TranSvcDatas { get; set; } = [];
     public List<ServiceData> TtsSvcDatas { get; set; } = [];
     public List<ServiceData> OcrSvcDatas { get; set; } = [];

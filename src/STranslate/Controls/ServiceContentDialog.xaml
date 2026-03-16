@@ -94,7 +94,9 @@
                                                 <ListBox
                                                     Background="Transparent"
                                                     ItemsSource="{Binding Items}"
-                                                    SelectedItem="{Binding DataContext.SelectedItem, RelativeSource={RelativeSource AncestorType=ItemsControl}, Mode=TwoWay}">
+                                                    Loaded="OnGroupListLoaded"
+                                                    SelectionChanged="OnGroupListSelectionChanged"
+                                                    Tag="ServiceGroupList">
                                                     <ListBox.Resources>
                                                         <Style TargetType="ListBoxItem">
                                                             <Setter Property="Template">

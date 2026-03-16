@@ -54,11 +54,17 @@
     <sys:String x:Key="General_SecondLanguageDescription">当目标语言设为自动且源语言为第一语言时目标语言使用第二语言。</sys:String>
     <sys:String x:Key="General_HttpTimeout">超时时间</sys:String>
     <sys:String x:Key="General_HttpTimeoutDescription">请求网络请求的超时时间，单位：秒。</sys:String>
+    <sys:String x:Key="General_UseClipboardOutput">文本输出使用剪贴板</sys:String>
+    <sys:String x:Key="General_UseClipboardOutputDescription">开启后将通过剪贴板 Ctrl+V 输出文本；关闭时使用键盘模拟输入（默认）。</sys:String>
     <sys:String x:Key="General_TranslateOnPaste">粘贴立即翻译</sys:String>
     <sys:String x:Key="General_TranslateOnPasteDescription">输入框内粘贴文本立即执行翻译。</sys:String>
     <sys:String x:Key="General_AutoTranslate">自动翻译</sys:String>
     <sys:String x:Key="General_AutoTranslateDescription">输入内容等待一定时间后自动执行翻译。</sys:String>
+    <sys:String x:Key="General_InstantTranslate">立即翻译</sys:String>
+    <sys:String x:Key="General_InstantTranslateDescription">以下操作触发后将立即执行翻译。</sys:String>
     <sys:String x:Key="General_AutoTranslateButtonVisible">在主界面上显示自动翻译按钮</sys:String>
+    <sys:String x:Key="General_AutoTranslateOnPromptChanged">切换提示词后自动翻译</sys:String>
+    <sys:String x:Key="General_AutoTranslateOnPromptChangedDescription">切换AI翻译服务的提示词后，立即重新执行翻译。</sys:String>
     <sys:String x:Key="General_AutoTranslateDelay">自动翻译延时</sys:String>
     <sys:String x:Key="General_AutoTranslateDelayDescription">输入内容等待时间，单位：毫秒。</sys:String>
     <sys:String x:Key="General_LineBreakHandleType">取词换行处理</sys:String>
@@ -96,6 +102,12 @@
     <sys:String x:Key="General_ShowOcrButtonDescription">在主界面标题栏显示OCR按钮。</sys:String>
     <sys:String x:Key="General_ShowClipboardMonitor">显示剪贴板监听按钮</sys:String>
     <sys:String x:Key="General_ShowClipboardMonitorDescription">在主界面标题栏显示剪贴板监听切换按钮。</sys:String>
+    <sys:String x:Key="General_MainHeaderConfig">主界面标题栏按钮布局</sys:String>
+    <sys:String x:Key="General_MainHeaderConfigDescription">上面一行是预览区，下面一行是控件池。把控件从控件池拖到预览区就会显示，拖回控件池就会隐藏；也可以在预览区里拖动调整顺序。</sys:String>
+    <sys:String x:Key="General_MainHeaderPreview">预览区（主界面 Header）</sys:String>
+    <sys:String x:Key="General_MainHeaderPool">控件池（未显示）</sys:String>
+    <sys:String x:Key="General_MainHeaderShowAll">全部显示</sys:String>
+    <sys:String x:Key="General_MainHeaderHideAll">全部隐藏</sys:String>
     <sys:String x:Key="General_FontSize">字体大小</sys:String>
     <sys:String x:Key="General_FontSizeDescription">调整除「右键菜单」外的所有字体大小</sys:String>
     <sys:String x:Key="General_OutputShowingControl">输出控件显示控制</sys:String>
@@ -113,6 +125,21 @@
     <sys:String x:Key="General_CopyAfterTranslationNotAutomatic">非「自动执行」服务翻译后复制</sys:String>
     <sys:String x:Key="General_CopyAfterOcr">OCR后复制</sys:String>
     <sys:String x:Key="General_CopyAfterOcrDescription">针对所有文本识别场景，识别后自动复制识别结果</sys:String>
+    <sys:String x:Key="General_PluginMarketCdnSource">插件市场CDN源</sys:String>
+    <sys:String x:Key="General_PluginMarketCdnSourceDescription">选择插件市场数据的CDN加速服务（GitHub直链无缓存延迟）</sys:String>
+    <sys:String x:Key="General_CustomCdnUrl">自定义CDN URL</sys:String>
+    <sys:String x:Key="General_CustomCdnUrlDescription">输入自定义CDN地址模板，使用 {author}, {repo}, {branch}, {path} 作为占位符</sys:String>
+
+    <!--  // PluginMarketCdnSourceType //  -->
+    <sys:String x:Key="PluginMarketCdnSourceTypeJsDelivr">jsDelivr CDN（推荐）</sys:String>
+    <sys:String x:Key="PluginMarketCdnSourceTypeGitHubRaw">GitHub 直链</sys:String>
+    <sys:String x:Key="PluginMarketCdnSourceTypeCustom">自定义</sys:String>
+
+    <!--  // PluginDownloadProxyType //  -->
+    <sys:String x:Key="PluginDownloadProxyTypeGitHub">GitHub 直连</sys:String>
+    <sys:String x:Key="PluginDownloadProxyTypeGhProxyMirror">mirror.ghproxy.com</sys:String>
+    <sys:String x:Key="PluginDownloadProxyTypeGhProxyNet">ghproxy.net</sys:String>
+    <sys:String x:Key="PluginDownloadProxyTypeCustom">自定义</sys:String>
 
     <!--  // Hotkey Page //  -->
     <sys:String x:Key="GlobalHotkeys">全局热键</sys:String>
@@ -126,6 +153,7 @@
     <sys:String x:Key="Hotkey_CrosswordTranslateIsUseCtrlSameC">是否使用 Ctrl+C+C 进行划词翻译？</sys:String>
     <sys:String x:Key="Hotkey_CrosswordTranslateTraditional">传统快捷键</sys:String>
     <sys:String x:Key="Hotkey_CrosswordTranslateByCtrlSameCDescription">鼠标选中文本快速按下 Ctrl+C+C 进行取词翻译。</sys:String>
+    <sys:String x:Key="CrosswordTranslateFetchFailed">划词取词失败，已打开输入翻译</sys:String>
     <sys:String x:Key="Hotkey_MouseHookTranslate">监听鼠标划词</sys:String>
     <sys:String x:Key="Hotkey_MouseHookTranslateDescription">开启/关闭监听鼠标划词选中文本触发翻译的快捷键。</sys:String>
     <sys:String x:Key="Hotkey_ReplaceTranslate">替换翻译</sys:String>
@@ -174,6 +202,8 @@
     <sys:String x:Key="SpecialServiceInfo">拖拽左侧服务至此或者右键选择以启用</sys:String>
     <sys:String x:Key="AsReplaceSvc">替换翻译</sys:String>
     <sys:String x:Key="AsImTranSvc">图片翻译</sys:String>
+    <sys:String x:Key="ImTranOcrService">图片翻译OCR</sys:String>
+    <sys:String x:Key="AsImTranOcrSvc">图片翻译OCR</sys:String>
     <sys:String x:Key="TransExecMode">翻译模式</sys:String>
     <sys:String x:Key="TransExecAutomatic">自动执行</sys:String>
     <sys:String x:Key="TransExecManual">手动执行</sys:String>
@@ -189,6 +219,25 @@
     <sys:String x:Key="SearchPlugin">搜索插件</sys:String>
     <sys:String x:Key="SearchPluginToolTip">按 Ctrl+F 搜索插件</sys:String>
     <sys:String x:Key="DropInstallPlugin">松开安装插件</sys:String>
+
+    <!--  // Plugin Market //  -->
+    <sys:String x:Key="PluginMarketRefresh">刷新</sys:String>
+    <sys:String x:Key="PluginMarketDownload">下载</sys:String>
+    <sys:String x:Key="PluginMarketUpgrade">升级</sys:String>
+    <sys:String x:Key="PluginMarketInstalled">已安装</sys:String>
+    <sys:String x:Key="PluginMarketDownloading">下载中</sys:String>
+    <sys:String x:Key="Back">返回</sys:String>
+    <sys:String x:Key="PluginMarketLoading">加载中...</sys:String>
+    <sys:String x:Key="PluginMarketLoadError">加载失败</sys:String>
+    <sys:String x:Key="PluginMarketNoPlugins">暂无插件</sys:String>
+    <sys:String x:Key="PluginMarketCurrentVersion">当前版本</sys:String>
+    <sys:String x:Key="PluginMarketLatestVersion">最新版本</sys:String>
+    <sys:String x:Key="PluginActionDownload">下载插件</sys:String>
+    <sys:String x:Key="PluginActionUpgrade">升级插件</sys:String>
+    <sys:String x:Key="PluginActionInstalled">已安装</sys:String>
+    <sys:String x:Key="PluginActionPendingRestart">待重启</sys:String>
+    <sys:String x:Key="PluginActionWebsite">项目主页</sys:String>
+    <sys:String x:Key="PluginDownloadCancelled">下载已取消</sys:String>
 
     <!--  // Network Page //  -->
     <sys:String x:Key="Network_EnableExternalCall">启用外部调用</sys:String>
@@ -277,7 +326,19 @@
     <sys:String x:Key="UserDataLocation">用户数据位置</sys:String>
     <sys:String x:Key="UserDataLocationDescription">用户设置和已安装的插件保存在用户数据文件夹中。此位置可能因是否处于便携模式而异。</sys:String>
     <sys:String x:Key="OpenDirectory">打开目录</sys:String>
-    <sys:String x:Key="DeveloperTools">开发工具</sys:String>
+    <sys:String x:Key="PortableModeDescription">在程序目录与系统漫游目录之间切换用户数据存储位置。切换后会迁移数据并自动重启应用。</sys:String>
+    <sys:String x:Key="PortableModeStatePortable">便携模式</sys:String>
+    <sys:String x:Key="PortableModeStateRoaming">漫游模式</sys:String>
+    <sys:String x:Key="EnablePortableMode">启用便携模式</sys:String>
+    <sys:String x:Key="DisablePortableMode">关闭便携模式</sys:String>
+    <sys:String x:Key="ConfirmRestartAndEnablePortableMode">是否确认重启并启用便携模式</sys:String>
+    <sys:String x:Key="ConfirmRestartAndDisablePortableMode">是否确认重启并关闭便携模式</sys:String>
+    <sys:String x:Key="PortableModeDisableRoamingConflict">检测到漫游目录已存在，请先手动处理后再重试</sys:String>
+    <sys:String x:Key="PortableModeEnableSuccess">便携模式启用成功</sys:String>
+    <sys:String x:Key="PortableModeDisableSuccess">便携模式已关闭，已恢复漫游模式</sys:String>
+    <sys:String x:Key="PortableModeEnableFailed">便携模式启用失败</sys:String>
+    <sys:String x:Key="PortableModeDisableFailed">便携模式关闭失败</sys:String>
+    <sys:String x:Key="PortableModeHostStartFailed">便携模式操作启动失败：{0}</sys:String>
     <sys:String x:Key="ClearCache">清理缓存</sys:String>
     <sys:String x:Key="ClearLogs">清理日志</sys:String>
     <sys:String x:Key="SettingsDirectory">设置目录</sys:String>
@@ -313,6 +374,8 @@
     <sys:String x:Key="RestoreBackup">恢复备份</sys:String>
     <sys:String x:Key="Version">版本</sys:String>
     <sys:String x:Key="CheckUpdate">检查更新</sys:String>
+    <sys:String x:Key="General_AutoCheckUpdate">自动检查更新</sys:String>
+    <sys:String x:Key="General_AutoCheckUpdateDescription">定时检查新版本，发现后通过托盘通知提醒。</sys:String>
     <sys:String x:Key="NoCheckUpdataInDev">开发模式下禁止检查更新</sys:String>
     <sys:String x:Key="Donate">赞助</sys:String>
     <sys:String x:Key="OfficialWebsite">官网</sys:String>
@@ -474,6 +537,14 @@
     <sys:String x:Key="PluginTypeTts">语音合成</sys:String>
     <sys:String x:Key="PluginTypeVocabulary">生词本</sys:String>
 
+    <sys:String x:Key="PluginMarketSettings">高级配置</sys:String>
+    <sys:String x:Key="PluginMarketSettingsChanged">CDN 源设置已更改，是否立即刷新插件列表？</sys:String>
+    <sys:String x:Key="PluginDownloadProxy">下载代理</sys:String>
+    <sys:String x:Key="PluginDownloadProxyDescription">用于加速 GitHub Releases 下载</sys:String>
+    <sys:String x:Key="PluginDownloadProxyUrl">自定义代理 URL</sys:String>
+    <sys:String x:Key="PluginDownloadProxyUrlDescription">输入自定义代理地址</sys:String>
+    <sys:String x:Key="PluginDownloadProxyUrlExample">例如：https://mirror.ghproxy.com/</sys:String>
+
     <sys:String x:Key="ProxyTypeSystem">系统代理</sys:String>
     <sys:String x:Key="ProxyTypeHttp">HTTP代理</sys:String>
     <sys:String x:Key="ProxyTypeSocks5">Socks5代理</sys:String>
@@ -488,6 +559,7 @@
 
     <sys:String x:Key="WindowScreenTypeRememberLastLaunchLocation">记住上次的位置</sys:String>
     <sys:String x:Key="WindowScreenTypeCursor">鼠标光标所在显示器</sys:String>
+    <sys:String x:Key="WindowScreenTypeFollowMouse">跟随鼠标</sys:String>
     <sys:String x:Key="WindowScreenTypeFocus">聚焦窗口所在显示器</sys:String>
     <sys:String x:Key="WindowScreenTypePrimary">主显示器</sys:String>
     <sys:String x:Key="WindowScreenTypeCustom">自定义显示器</sys:String>
@@ -560,6 +632,9 @@
     <sys:String x:Key="PluginUpgradeConfirm">插件 {0} 已安装版本 {1}，新版本 {2}。是否要升级？</sys:String>
     <sys:String x:Key="PluginUpgradeSuccess">插件升级准备就绪，重启后生效</sys:String>
     <sys:String x:Key="PluginUpgradeFailed">插件升级失败</sys:String>
+    <sys:String x:Key="RestartNow">立即重启</sys:String>
+    <sys:String x:Key="RestartLater">稍后手动重启</sys:String>
+    <sys:String x:Key="PendingRestart">待重启</sys:String>
     <sys:String x:Key="BatchOperation">批量操作</sys:String>
     <sys:String x:Key="DeleteSelected">删除选中</sys:String>
     <sys:String x:Key="NoPluginSelected">未选择插件</sys:String>
@@ -653,11 +728,15 @@
     <sys:String x:Key="NoUpdateInfoFound">未找到更新信息。</sys:String>
     <sys:String x:Key="AlreadyLatestVersion">您已是最新版本。</sys:String>
     <sys:String x:Key="UpdateAvailable">有可用更新</sys:String>
+    <sys:String x:Key="UpdateOpenAboutButton">前往更新</sys:String>
+    <sys:String x:Key="UpdateAvailableTrayMessage">发现新版本 {0}，点击按钮可前往 设置-关于 页面更新。</sys:String>
     <sys:String x:Key="NewVersionFound">发现新版本 {0}。是否下载？</sys:String>
     <sys:String x:Key="PortableDataMoveError">STranslate 无法将您的用户配置数据移动到新更新版本。&#10;请手动将您的配置数据文件夹从 {0} 移动到 {1}</sys:String>
     <sys:String x:Key="UpdateReady">更新准备就绪</sys:String>
     <sys:String x:Key="UpdateFailed">更新失败</sys:String>
     <sys:String x:Key="UpdateFailedMessage">应用程序更新失败。请检查您的网络连接。</sys:String>
+    <sys:String x:Key="UpdateChangelogLoading">正在加载更新内容...</sys:String>
+    <sys:String x:Key="UpdateChangelogLoadFailedMarkdown">更新内容加载失败。你可以[点击这里查看完整更新日志]({0})。</sys:String>
     <sys:String x:Key="NewVersionTips">新版本 {0} 已可用，是否重新启动 STranslate 以使用更新？</sys:String>
 
     <!--  // LLM Service Configurations for plugins //  -->

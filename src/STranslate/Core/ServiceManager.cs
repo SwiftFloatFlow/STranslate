@@ -123,6 +123,14 @@ public class ServiceManager
 
             _logger.LogInformation("图片翻译服务已重置为空，因为之前设置的服务不存在。");
         }
+
+        if (!_serviceSettings.OcrSvcDatas.Select(x => x.SvcID).Contains(_serviceSettings.ImageTranslateOcrSvcID))
+        {
+            _serviceSettings.ImageTranslateOcrSvcID = string.Empty;
+            _serviceSettings.Save();
+
+            _logger.LogInformation("图片翻译OCR服务已重置为空，因为之前设置的服务不存在。");
+        }
     }
 
     /// <summary>

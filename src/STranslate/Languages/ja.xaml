@@ -51,11 +51,17 @@
     <sys:String x:Key="General_SecondLanguageDescription">翻訳先が自動で、かつ翻訳元が第一言語の場合、翻訳先に第二言語を使用します。</sys:String>
     <sys:String x:Key="General_HttpTimeout">タイムアウト</sys:String>
     <sys:String x:Key="General_HttpTimeoutDescription">ネットワークリクエストのタイムアウト時間。単位：秒。</sys:String>
+    <sys:String x:Key="General_UseClipboardOutput">テキスト出力にクリップボードを使用</sys:String>
+    <sys:String x:Key="General_UseClipboardOutputDescription">有効時はクリップボード Ctrl+V でテキストを出力し、無効時はキーボード入力シミュレーションを使用します（既定）。</sys:String>
     <sys:String x:Key="General_TranslateOnPaste">貼り付け時に即時翻訳</sys:String>
     <sys:String x:Key="General_TranslateOnPasteDescription">入力ボックスにテキストを貼り付けると、直ちに翻訳を実行します。</sys:String>
     <sys:String x:Key="General_AutoTranslate">自動翻訳</sys:String>
     <sys:String x:Key="General_AutoTranslateDescription">入力後、一定時間待機してから自動的に翻訳を実行します。</sys:String>
+    <sys:String x:Key="General_InstantTranslate">即時翻訳</sys:String>
+    <sys:String x:Key="General_InstantTranslateDescription">以下の操作が発生したら、すぐに翻訳を実行します。</sys:String>
     <sys:String x:Key="General_AutoTranslateButtonVisible">メイン画面に自動翻訳ボタンを表示</sys:String>
+    <sys:String x:Key="General_AutoTranslateOnPromptChanged">プロンプト切替後に自動翻訳</sys:String>
+    <sys:String x:Key="General_AutoTranslateOnPromptChangedDescription">AI翻訳サービスのプロンプトを切り替えた直後に、翻訳を再実行します。</sys:String>
     <sys:String x:Key="General_AutoTranslateDelay">自動翻訳の遅延</sys:String>
     <sys:String x:Key="General_AutoTranslateDelayDescription">入力後の待機時間。単位：ミリ秒。</sys:String>
     <sys:String x:Key="General_LineBreakHandleType">改行処理</sys:String>
@@ -93,6 +99,12 @@
     <sys:String x:Key="General_ShowOcrButtonDescription">メイン画面のタイトルバーにOCRボタンを表示します。</sys:String>
     <sys:String x:Key="General_ShowClipboardMonitor">クリップボード監視ボタンを表示</sys:String>
     <sys:String x:Key="General_ShowClipboardMonitorDescription">メイン画面のタイトルバーにクリップボード監視切替ボタンを表示します。</sys:String>
+    <sys:String x:Key="General_MainHeaderConfig">メインヘッダーボタン配置</sys:String>
+    <sys:String x:Key="General_MainHeaderConfigDescription">上の行がプレビュー、下の行がコントロールプールです。プールからプレビューへドラッグすると表示、プールへ戻すと非表示になり、プレビュー内で並び替えもできます。</sys:String>
+    <sys:String x:Key="General_MainHeaderPreview">プレビュー（メイン Header）</sys:String>
+    <sys:String x:Key="General_MainHeaderPool">コントロールプール（非表示）</sys:String>
+    <sys:String x:Key="General_MainHeaderShowAll">すべて表示</sys:String>
+    <sys:String x:Key="General_MainHeaderHideAll">すべて非表示</sys:String>
     <sys:String x:Key="General_FontSize">フォントサイズ</sys:String>
     <sys:String x:Key="General_FontSizeDescription">「右クリックメニュー」以外のすべてのフォントサイズを調整します。</sys:String>
     <sys:String x:Key="General_OutputShowingControl">出力表示コントロール</sys:String>
@@ -110,6 +122,21 @@
     <sys:String x:Key="General_CopyAfterTranslationNotAutomatic">「自動実行」以外の翻訳後にコピー</sys:String>
     <sys:String x:Key="General_CopyAfterOcr">OCR後にコピー</sys:String>
     <sys:String x:Key="General_CopyAfterOcrDescription">すべての文字認識シーンにおいて、認識後に結果を自動コピーします。</sys:String>
+    <sys:String x:Key="General_PluginMarketCdnSource">プラグイン市場CDNソース</sys:String>
+    <sys:String x:Key="General_PluginMarketCdnSourceDescription">プラグイン市場データのCDN加速サービスを選択（GitHub直リンクはキャッシュ遅延なし）</sys:String>
+    <sys:String x:Key="General_CustomCdnUrl">カスタムCDN URL</sys:String>
+    <sys:String x:Key="General_CustomCdnUrlDescription">カスタムCDN URLテンプレートを入力、{author}、{repo}、{branch}、{path}をプレースホルダとして使用</sys:String>
+
+    <!--  // PluginMarketCdnSourceType //  -->
+    <sys:String x:Key="PluginMarketCdnSourceTypeJsDelivr">jsDelivr CDN（推奨）</sys:String>
+    <sys:String x:Key="PluginMarketCdnSourceTypeGitHubRaw">GitHub 直リンク</sys:String>
+    <sys:String x:Key="PluginMarketCdnSourceTypeCustom">カスタム</sys:String>
+
+    <!--  // PluginDownloadProxyType //  -->
+    <sys:String x:Key="PluginDownloadProxyTypeGitHub">GitHub 直接接続</sys:String>
+    <sys:String x:Key="PluginDownloadProxyTypeGhProxyMirror">mirror.ghproxy.com</sys:String>
+    <sys:String x:Key="PluginDownloadProxyTypeGhProxyNet">ghproxy.net</sys:String>
+    <sys:String x:Key="PluginDownloadProxyTypeCustom">カスタム</sys:String>
 
     <sys:String x:Key="GlobalHotkeys">グローバルホットキー</sys:String>
     <sys:String x:Key="SoftwareHotkeys">ソフトウェアホットキー</sys:String>
@@ -122,6 +149,7 @@
     <sys:String x:Key="Hotkey_CrosswordTranslateIsUseCtrlSameC">Ctrl+C+C で選択翻訳を行う？</sys:String>
     <sys:String x:Key="Hotkey_CrosswordTranslateTraditional">従来のホットキー</sys:String>
     <sys:String x:Key="Hotkey_CrosswordTranslateByCtrlSameCDescription">テキストを選択し、Ctrl+C+C を素早く押して翻訳します。</sys:String>
+    <sys:String x:Key="CrosswordTranslateFetchFailed">選択テキストの取得に失敗しました。入力翻訳を開きました。</sys:String>
     <sys:String x:Key="Hotkey_MouseHookTranslate">マウス選択監視</sys:String>
     <sys:String x:Key="Hotkey_MouseHookTranslateDescription">マウス選択による翻訳トリガーの監視を有効/無効化するホットキー。</sys:String>
     <sys:String x:Key="Hotkey_ReplaceTranslate">置換翻訳</sys:String>
@@ -169,6 +197,8 @@
     <sys:String x:Key="SpecialServiceInfo">左側のサービスをここにドラッグするか、右クリックで有効化してください</sys:String>
     <sys:String x:Key="AsReplaceSvc">置換翻訳として使用</sys:String>
     <sys:String x:Key="AsImTranSvc">画像翻訳として使用</sys:String>
+    <sys:String x:Key="ImTranOcrService">画像翻訳OCR</sys:String>
+    <sys:String x:Key="AsImTranOcrSvc">画像翻訳OCRとして使用</sys:String>
     <sys:String x:Key="TransExecMode">翻訳モード</sys:String>
     <sys:String x:Key="TransExecAutomatic">自動実行</sys:String>
     <sys:String x:Key="TransExecManual">手動実行</sys:String>
@@ -183,6 +213,25 @@
     <sys:String x:Key="SearchPlugin">プラグインを検索</sys:String>
     <sys:String x:Key="SearchPluginToolTip">Ctrl+F でプラグインを検索</sys:String>
     <sys:String x:Key="DropInstallPlugin">ドロップしてプラグインをインストール</sys:String>
+
+    <!--  // Plugin Market //  -->
+    <sys:String x:Key="PluginMarketRefresh">更新</sys:String>
+    <sys:String x:Key="PluginMarketDownload">ダウンロード</sys:String>
+    <sys:String x:Key="PluginMarketUpgrade">アップグレード</sys:String>
+    <sys:String x:Key="PluginMarketInstalled">インストール済み</sys:String>
+    <sys:String x:Key="PluginMarketDownloading">ダウンロード中</sys:String>
+    <sys:String x:Key="Back">戻る</sys:String>
+    <sys:String x:Key="PluginMarketLoading">読み込み中...</sys:String>
+    <sys:String x:Key="PluginMarketLoadError">読み込みに失敗しました</sys:String>
+    <sys:String x:Key="PluginMarketNoPlugins">プラグインがありません</sys:String>
+    <sys:String x:Key="PluginMarketCurrentVersion">現在のバージョン</sys:String>
+    <sys:String x:Key="PluginMarketLatestVersion">最新バージョン</sys:String>
+    <sys:String x:Key="PluginDownloadCancelled">ダウンロードがキャンセルされました</sys:String>
+    <sys:String x:Key="PluginActionDownload">プラグインをダウンロード</sys:String>
+    <sys:String x:Key="PluginActionUpgrade">プラグインをアップグレード</sys:String>
+    <sys:String x:Key="PluginActionInstalled">インストール済み</sys:String>
+    <sys:String x:Key="PluginActionPendingRestart">再起動待ち</sys:String>
+    <sys:String x:Key="PluginActionWebsite">プロジェクトページ</sys:String>
 
     <sys:String x:Key="Network_EnableExternalCall">外部呼び出しを有効化</sys:String>
     <sys:String x:Key="Network_EnableExternalCallDescription">外部呼び出し機能の有効/無効化</sys:String>
@@ -267,7 +316,19 @@
     <sys:String x:Key="UserDataLocation">ユーザーデータの場所</sys:String>
     <sys:String x:Key="UserDataLocationDescription">ユーザー設定とインストール済みプラグインはユーザーデータフォルダに保存されます。この場所はポータブルモードかどうかによって異なる場合があります。</sys:String>
     <sys:String x:Key="OpenDirectory">ディレクトリを開く</sys:String>
-    <sys:String x:Key="DeveloperTools">開発ツール</sys:String>
+    <sys:String x:Key="PortableModeDescription">ユーザーデータの保存先をアプリフォルダとローミングプロファイルの間で切り替えます。切り替えるとデータが移行され、アプリが自動的に再起動します。</sys:String>
+    <sys:String x:Key="PortableModeStatePortable">ポータブルモード</sys:String>
+    <sys:String x:Key="PortableModeStateRoaming">ローミングモード</sys:String>
+    <sys:String x:Key="EnablePortableMode">ポータブルモードを有効化</sys:String>
+    <sys:String x:Key="DisablePortableMode">ポータブルモードを無効化</sys:String>
+    <sys:String x:Key="ConfirmRestartAndEnablePortableMode">再起動してポータブルモードを有効化しますか？</sys:String>
+    <sys:String x:Key="ConfirmRestartAndDisablePortableMode">再起動してポータブルモードを無効化しますか？</sys:String>
+    <sys:String x:Key="PortableModeDisableRoamingConflict">Roaming データディレクトリが既に存在します。手動で処理してから再試行してください。</sys:String>
+    <sys:String x:Key="PortableModeEnableSuccess">ポータブルモードの有効化に成功しました</sys:String>
+    <sys:String x:Key="PortableModeDisableSuccess">ポータブルモードを無効化し、Roaming モードに戻しました</sys:String>
+    <sys:String x:Key="PortableModeEnableFailed">ポータブルモードの有効化に失敗しました</sys:String>
+    <sys:String x:Key="PortableModeDisableFailed">ポータブルモードの無効化に失敗しました</sys:String>
+    <sys:String x:Key="PortableModeHostStartFailed">ポータブルモード処理の起動に失敗しました: {0}</sys:String>
     <sys:String x:Key="ClearCache">キャッシュ削除</sys:String>
     <sys:String x:Key="ClearLogs">ログ削除</sys:String>
     <sys:String x:Key="SettingsDirectory">設定ディレクトリ</sys:String>
@@ -303,6 +364,8 @@
     <sys:String x:Key="RestoreBackup">バックアップから復元</sys:String>
     <sys:String x:Key="Version">バージョン</sys:String>
     <sys:String x:Key="CheckUpdate">更新を確認</sys:String>
+    <sys:String x:Key="General_AutoCheckUpdate">自動更新チェック</sys:String>
+    <sys:String x:Key="General_AutoCheckUpdateDescription">定期的に新しいバージョンを確認し、見つかった場合はトレイ通知でお知らせします。</sys:String>
     <sys:String x:Key="NoCheckUpdataInDev">開発モードでは更新確認は無効です</sys:String>
     <sys:String x:Key="Donate">寄付</sys:String>
     <sys:String x:Key="OfficialWebsite">公式サイト</sys:String>
@@ -457,6 +520,14 @@
     <sys:String x:Key="PluginTypeTts">音声合成</sys:String>
     <sys:String x:Key="PluginTypeVocabulary">単語帳</sys:String>
 
+    <sys:String x:Key="PluginMarketSettings">詳細設定</sys:String>
+    <sys:String x:Key="PluginMarketSettingsChanged">CDNソース設定が変更されました。プラグインリストを今すぐ更新しますか？</sys:String>
+    <sys:String x:Key="PluginDownloadProxy">ダウンロードプロキシ</sys:String>
+    <sys:String x:Key="PluginDownloadProxyDescription">GitHub Releasesのダウンロードを高速化するために使用</sys:String>
+    <sys:String x:Key="PluginDownloadProxyUrl">カスタムプロキシURL</sys:String>
+    <sys:String x:Key="PluginDownloadProxyUrlDescription">カスタムプロキシアドレスを入力</sys:String>
+    <sys:String x:Key="PluginDownloadProxyUrlExample">例：https://mirror.ghproxy.com/</sys:String>
+
     <sys:String x:Key="ProxyTypeSystem">システムプロキシ</sys:String>
     <sys:String x:Key="ProxyTypeHttp">HTTPプロキシ</sys:String>
     <sys:String x:Key="ProxyTypeSocks5">Socks5プロキシ</sys:String>
@@ -471,6 +542,7 @@
 
     <sys:String x:Key="WindowScreenTypeRememberLastLaunchLocation">前回の位置を記憶</sys:String>
     <sys:String x:Key="WindowScreenTypeCursor">マウスカーソルのある画面</sys:String>
+    <sys:String x:Key="WindowScreenTypeFollowMouse">マウス追従</sys:String>
     <sys:String x:Key="WindowScreenTypeFocus">フォーカスのある画面</sys:String>
     <sys:String x:Key="WindowScreenTypePrimary">メインディスプレイ</sys:String>
     <sys:String x:Key="WindowScreenTypeCustom">カスタムディスプレイ</sys:String>
@@ -542,6 +614,9 @@
     <sys:String x:Key="PluginUpgradeConfirm">プラグイン {0} の既知のバージョン {1}、新バージョン {2}。更新しますか？</sys:String>
     <sys:String x:Key="PluginUpgradeSuccess">プラグイン更新の準備が完了しました。再起動後に反映されます。</sys:String>
     <sys:String x:Key="PluginUpgradeFailed">プラグイン更新に失敗しました</sys:String>
+    <sys:String x:Key="RestartNow">今すぐ再起動</sys:String>
+    <sys:String x:Key="RestartLater">後で手動で再起動</sys:String>
+    <sys:String x:Key="PendingRestart">再起動待ち</sys:String>
     <sys:String x:Key="BatchOperation">一括操作</sys:String>
     <sys:String x:Key="DeleteSelected">選択項目を削除</sys:String>
     <sys:String x:Key="NoPluginSelected">プラグインが選択されていません</sys:String>
@@ -627,11 +702,15 @@
     <sys:String x:Key="NoUpdateInfoFound">更新情報は見つかりませんでした。</sys:String>
     <sys:String x:Key="AlreadyLatestVersion">最新バージョンを使用中です。</sys:String>
     <sys:String x:Key="UpdateAvailable">利用可能な更新があります</sys:String>
+    <sys:String x:Key="UpdateOpenAboutButton">更新ページへ</sys:String>
+    <sys:String x:Key="UpdateAvailableTrayMessage">新バージョン {0} が見つかりました。ボタンから 設定-情報 へ移動して更新できます。</sys:String>
     <sys:String x:Key="NewVersionFound">新バージョン {0} が見つかりました。ダウンロードしますか？</sys:String>
     <sys:String x:Key="PortableDataMoveError">STranslateはユーザー設定データを新バージョンへ移行できませんでした。&#10;設定データフォルダを {0} から {1} へ手動で移動してください。</sys:String>
     <sys:String x:Key="UpdateReady">更新の準備完了</sys:String>
     <sys:String x:Key="UpdateFailed">更新失敗</sys:String>
     <sys:String x:Key="UpdateFailedMessage">アプリケーションの更新に失敗しました。ネットワーク接続を確認してください。</sys:String>
+    <sys:String x:Key="UpdateChangelogLoading">更新内容を読み込み中...</sys:String>
+    <sys:String x:Key="UpdateChangelogLoadFailedMarkdown">更新内容の読み込みに失敗しました。[ここをクリックして完全な更新ログを表示]({0})。</sys:String>
     <sys:String x:Key="NewVersionTips">新バージョン {0} が利用可能です。STranslateを再起動して更新を適用しますか？</sys:String>
 
     <sys:String x:Key="Url">エンドポイント</sys:String>
