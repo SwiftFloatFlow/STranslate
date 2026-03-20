@@ -11,10 +11,12 @@ using STranslate.Services;
 using STranslate.ViewModels.Pages;
 using STranslate.Views;
 using STranslate.Views.Pages;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Windows.Win32;
@@ -33,6 +35,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private readonly INotification _notification;
     private double _cacheLeft;
     private double _cacheTop;
+    private bool _isAdjustingWindowPositionForContent;
 
     public TranslateService TranslateService { get; }
     public OcrService OcrService { get; }
@@ -79,6 +82,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
         _debounceExecutor = new();
         _i18n.OnLanguageChanged += OnLanguageChanged;
+        Settings.PropertyChanged += OnSettingsPropertyChanged;
     }
 
     private void OnLanguageChanged()
@@ -116,6 +120,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     public partial bool IsClipboardMonitoring { get; set; } = false;
+
+    [ObservableProperty]
+    public partial double MainWindowEffectiveMaxHeight { get; set; } = 800;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SingleTranslateCommand))]
@@ -200,7 +207,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
         #region 历史记录处理
 
-        if (Settings.HistoryLimit > 0 && history != null)
+        if (Settings.HistoryLimit > 0 && history != null && history.Data.Count != 0)
         {
             // 按服务启用顺序排序
             var enabledServices = TranslateService.Services.Where(x => x.IsEnabled).ToList();
@@ -294,6 +301,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             TargetLang = Settings.TargetLang.ToString(),
             Data = []
         };
+        ApplyEffectiveLanguages(history, source, target);
         // 添加新的历史数据记录
         var historyData = history.GetData(service);
         if (historyData == null)
@@ -301,6 +309,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             historyData = new HistoryData(service);
             history.Data.Add(historyData);
         }
+        UpdateHistoryServiceSnapshot(historyData, service);
         historyData.TransResult = translateResult;
 
         if (service.Options?.AutoBackTranslation ?? false)
@@ -329,11 +338,19 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             .GetLanguageAsync(InputText, cancellationToken, StartProcess, CompleteProcess, FinishProcess)
             .ConfigureAwait(false);
 
+        if (history != null)
+            ApplyEffectiveLanguages(history, source, target);
+
         var backResult = await ExecuteBackAsync(plugin, target, source, cancellationToken).ConfigureAwait(false);
         if (!plugin.TransResult.IsSuccess)
             return;
 
-        history?.GetData(service)?.TransBackResult = backResult;
+        var historyData = history?.GetData(service);
+        if (historyData != null)
+        {
+            UpdateHistoryServiceSnapshot(historyData, service);
+            historyData.TransBackResult = backResult;
+        }
 
         if (Settings.HistoryLimit > 0 && history != null)
             await _sqlService.InsertOrUpdateDataAsync(history, (long)Settings.HistoryLimit).ConfigureAwait(false);
@@ -395,10 +412,25 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             TargetLang = Settings.TargetLang.ToString(),
             Data = []
         };
+        ApplyEffectiveLanguages(history, source, target);
 
         await ExecuteTranslationForServicesAsync(uncachedSvcs, source, target, history, cancellationToken);
 
         return history;
+    }
+
+    private static void ApplyEffectiveLanguages(HistoryModel history, LangEnum source, LangEnum target)
+    {
+        history.EffectiveSourceLang = source.ToString();
+        history.EffectiveTargetLang = target.ToString();
+    }
+
+    /// <summary>
+    /// 统一维护历史记录里的服务名称快照，确保历史展示和导出不依赖当前服务配置。
+    /// </summary>
+    private static void UpdateHistoryServiceSnapshot(HistoryData historyData, Service service)
+    {
+        historyData.ServiceDisplayName = service.DisplayName;
     }
 
     /// <summary>
@@ -517,6 +549,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         // 添加新的历史数据记录
         var historyData = new HistoryData(service);
         history.Data.Add(historyData);
+        UpdateHistoryServiceSnapshot(historyData, service);
         historyData.TransResult = translateResult;
 
         // 执行反向翻译（如果需要且主翻译成功）
@@ -535,7 +568,11 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             return;
 
         var historyData = history.GetData(service);
-        historyData?.TransBackResult = backResult;
+        if (historyData != null)
+        {
+            UpdateHistoryServiceSnapshot(historyData, service);
+            historyData.TransBackResult = backResult;
+        }
     }
 
     private async Task ProcessDictionaryPluginAsync(Service service, IDictionaryPlugin plugin,
@@ -552,6 +589,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         // 添加新的历史数据记录并执行字典查询
         var historyData = new HistoryData(service);
         history.Data.Add(historyData);
+        UpdateHistoryServiceSnapshot(historyData, service);
         historyData.DictResult = result;
     }
 
@@ -1326,6 +1364,11 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         Show();
     }
 
+    /// <summary>
+    /// 初始化主窗口布局约束，避免窗口首次显示时沿用过期的高度上限。
+    /// </summary>
+    public void InitializeWindowLayoutConstraints() => UpdateMainWindowMaxHeightConstraint();
+
     public void Show()
     {
         if (Settings.MainWindowLeft <= -18000 && Settings.MainWindowTop <= -18000)
@@ -1334,7 +1377,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             Settings.MainWindowTop = _cacheTop;
         }
         MainWindow.Visibility = Visibility.Visible;
+        UpdateMainWindowMaxHeightConstraint();
         UpdatePosition();
+        UpdateMainWindowMaxHeightConstraint();
 
         Win32Helper.SetForegroundWindow(MainWindow);
 
@@ -1568,6 +1613,75 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     #region Window Position
 
+    private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(Settings.MainWindowMaxHeightRatio) &&
+            e.PropertyName != nameof(Settings.WindowScreen) &&
+            e.PropertyName != nameof(Settings.CustomScreenNumber))
+            return;
+
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher == null)
+            return;
+
+        void RefreshWindowHeightConstraint()
+        {
+            UpdateMainWindowMaxHeightConstraint();
+            if (IsMainWindowVisible)
+                AdjustPositionForContentSizeChanged();
+        }
+
+        if (dispatcher.CheckAccess())
+        {
+            RefreshWindowHeightConstraint();
+            return;
+        }
+
+        dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(RefreshWindowHeightConstraint));
+    }
+
+    /// <summary>
+    /// 根据当前屏幕工作区和用户配置比例刷新主窗口最大高度约束。
+    /// </summary>
+    /// <param name="monitor">可选。指定目标显示器，避免跟随鼠标场景下读取到旧屏幕。</param>
+    private void UpdateMainWindowMaxHeightConstraint(MonitorInfo? monitor = null)
+    {
+        if (Application.Current?.MainWindow is not MainWindow window)
+            return;
+
+        var ratio = Math.Clamp(Settings.MainWindowMaxHeightRatio, 0.6, 1.0);
+        if (Math.Abs(ratio - Settings.MainWindowMaxHeightRatio) > double.Epsilon)
+        {
+            // 统一写回归一化后的比例，确保各入口读取到一致约束。
+            Settings.MainWindowMaxHeightRatio = ratio;
+        }
+
+        var targetMonitor = monitor ?? GetWindowMonitor();
+        var workAreaTopLeft = Win32Helper.TransformPixelsToDIP(window, targetMonitor.WorkingArea.X, targetMonitor.WorkingArea.Y);
+        var workAreaBottomRight = Win32Helper.TransformPixelsToDIP(
+            window,
+            targetMonitor.WorkingArea.X + targetMonitor.WorkingArea.Width,
+            targetMonitor.WorkingArea.Y + targetMonitor.WorkingArea.Height);
+
+        var workAreaHeight = Math.Max(0, workAreaBottomRight.Y - workAreaTopLeft.Y - 8 * 2);
+        var effectiveMaxHeight = Math.Max(window.MinHeight, workAreaHeight * ratio);
+        MainWindowEffectiveMaxHeight = Math.Max(window.MinHeight, effectiveMaxHeight);
+    }
+
+    private MonitorInfo GetWindowMonitor()
+    {
+        try
+        {
+            var windowHelper = new WindowInteropHelper(MainWindow);
+            windowHelper.EnsureHandle();
+            return MonitorInfo.GetNearestDisplayMonitor(windowHelper.Handle);
+        }
+        catch
+        {
+            return SelectedScreen();
+        }
+    }
+
     public void UpdatePosition(bool hideOnStartup = false)
     {
         if (IsTopmost) return;
@@ -1666,6 +1780,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         var cursorDip = Win32Helper.TransformPixelsToDIP(MainWindow, cursorPosition.X, cursorPosition.Y);
 
         var screen = MonitorInfo.GetCursorDisplayMonitor();
+        UpdateMainWindowMaxHeightConstraint(screen);
         var workAreaTopLeft = Win32Helper.TransformPixelsToDIP(MainWindow, screen.WorkingArea.X, screen.WorkingArea.Y);
         var workAreaBottomRight = Win32Helper.TransformPixelsToDIP(
             MainWindow,
@@ -1694,6 +1809,79 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
         Settings.MainWindowLeft = Math.Clamp(left, minLeft, maxLeft);
         Settings.MainWindowTop = Math.Clamp(top, minTop, maxTop);
+    }
+
+    /// <summary>
+    /// 在窗口内容尺寸变化后，确保窗口底部不会超出当前屏幕工作区。
+    /// </summary>
+    [RelayCommand]
+    private void AdjustPositionForContentSizeChanged()
+    {
+        if (_isAdjustingWindowPositionForContent || !IsMainWindowVisible || MainWindow.WindowState == WindowState.Minimized)
+            return;
+
+        var windowHeight = MainWindow.ActualHeight > 0 ? MainWindow.ActualHeight : MainWindow.MinHeight;
+        if (windowHeight <= 0)
+            return;
+
+        try
+        {
+            _isAdjustingWindowPositionForContent = true;
+            AdjustVerticalPositionWithinWorkArea();
+        }
+        finally
+        {
+            _isAdjustingWindowPositionForContent = false;
+        }
+    }
+
+    /// <summary>
+    /// 当窗口触底时，仅向上修正 Top，避免内容被屏幕底部遮挡。
+    /// </summary>
+    private void AdjustVerticalPositionWithinWorkArea()
+    {
+        const double edgePadding = 8;
+
+        MonitorInfo screen;
+        try
+        {
+            // 以主窗口句柄所在屏幕为准，避免多屏时误用鼠标屏幕。
+            var windowHelper = new WindowInteropHelper(MainWindow);
+            windowHelper.EnsureHandle();
+            screen = MonitorInfo.GetNearestDisplayMonitor(windowHelper.Handle);
+        }
+        catch
+        {
+            screen = SelectedScreen();
+        }
+
+        UpdateMainWindowMaxHeightConstraint(screen);
+
+        var workAreaTopLeft = Win32Helper.TransformPixelsToDIP(MainWindow, screen.WorkingArea.X, screen.WorkingArea.Y);
+        var workAreaBottomRight = Win32Helper.TransformPixelsToDIP(
+            MainWindow,
+            screen.WorkingArea.X + screen.WorkingArea.Width,
+            screen.WorkingArea.Y + screen.WorkingArea.Height);
+
+        var windowHeight = MainWindow.ActualHeight > 0 ? MainWindow.ActualHeight : MainWindow.MinHeight;
+        var currentTop = Settings.MainWindowTop;
+        var bottomLimit = workAreaBottomRight.Y - edgePadding;
+        var currentBottom = currentTop + windowHeight;
+
+        // 仅在触底时上移，未触底时保持原位避免抖动。
+        if (currentBottom <= bottomLimit)
+            return;
+
+        var minTop = workAreaTopLeft.Y + edgePadding;
+        var maxTop = bottomLimit - windowHeight;
+        if (maxTop < minTop)
+            maxTop = minTop;
+
+        var targetTop = Math.Clamp(currentTop, minTop, maxTop);
+        if (targetTop >= currentTop)
+            return;
+
+        Settings.MainWindowTop = targetTop;
     }
 
     private void AdjustPositionForResolutionChange()
@@ -1895,8 +2083,18 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     private void HandleCrosswordFetchFailed()
     {
-        InputClear();
-        _snackbar.ShowWarning(_i18n.GetTranslation("CrosswordTranslateFetchFailed"), 3000);
+        switch (Settings.CrosswordFetchFailedFallbackTarget)
+        {
+            case CrosswordFetchFailedFallbackTarget.ShowWindow:
+                Show();
+                _snackbar.ShowWarning(_i18n.GetTranslation("CrosswordTranslateFetchFailedShowWindow"), 3000);
+                break;
+            case CrosswordFetchFailedFallbackTarget.InputTranslate:
+            default:
+                InputClear();
+                _snackbar.ShowWarning(_i18n.GetTranslation("CrosswordTranslateFetchFailed"), 3000);
+                break;
+        }
     }
 
     private void StartProcess()
@@ -1920,6 +2118,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         MouseKeyHelper.MouseTextSelected -= OnMouseTextSelected;
         MouseKeyHelper.MouseTextSelected -= OnMouseTextSelectedIncretemental;
         _clipboardMonitor?.OnClipboardTextChanged -= OnClipboardTextChanged;
+        Settings.PropertyChanged -= OnSettingsPropertyChanged;
 
         _debounceExecutor.Dispose();
         _clipboardMonitor?.Dispose();

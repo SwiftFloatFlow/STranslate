@@ -154,6 +154,7 @@ public partial class Settings : ObservableObject
     [ObservableProperty] public partial double MainWindowTop { get; set; }
     [ObservableProperty] public partial double CustomWindowLeft { get; set; }
     [ObservableProperty] public partial double CustomWindowTop { get; set; }
+    [ObservableProperty] public partial double MainWindowMaxHeightRatio { get; set; } = 0.85;
 
     private double _mainWindowWidth = 470;
     public double MainWindowWidth
@@ -187,6 +188,12 @@ public partial class Settings : ObservableObject
     /// 取词时换行处理
     /// </summary>
     [ObservableProperty] public partial LineBreakHandleType LineBreakHandleType { get; set; } = LineBreakHandleType.RemoveExtraLineBreak;
+
+    /// <summary>
+    /// 划词取词失败时的回退目标。
+    /// </summary>
+    [ObservableProperty] public partial CrosswordFetchFailedFallbackTarget CrosswordFetchFailedFallbackTarget { get; set; } = CrosswordFetchFailedFallbackTarget.InputTranslate;
+
     [ObservableProperty] public partial ImageQuality ImageQuality { get; set; } = ImageQuality.Medium;
 
     #region Global Prompts
@@ -403,6 +410,15 @@ public partial class Settings : ObservableObject
         }
     }
 
+    partial void OnMainWindowMaxHeightRatioChanged(double value)
+    {
+        var normalized = Math.Clamp(Math.Round(value, 2), 0.6, 1.0);
+        if (Math.Abs(normalized - value) > double.Epsilon)
+        {
+            MainWindowMaxHeightRatio = normalized;
+        }
+    }
+
     #endregion
 
     #region Public Methods
@@ -419,6 +435,7 @@ public partial class Settings : ObservableObject
             if (e.PropertyName == nameof(MainWindowTop) ||
                 e.PropertyName == nameof(MainWindowLeft) ||
                 e.PropertyName == nameof(MainWindowWidth) ||
+                e.PropertyName == nameof(MainWindowMaxHeightRatio) ||
                 e.PropertyName == nameof(AutoTranslateDelayMs))
                 SaveWithDebounce();
             else
@@ -754,6 +771,22 @@ public enum LineBreakHandleType
     RemoveAllLineBreakWithoutSpace,
 }
 
+/// <summary>
+/// 划词取词失败时，主窗口的回退行为。
+/// </summary>
+public enum CrosswordFetchFailedFallbackTarget
+{
+    /// <summary>
+    /// 回退到输入翻译（清空输入并显示主窗口）。
+    /// </summary>
+    InputTranslate,
+
+    /// <summary>
+    /// 仅显示主窗口，保留当前输入与输出内容。
+    /// </summary>
+    ShowWindow,
+}
+
 public enum LayoutAnalysisMode
 {
     MergeAll,
@@ -768,9 +801,9 @@ public enum WindowScreenType
 {
     RememberLastLaunchLocation,
     Cursor,
-    FollowMouse,
     Focus,
     Primary,
+    FollowMouse,
     Custom
 }
 

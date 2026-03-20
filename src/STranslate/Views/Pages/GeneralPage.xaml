@@ -460,6 +460,17 @@
                         SelectedValuePath="Value" />
                 </ui:SettingsCard>
 
+                <ui:SettingsCard Description="{DynamicResource General_CrosswordFetchFailedFallbackTargetDescription}" Header="{DynamicResource General_CrosswordFetchFailedFallbackTarget}">
+                    <ui:SettingsCard.HeaderIcon>
+                        <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.CursorClick_20_Regular}" />
+                    </ui:SettingsCard.HeaderIcon>
+                    <ComboBox
+                        DisplayMemberPath="Display"
+                        ItemsSource="{Binding DataProvider.CrosswordFetchFailedFallbackTargets}"
+                        SelectedValue="{Binding Settings.CrosswordFetchFailedFallbackTarget}"
+                        SelectedValuePath="Value" />
+                </ui:SettingsCard>
+
                 <ui:SettingsCard Description="{DynamicResource General_ImageQualityDescription}" Header="{DynamicResource General_ImageQuality}">
                     <ui:SettingsCard.HeaderIcon>
                         <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.ImageTable_20_Regular}" />
@@ -570,6 +581,24 @@
                     </ui:SettingsCard>
                 </control:CardGroup>
 
+                <ui:SettingsCard Description="{DynamicResource General_MainWindowMaxHeightRatioDescription}" Header="{DynamicResource General_MainWindowMaxHeightRatio}">
+                    <ui:SettingsCard.HeaderIcon>
+                        <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.DesktopPulse_20_Regular}" />
+                    </ui:SettingsCard.HeaderIcon>
+                    <ikw:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                        <Button Command="{Binding ResetMainWindowMaxHeightRatioCommand}" Content="{DynamicResource Reset}" />
+                        <Slider
+                            x:Name="PART_MainWindowMaxHeightRatio"
+                            IsSnapToTickEnabled="True"
+                            Maximum="1"
+                            Minimum="0.6"
+                            TickFrequency="0.05"
+                            TickPlacement="BottomRight"
+                            Value="{Binding Settings.MainWindowMaxHeightRatio, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=PART_MainWindowMaxHeightRatio, Path=Value, StringFormat={}{0:P0}}" />
+                    </ikw:SimpleStackPanel>
+                </ui:SettingsCard>
+
                 <ui:SettingsExpander Header="{DynamicResource General_HideNotifyIcon}">
                     <ui:SettingsExpander.HeaderIcon>
                         <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.AlertOff_20_Regular}" />
@@ -610,17 +639,17 @@
                     </ui:SettingsExpander.Items>
                 </ui:SettingsExpander>
 
-                <ui:SettingsExpander Description="{DynamicResource General_ColorThemeDescription}" Header="{DynamicResource General_ColorTheme}">
-                    <ui:SettingsExpander.HeaderIcon>
+                <ui:SettingsCard Description="{DynamicResource General_ColorThemeDescription}" Header="{DynamicResource General_ColorTheme}">
+                    <ui:SettingsCard.HeaderIcon>
                         <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.Color_20_Regular}" />
-                    </ui:SettingsExpander.HeaderIcon>
+                    </ui:SettingsCard.HeaderIcon>
                     <ComboBox
                         MaxWidth="200"
                         DisplayMemberPath="Display"
                         ItemsSource="{Binding DataProvider.ColorSchemes}"
                         SelectedValue="{Binding Settings.ColorScheme}"
                         SelectedValuePath="Value" />
-                </ui:SettingsExpander>
+                </ui:SettingsCard>
 
                 <ui:SettingsExpander Description="{DynamicResource General_HideInputBoxDescription}" Header="{DynamicResource General_HideInputBox}">
                     <ui:SettingsExpander.HeaderIcon>

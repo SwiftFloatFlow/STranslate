@@ -5,6 +5,7 @@
     xmlns:cnvt="clr-namespace:STranslate.Converters"
     xmlns:control="clr-namespace:STranslate.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:ikw="http://schemas.inkore.net/lib/ui/wpf"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:s="https://github.com/zggsong/2022/xaml"
@@ -16,7 +17,7 @@
     Width="{Binding Settings.MainWindowWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
     MinWidth="400"
     MinHeight="200"
-    MaxHeight="{Binding Settings.MainWindowMaxHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+    MaxHeight="{Binding MainWindowEffectiveMaxHeight, Mode=OneWay}"
     control:SizeToContentBehavior.PersistentSizeToContent="Height"
     control:SnackbarBehavior.EnableSnackbar="True"
     d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel}"
@@ -38,6 +39,11 @@
     Visibility="Visible"
     WindowStartupLocation="Manual"
     mc:Ignorable="d">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="SizeChanged">
+            <i:InvokeCommandAction Command="{Binding AdjustPositionForContentSizeChangedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Window.InputBindings>
         <KeyBinding
             Key="Esc"

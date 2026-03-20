@@ -37,6 +37,8 @@
     <sys:String x:Key="General_HideWhenDeactivated">포커스 해제 시 자동 숨김</sys:String>
     <sys:String x:Key="General_WindowPosition">메인 창 위치</sys:String>
     <sys:String x:Key="General_WindowAlign">모니터상 위치</sys:String>
+    <sys:String x:Key="General_MainWindowMaxHeightRatio">메인 창 최대 높이(화면 비율)</sys:String>
+    <sys:String x:Key="General_MainWindowMaxHeightRatioDescription">메인 창의 최대 높이를 현재 모니터 작업 영역 대비 비율(60%~100%)로 설정합니다.</sys:String>
     <sys:String x:Key="General_DisableGlobalHotkeys">전역 단축키 비활성화</sys:String>
     <sys:String x:Key="General_IgnoreHotkeysOnFullscreen">전체 화면 모드에서 단축키 무시</sys:String>
     <sys:String x:Key="General_IgnoreHotkeysOnFullscreenDescription">「전역 단축키 비활성화」보다 우선순위가 낮으며, 주로 게임 환경에서 사용됩니다.</sys:String>
@@ -66,6 +68,8 @@
     <sys:String x:Key="General_AutoTranslateDelayDescription">입력 후 대기 시간, 단위: 밀리초.</sys:String>
     <sys:String x:Key="General_LineBreakHandleType">단어 선택 줄 바꿈 처리</sys:String>
     <sys:String x:Key="General_LineBreakHandleTypeDescription" xml:space="preserve">드래그 번역, 스크린샷 번역, 클립보드, 정적 OCR 단어 선택 시 줄 바꿈 처리를 포함합니다.&#10;「불필요한 줄 바꿈 제거」는 주로 PDF 단어 선택 시 사용되며, 불필요한 줄 바꿈을 제거하지만 PDF가 아닌 경우 영향을 줄 수 있습니다.</sys:String>
+    <sys:String x:Key="General_CrosswordFetchFailedFallbackTarget">드래그 번역 실패 시 복귀 대상</sys:String>
+    <sys:String x:Key="General_CrosswordFetchFailedFallbackTargetDescription">선택 텍스트 가져오기에 실패했을 때 입력 번역으로 전환할지, 메인 창만 표시할지 선택합니다.</sys:String>
     <sys:String x:Key="General_ImageQuality">이미지 품질</sys:String>
     <sys:String x:Key="General_ImageQualityDescription">이미지 처리 시 품질을 조정합니다. 온라인 OCR 서비스는 이미지 크기를 제한할 수 있습니다.</sys:String>
     <sys:String x:Key="General_DoubleClickTrayFunction">트레이 아이콘 더블 클릭 기능</sys:String>
@@ -150,6 +154,7 @@
     <sys:String x:Key="Hotkey_CrosswordTranslateTraditional">기존 단축키</sys:String>
     <sys:String x:Key="Hotkey_CrosswordTranslateByCtrlSameCDescription">마우스로 텍스트를 선택하고 빠르게 Ctrl+C+C를 눌러 번역합니다.</sys:String>
     <sys:String x:Key="CrosswordTranslateFetchFailed">선택 텍스트를 가져오지 못했습니다. 입력 번역을 열었습니다.</sys:String>
+    <sys:String x:Key="CrosswordTranslateFetchFailedShowWindow">선택 텍스트를 가져오지 못했습니다. 메인 창을 표시했습니다.</sys:String>
     <sys:String x:Key="Hotkey_MouseHookTranslate">마우스 감지</sys:String>
     <sys:String x:Key="Hotkey_MouseHookTranslateDescription">마우스 드래그 텍스트 선택 번역 감지를 켜고 끄는 단축키입니다.</sys:String>
     <sys:String x:Key="Hotkey_ReplaceTranslate">치환 번역</sys:String>
@@ -308,7 +313,14 @@
     <sys:String x:Key="ExportHistory">기록 내보내기</sys:String>
     <sys:String x:Key="BatchDeleteHistory">기록 일괄 삭제</sys:String>
     <sys:String x:Key="BatchDeleteHistoryConfirm">선택한 기록 {0}개를 삭제하시겠습니까?</sys:String>
+    <sys:String x:Key="BatchDeleteHistoryResult">일괄 삭제 완료: 성공 {0}개, 실패 {1}개</sys:String>
+    <sys:String x:Key="DeleteAllHistoryConfirm">전체 기록 {0}개를 삭제하시겠습니까?</sys:String>
+    <sys:String x:Key="AllHistoryActions">전체 작업</sys:String>
+    <sys:String x:Key="DeleteAllHistory">전체 삭제</sys:String>
+    <sys:String x:Key="ExportAllHistory">전체 내보내기</sys:String>
     <sys:String x:Key="HistorySelectAllOrClear">모두 선택/해제</sys:String>
+
+
     <sys:String x:Key="NoHistorySelected">선택된 기록이 없습니다</sys:String>
     <sys:String x:Key="ExportSuccess">내보내기 성공</sys:String>
     <sys:String x:Key="ExportFailed">내보내기 실패</sys:String>
@@ -513,6 +525,8 @@
     <sys:String x:Key="LineBreakHandleTypeRemoveExtraLineBreak">불필요한 줄 바꿈 제거</sys:String>
     <sys:String x:Key="LineBreakHandleTypeRemoveAllLineBreak">모든 줄 바꿈 제거</sys:String>
     <sys:String x:Key="LineBreakHandleTypeRemoveAllLineBreakWithoutSpace">모든 줄 바꿈 제거 (공백 없음)</sys:String>
+    <sys:String x:Key="CrosswordFetchFailedFallbackTargetInputTranslate">입력 번역</sys:String>
+    <sys:String x:Key="CrosswordFetchFailedFallbackTargetShowWindow">메인 창 표시</sys:String>
 
     <sys:String x:Key="PluginTypeAll">모든 플러그인</sys:String>
     <sys:String x:Key="PluginTypeTranslate">텍스트 번역</sys:String>
