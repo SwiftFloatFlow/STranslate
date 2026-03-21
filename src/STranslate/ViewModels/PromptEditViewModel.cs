@@ -36,6 +36,7 @@ public partial class PromptEditViewModel : ObservableObject, IDisposable
 
     private readonly ObservableCollection<Prompt> _originalPrompts;
     private bool _isUpdatingPromptEnabled = false;
+    private bool _disposed = false;
 
     /// <summary>
     /// 是否启用互斥选择
@@ -212,6 +213,7 @@ public partial class PromptEditViewModel : ObservableObject, IDisposable
         return name;
     }
 
+    // 始终保留至少一个提示词，防止用户误删所有提示词
     public bool CanRemovePrompt() => SelectedPrompt is not null && Prompts.Count > 1;
 
     [RelayCommand(CanExecute = nameof(CanRemovePrompt))]
@@ -307,6 +309,9 @@ public partial class PromptEditViewModel : ObservableObject, IDisposable
     // 清理事件监听
     public void Dispose()
     {
+        if (_disposed) return;
+        _disposed = true;
+
         foreach (var prompt in Prompts)
         {
             prompt.PropertyChanged -= OnPromptPropertyChanged;

@@ -32,5 +32,8 @@ public partial class PromptEditWindow
             viewModel.SaveRequested -= OnSaveRequested;
             viewModel.Dispose();
         }
+
+        // 取消订阅 Closing 事件，防止窗口实例被缓存时的内存泄漏
+        Closing -= OnClosing;
     }
 }
