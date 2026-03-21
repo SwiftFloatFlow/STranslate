@@ -6,6 +6,8 @@ using Serilog.Events;
 using STranslate.Helpers;
 using STranslate.Plugin;
 using STranslate.Views;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing.Imaging;
 using System.Windows.Media;
@@ -193,6 +195,50 @@ public partial class Settings : ObservableObject
     [ObservableProperty] public partial CrosswordFetchFailedFallbackTarget CrosswordFetchFailedFallbackTarget { get; set; } = CrosswordFetchFailedFallbackTarget.InputTranslate;
 
     [ObservableProperty] public partial ImageQuality ImageQuality { get; set; } = ImageQuality.Medium;
+
+    #region Global Prompts
+
+    /// <summary>
+    /// 全局提示词（主软件的局部提示词，通过接口暴露给插件）
+    /// IsEnabled = 是否暴露给插件使用（不互斥，可多选）
+    /// </summary>
+    [ObservableProperty]
+    public partial ObservableCollection<Prompt> GlobalPrompts { get; set; } = [];
+
+    /// <summary>
+    /// 全局提示词变更事件（仅在有效保存后手动触发）
+    /// </summary>
+    public event Action<IReadOnlyList<Prompt>>? GlobalPromptsChanged;
+
+    partial void OnGlobalPromptsChanged(ObservableCollection<Prompt>? oldValue, ObservableCollection<Prompt>? newValue)
+    {
+        if (oldValue != null)
+        {
+            oldValue.CollectionChanged -= OnGlobalPromptsCollectionChanged;
+        }
+
+        if (newValue != null)
+        {
+            newValue.CollectionChanged += OnGlobalPromptsCollectionChanged;
+        }
+    }
+
+    private void OnGlobalPromptsCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        // 触发 PropertyChanged 以自动保存
+        OnPropertyChanged(nameof(GlobalPrompts));
+    }
+
+    /// <summary>
+    /// 触发全局提示词变更通知（仅由全局提示词窗口有效保存时调用）
+    /// </summary>
+    public void NotifyGlobalPromptsChanged()
+    {
+        var enabledPrompts = GlobalPrompts.Where(p => p.IsEnabled).ToList().AsReadOnly();
+        GlobalPromptsChanged?.Invoke(enabledPrompts);
+    }
+
+    #endregion
 
     #region Layout Analysis
     /* 版面分析参数配置

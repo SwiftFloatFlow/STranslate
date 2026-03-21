@@ -6,6 +6,7 @@ using STranslate.Plugin;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Text.Json;
 using System.Windows;
 
 namespace STranslate.ViewModels;
@@ -13,6 +14,11 @@ namespace STranslate.ViewModels;
 public partial class PromptEditViewModel : ObservableObject, IDisposable
 {
     private readonly Internationalization _i18n = Ioc.Default.GetRequiredService<Internationalization>();
+
+    /// <summary>
+    /// 保存请求事件，参数为是否有有效变更
+    /// </summary>
+    public event Action<bool>? SaveRequested;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RemovePromptCommand), nameof(EditPromptCommand), nameof(CopyPromptCommand))]
@@ -30,10 +36,19 @@ public partial class PromptEditViewModel : ObservableObject, IDisposable
 
     private readonly ObservableCollection<Prompt> _originalPrompts;
     private bool _isUpdatingPromptEnabled = false;
+    private bool _disposed = false;
 
-    public PromptEditViewModel(ObservableCollection<Prompt> prompts, List<string>? roles = default)
+    /// <summary>
+    /// 是否启用互斥选择
+    /// true: 插件局部提示词（只能选一个）
+    /// false: 主软件全局提示词（可多选暴露）
+    /// </summary>
+    public bool IsMutualExclusion { get; }
+
+    public PromptEditViewModel(ObservableCollection<Prompt> prompts, List<string>? roles = default, bool isMutualExclusion = true)
     {
         _originalPrompts = prompts;
+        IsMutualExclusion = isMutualExclusion;
         if (roles is not null)
         {
             Roles = roles;
@@ -98,6 +113,9 @@ public partial class PromptEditViewModel : ObservableObject, IDisposable
 
     private void OnPromptPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        // 只有互斥模式下才执行互斥逻辑
+        if (!IsMutualExclusion) return;
+
         if (e.PropertyName == nameof(Prompt.IsEnabled) && !_isUpdatingPromptEnabled)
         {
             var changedPrompt = sender as Prompt;
@@ -195,6 +213,7 @@ public partial class PromptEditViewModel : ObservableObject, IDisposable
         return name;
     }
 
+    // 始终保留至少一个提示词，防止用户误删所有提示词
     public bool CanRemovePrompt() => SelectedPrompt is not null && Prompts.Count > 1;
 
     [RelayCommand(CanExecute = nameof(CanRemovePrompt))]
@@ -249,15 +268,28 @@ public partial class PromptEditViewModel : ObservableObject, IDisposable
         }
     }
 
+    private bool HasChanges()
+    {
+        var options = new JsonSerializerOptions { IncludeFields = true };
+        var originalJson = JsonSerializer.Serialize(_originalPrompts, options);
+        var currentJson = JsonSerializer.Serialize(Prompts, options);
+        return originalJson != currentJson;
+    }
+
     [RelayCommand]
     private void Save(Window window)
     {
+        var hasChanges = HasChanges();
+
         // 更新原始 Prompts 集合
         _originalPrompts.Clear();
         foreach (var prompt in Prompts)
         {
             _originalPrompts.Add(prompt.Clone());
         }
+
+        // 触发保存请求事件，通知窗口是否有有效变更
+        SaveRequested?.Invoke(hasChanges);
 
         window.DialogResult = true;
 
@@ -274,15 +306,12 @@ public partial class PromptEditViewModel : ObservableObject, IDisposable
         window.Close();
     }
 
-    // 清理资源
-    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
-    {
-        base.OnPropertyChanged(e);
-    }
-
-    // 添加析构函数来清理事件监听
+    // 清理事件监听
     public void Dispose()
     {
+        if (_disposed) return;
+        _disposed = true;
+
         foreach (var prompt in Prompts)
         {
             prompt.PropertyChanged -= OnPromptPropertyChanged;

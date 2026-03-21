@@ -58,6 +58,20 @@ public interface IPluginContext : IDisposable
     Window GetPromptEditWindow(ObservableCollection<Prompt> prompts, List<string>? roles = default);
 
     /// <summary>
+    /// 获取启用的全局提示词（IsEnabled=true 的）
+    /// </summary>
+    /// <returns>只读的全局提示词列表</returns>
+    IReadOnlyList<Prompt> GetGlobalPrompts();
+
+    /// <summary>
+    /// 注册全局提示词变更回调
+    /// </summary>
+    /// <param name="callback">回调函数，参数为启用的全局提示词列表</param>
+    /// <param name="delayMs">延时注销毫秒数（防止窗口关闭后回调被过早注销），默认100ms</param>
+    /// <returns>可释放对象，用于注销回调</returns>
+    IDisposable RegisterGlobalPromptsChangedCallback(Action<IReadOnlyList<Prompt>> callback, int delayMs = 100);
+
+    /// <summary>
     /// 加载插件的设置存储。
     /// </summary>
     /// <typeparam name="T">设置存储的类型。</typeparam>
