@@ -1543,11 +1543,44 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private void Copy(string text)
+    private void Copy(object? param)
     {
+        string? text = null;
+        
+        if (param is Service service)
+        {
+            text = (service.Plugin as ITranslatePlugin)?.TransResult?.Text;
+            if (service.Options?.CopyAsPlainText == true && !string.IsNullOrEmpty(text))
+            {
+                text = ConvertMarkdownToPlainText(text);
+            }
+        }
+        else if (param is string str)
+        {
+            text = str;
+        }
+        
         if (string.IsNullOrEmpty(text)) return;
+
         ClipboardHelper.SetText(text);
         _snackbar.ShowSuccess(_i18n.GetTranslation("CopySuccess"));
+    }
+
+    private static string ConvertMarkdownToPlainText(string markdown)
+    {
+        var text = markdown;
+
+        text = System.Text.RegularExpressions.Regex.Replace(text, @"\*\*(.+?)\*\*", "$1");
+        text = System.Text.RegularExpressions.Regex.Replace(text, @"__(.+?)__", "$1");
+        text = System.Text.RegularExpressions.Regex.Replace(text, @"\*(.+?)\*", "$1");
+        text = System.Text.RegularExpressions.Regex.Replace(text, @"_(.+?)_", "$1");
+        text = System.Text.RegularExpressions.Regex.Replace(text, @"`(.+?)`", "$1");
+        text = System.Text.RegularExpressions.Regex.Replace(text, @"\[(.+?)\]\(.+?\)", "$1");
+        text = System.Text.RegularExpressions.Regex.Replace(text, @"!\[.*?\]\(.+?\)", "");
+        text = System.Text.RegularExpressions.Regex.Replace(text, @"^#{1,6}\s*", "", System.Text.RegularExpressions.RegexOptions.Multiline);
+        text = System.Text.RegularExpressions.Regex.Replace(text, @"^[-*_]{3,}\s*$", "", System.Text.RegularExpressions.RegexOptions.Multiline);
+
+        return text.Trim();
     }
 
     [RelayCommand]
