@@ -89,7 +89,6 @@
         <PackageReference Include="Hardcodet.NotifyIcon.Wpf" />
         <PackageReference Include="Markdig" />
         <PackageReference Include="Markdig.Wpf" />
-        <PackageReference Include="HtmlAgilityPack" />
         <PackageReference Include="Microsoft.Data.Sqlite" />
         <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" />
         <PackageReference Include="MouseKeyHook" />

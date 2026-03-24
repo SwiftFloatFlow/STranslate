@@ -2,6 +2,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using iNKORE.UI.WPF.Modern;
+using Markdig;
+using Markdig.Syntax;
+using Markdig.Syntax.Inlines;
 using Microsoft.Extensions.Logging;
 using STranslate.Core;
 using STranslate.Helpers;
@@ -1568,19 +1571,71 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     private static string ConvertMarkdownToPlainText(string markdown)
     {
-        var text = markdown;
+        if (string.IsNullOrWhiteSpace(markdown))
+            return string.Empty;
 
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"\*\*(.+?)\*\*", "$1");
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"__(.+?)__", "$1");
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"\*(.+?)\*", "$1");
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"_(.+?)_", "$1");
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"`(.+?)`", "$1");
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"\[(.+?)\]\(.+?\)", "$1");
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"!\[.*?\]\(.+?\)", "");
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"^#{1,6}\s*", "", System.Text.RegularExpressions.RegexOptions.Multiline);
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"^[-*_]{3,}\s*$", "", System.Text.RegularExpressions.RegexOptions.Multiline);
+        var pipeline = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .Build();
 
-        return text.Trim();
+        var document = Markdown.Parse(markdown, pipeline);
+        var sb = new System.Text.StringBuilder();
+
+        foreach (var block in document.Descendants())
+        {
+            if (block is HeadingBlock heading && heading.Inline != null)
+            {
+                sb.Append(new string('#', heading.Level)).Append(' ');
+                AppendInline(heading.Inline, sb);
+                sb.AppendLine();
+            }
+            else if (block is ParagraphBlock paragraph && paragraph.Inline != null)
+            {
+                AppendInline(paragraph.Inline, sb);
+                sb.AppendLine();
+            }
+            else if (block is CodeBlock codeBlock)
+            {
+                sb.AppendLine(codeBlock.Lines.ToString());
+            }
+            else if (block is ThematicBreakBlock)
+            {
+                sb.AppendLine("---");
+            }
+        }
+
+        return sb.ToString().Trim();
+    }
+
+    private static void AppendInline(ContainerInline container, System.Text.StringBuilder sb)
+    {
+        if (container == null) return;
+        
+        foreach (var inline in container)
+        {
+            switch (inline)
+            {
+                case LiteralInline literal:
+                    sb.Append(literal.Content.ToString());
+                    break;
+
+                case CodeInline code:
+                    sb.Append(code.Content.ToString());
+                    break;
+
+                case LineBreakInline:
+                    sb.AppendLine();
+                    break;
+
+                case AutolinkInline autolink:
+                    sb.Append(autolink.Url);
+                    break;
+
+                case ContainerInline containerInline:
+                    AppendInline(containerInline, sb);
+                    break;
+            }
+        }
     }
 
     [RelayCommand]
