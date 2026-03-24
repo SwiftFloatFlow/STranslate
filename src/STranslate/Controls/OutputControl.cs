@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace STranslate.Controls;
 
@@ -23,6 +25,31 @@ public class OutputControl : ItemsControl
             nameof(CopyCommand),
             typeof(ICommand),
             typeof(OutputControl));
+
+    public string? CopyText
+    {
+        get => (string?)GetValue(CopyTextProperty);
+        set => SetValue(CopyTextProperty, value);
+    }
+
+    public static readonly DependencyProperty CopyTextProperty =
+        DependencyProperty.Register(
+            nameof(CopyText),
+            typeof(string),
+            typeof(OutputControl));
+
+    public bool CopyAsPlainText
+    {
+        get => (bool)GetValue(CopyAsPlainTextProperty);
+        set => SetValue(CopyAsPlainTextProperty, value);
+    }
+
+    public static readonly DependencyProperty CopyAsPlainTextProperty =
+        DependencyProperty.Register(
+            nameof(CopyAsPlainText),
+            typeof(bool),
+            typeof(OutputControl),
+            new PropertyMetadata(true));
 
     public ICommand? InsertCommand
     {
@@ -263,4 +290,63 @@ public class OutputControl : ItemsControl
 
     public static readonly DependencyProperty HasActivedVocabularyProperty =
         DependencyProperty.Register(nameof(HasActivedVocabulary), typeof(bool), typeof(OutputControl), new PropertyMetadata(false));
+
+    public static readonly DependencyProperty EnableMouseWheelScrollProperty =
+        DependencyProperty.RegisterAttached(
+            "EnableMouseWheelScroll",
+            typeof(bool),
+            typeof(OutputControl),
+            new PropertyMetadata(false, OnEnableMouseWheelScrollChanged));
+
+    public static bool GetEnableMouseWheelScroll(DependencyObject obj) => (bool)obj.GetValue(EnableMouseWheelScrollProperty);
+
+    public static void SetEnableMouseWheelScroll(DependencyObject obj, bool value) => obj.SetValue(EnableMouseWheelScrollProperty, value);
+
+    private static void OnEnableMouseWheelScrollChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not FrameworkElement element)
+            return;
+
+        if ((bool)e.NewValue)
+        {
+            element.PreviewMouseWheel += OnPreviewMouseWheel;
+        }
+        else
+        {
+            element.PreviewMouseWheel -= OnPreviewMouseWheel;
+        }
+    }
+
+    private static void OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (sender is not FrameworkElement element)
+            return;
+
+        e.Handled = true;
+
+        var mouseWheelEvent = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+        {
+            RoutedEvent = MouseWheelEvent,
+            Source = sender
+        };
+
+        var parent = FindParentScrollViewer(element);
+        if (parent != null)
+        {
+            parent.RaiseEvent(mouseWheelEvent);
+        }
+    }
+
+    private static ScrollViewer? FindParentScrollViewer(DependencyObject element)
+    {
+        var current = element;
+        while (current != null)
+        {
+            if (current is ScrollViewer scrollViewer)
+                return scrollViewer;
+
+            current = VisualTreeHelper.GetParent(current);
+        }
+        return null;
+    }
 }

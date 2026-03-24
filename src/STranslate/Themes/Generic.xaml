@@ -9,6 +9,7 @@
         <ResourceDictionary Source="pack://application:,,,/STranslate;component/Controls/HistoryControl.xaml" />
         <ResourceDictionary Source="pack://application:,,,/STranslate;component/Controls/HotkeyControl.xaml" />
         <ResourceDictionary Source="pack://application:,,,/STranslate;component/Controls/HotkeyDisplay.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/STranslate;component/Controls/MarkdownViewer.xaml" />
         <ResourceDictionary Source="pack://application:,,,/STranslate;component/Controls/OutputControl.xaml" />
         <ResourceDictionary Source="pack://application:,,,/STranslate;component/Controls/ServicePanel.xaml" />
         <ResourceDictionary Source="pack://application:,,,/STranslate;component/Controls/WordExchange.xaml" />
