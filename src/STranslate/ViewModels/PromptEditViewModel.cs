@@ -270,10 +270,17 @@ public partial class PromptEditViewModel : ObservableObject, IDisposable
 
     private bool HasChanges()
     {
+        if (_originalPrompts.Count != Prompts.Count) return true;
+
         var options = new JsonSerializerOptions { IncludeFields = true };
-        var originalJson = JsonSerializer.Serialize(_originalPrompts, options);
-        var currentJson = JsonSerializer.Serialize(Prompts, options);
-        return originalJson != currentJson;
+
+        for (int i = 0; i < _originalPrompts.Count; i++)
+        {
+            var originalJson = JsonSerializer.Serialize(_originalPrompts[i], options);
+            var currentJson = JsonSerializer.Serialize(Prompts[i], options);
+            if (originalJson != currentJson) return true;
+        }
+        return false;
     }
 
     [RelayCommand]
