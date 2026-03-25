@@ -204,7 +204,6 @@ public class ServiceManager
             service.Options.ExecMode = settings?.Options?.ExecMode ?? ExecutionMode.Automatic;
             service.Options.AutoBackTranslation = settings?.Options?.AutoBackTranslation ?? false;
             service.Options.MarkdownRender = settings?.Options?.MarkdownRender ?? false;
-            service.Options.CopyAsPlainText = settings?.Options?.CopyAsPlainText ?? true;
         }
         var plugin = metaDataClone.CreatePluginService();
         var context = new PluginContext(metaDataClone, serviceID);

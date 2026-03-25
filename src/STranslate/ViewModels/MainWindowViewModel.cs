@@ -2,9 +2,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using iNKORE.UI.WPF.Modern;
-using Markdig;
-using Markdig.Syntax;
-using Markdig.Syntax.Inlines;
 using Microsoft.Extensions.Logging;
 using STranslate.Core;
 using STranslate.Helpers;
@@ -1553,10 +1550,6 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         if (param is Service service)
         {
             text = (service.Plugin as ITranslatePlugin)?.TransResult?.Text;
-            if (service.Options?.CopyAsPlainText == true && !string.IsNullOrEmpty(text))
-            {
-                text = ConvertMarkdownToPlainText(text);
-            }
         }
         else if (param is string str)
         {
@@ -1567,75 +1560,6 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
         ClipboardHelper.SetText(text);
         _snackbar.ShowSuccess(_i18n.GetTranslation("CopySuccess"));
-    }
-
-    private static string ConvertMarkdownToPlainText(string markdown)
-    {
-        if (string.IsNullOrWhiteSpace(markdown))
-            return string.Empty;
-
-        var pipeline = new MarkdownPipelineBuilder()
-            .UseAdvancedExtensions()
-            .Build();
-
-        var document = Markdown.Parse(markdown, pipeline);
-        var sb = new System.Text.StringBuilder();
-
-        foreach (var block in document.Descendants())
-        {
-            if (block is HeadingBlock heading && heading.Inline != null)
-            {
-                sb.Append(new string('#', heading.Level)).Append(' ');
-                AppendInline(heading.Inline, sb);
-                sb.AppendLine();
-            }
-            else if (block is ParagraphBlock paragraph && paragraph.Inline != null)
-            {
-                AppendInline(paragraph.Inline, sb);
-                sb.AppendLine();
-            }
-            else if (block is CodeBlock codeBlock)
-            {
-                sb.AppendLine(codeBlock.Lines.ToString());
-            }
-            else if (block is ThematicBreakBlock)
-            {
-                sb.AppendLine("---");
-            }
-        }
-
-        return sb.ToString().Trim();
-    }
-
-    private static void AppendInline(ContainerInline container, System.Text.StringBuilder sb)
-    {
-        if (container == null) return;
-        
-        foreach (var inline in container)
-        {
-            switch (inline)
-            {
-                case LiteralInline literal:
-                    sb.Append(literal.Content.ToString());
-                    break;
-
-                case CodeInline code:
-                    sb.Append(code.Content.ToString());
-                    break;
-
-                case LineBreakInline:
-                    sb.AppendLine();
-                    break;
-
-                case AutolinkInline autolink:
-                    sb.Append(autolink.Url);
-                    break;
-
-                case ContainerInline containerInline:
-                    AppendInline(containerInline, sb);
-                    break;
-            }
-        }
     }
 
     [RelayCommand]

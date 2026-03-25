@@ -311,34 +311,6 @@
                             IsCheckable="True"
                             IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.MarkdownRender, Converter={cnvt:BoolInverseConverter}}" />
                     </MenuItem>
-                    <MenuItem Header="{DynamicResource CopyAsPlainText}">
-                        <MenuItem.Style>
-                            <Style BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="MenuItem">
-                                <Setter Property="Icon">
-                                    <Setter.Value>
-                                        <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.TextDescription_20_Regular}" />
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.CopyAsPlainText}" Value="True">
-                                        <Setter Property="Icon">
-                                            <Setter.Value>
-                                                <ui:FontIcon Icon="{x:Static ui:FluentSystemIcons.TextDescription_20_Filled}" />
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </MenuItem.Style>
-                        <MenuItem
-                            Header="{DynamicResource On}"
-                            IsCheckable="True"
-                            IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.CopyAsPlainText}" />
-                        <MenuItem
-                            Header="{DynamicResource Off}"
-                            IsCheckable="True"
-                            IsChecked="{Binding Source={StaticResource SvcProxy}, Path=Data.Options.CopyAsPlainText, Converter={cnvt:BoolInverseConverter}}" />
-                    </MenuItem>
                     <Separator />
                     <MenuItem
                         Command="{Binding Source={StaticResource VmProxy}, Path=Data.DuplicateCommand}"

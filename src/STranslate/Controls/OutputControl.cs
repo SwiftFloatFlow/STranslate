@@ -38,19 +38,6 @@ public class OutputControl : ItemsControl
             typeof(string),
             typeof(OutputControl));
 
-    public bool CopyAsPlainText
-    {
-        get => (bool)GetValue(CopyAsPlainTextProperty);
-        set => SetValue(CopyAsPlainTextProperty, value);
-    }
-
-    public static readonly DependencyProperty CopyAsPlainTextProperty =
-        DependencyProperty.Register(
-            nameof(CopyAsPlainText),
-            typeof(bool),
-            typeof(OutputControl),
-            new PropertyMetadata(true));
-
     public ICommand? InsertCommand
     {
         get => (ICommand?)GetValue(InsertCommandProperty);
