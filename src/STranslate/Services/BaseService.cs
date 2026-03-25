@@ -258,13 +258,6 @@ public abstract partial class BaseService : ObservableObject, IDisposable
                     _serviceSettings.Save();
                 }
                 break;
-            case nameof(TranslationOptions.CopyAsPlainText):
-                if (svcSetting.Options != null && svc.Options != null)
-                {
-                    svcSetting.Options.CopyAsPlainText = svc.Options.CopyAsPlainText;
-                    _serviceSettings.Save();
-                }
-                break;
         }
     }
 

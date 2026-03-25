@@ -133,7 +133,6 @@ public partial class TranslationOptions : ObservableObject
     public partial bool TemporaryDisplay { get; set; } = false;
     [ObservableProperty] public partial bool AutoBackTranslation { get; set; } = false;
     [ObservableProperty] public partial bool MarkdownRender { get; set; } = false;
-    [ObservableProperty] public partial bool CopyAsPlainText { get; set; } = true;
 }
 
 /// <summary>
